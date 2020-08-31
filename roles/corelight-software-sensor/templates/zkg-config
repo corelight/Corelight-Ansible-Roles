@@ -1,0 +1,7 @@
+[sources]
+zeek = https://github.com/zeek/packages
+
+[paths]
+state_dir = /root/.zkg
+script_dir = /etc/corelight
+zeek_dist =

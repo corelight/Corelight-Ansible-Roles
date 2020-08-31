@@ -1,0 +1,5 @@
+main-vars.yml
+secrets.yml
+inventory.yml
+*.dat
+suricata.rules

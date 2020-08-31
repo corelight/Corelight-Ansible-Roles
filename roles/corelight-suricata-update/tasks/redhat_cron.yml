@@ -1,0 +1,17 @@
+---
+- name:           "redhat_cron: Install git"
+  yum:
+    name:         git
+    update_cache: yes
+    state:        latest
+
+- name:           "redhat_cron: Install ansible"
+  yum:
+    name:         ansible
+    state:        latest
+
+- name:           "redhat_cron: Install corelight-client"
+  pip:
+    name:         corelight-client
+    state:        latest
+    executable:   pip3

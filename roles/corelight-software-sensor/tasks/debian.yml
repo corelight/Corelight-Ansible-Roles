@@ -1,0 +1,73 @@
+---
+- name:           "debian: Install pip3"
+  apt:
+    name:         python3-pip
+    state:        latest
+
+- name:           "debian: Install git"
+  apt:
+    name:         git
+    state:        latest
+
+- name:           "debian: Install zkg"
+  pip:
+    name:         zkg
+    state:        latest
+
+- name:           "debian: Add repo key"
+  apt_key:
+    url:          https://{{ corelight_repo_url }}/signing.pub
+    state:        present
+
+- name:           "debian: Enable multiarch for Raspberry Pi"
+  lineinfile:
+    dest:         /var/lib/dpkg/arch
+    line:         "arm64"
+    create:       true
+    mode:         '0644'
+  when:
+    - ansible_facts['machine'] == 'aarch64'
+  register:       add_arm64
+
+- name:           "debian: Update apt cache after arm64 added to Raspbian"
+  apt:
+    update_cache: yes
+  when:           add_arm64.changed
+
+- name:           "debian: Update facts after arm64 added"
+  setup:
+  when:           add_arm64.changed
+
+- name:             "debian: Create Repository List"
+  template:
+    src:            corelight.list.j2
+    dest:           /etc/apt/sources.list.d/corelight.list
+    owner:          root
+    group:          root
+    mode:           '0644'
+  register:         repo
+
+- name:           "debian: Remove Corelight Software Sensor"
+  apt:
+    name:         corelight
+    update_cache: yes
+    state:        absent
+    purge:        yes
+  when:
+  - repo.changed
+
+- name:           "debian: Install Corelight Software Sensor arm64"
+  apt:
+    name:         corelight:arm64
+    update_cache: yes
+    state:        latest
+  when:
+  - ansible_facts['architecture'] == 'aarch64'
+
+- name:           "debian: Install Corelight Software Sensor x86_64"
+  apt:
+    name:         corelight
+    update_cache: yes
+    state:        latest
+  when:
+  - ansible_facts['architecture'] == 'x86_64'

@@ -1,0 +1,187 @@
+---
+- name:             "suricata-update-host: Install Suricata-update dependencies"
+  pip:
+    name:           pyyaml
+    executable:     pip3
+
+- name:             "suricata-update-host: Install Suricata-update"
+  pip:
+    name:           suricata-update
+    state:          latest
+    executable:     pip3
+  become:           no
+  register:         pip
+  when: 
+    - (ansible_distribution != 'CentOS' or ansible_distribution_major_version != '7')
+
+- debug:
+    msg:  "{{ pip.stdout_lines }}"
+  when: 
+    - (ansible_distribution != 'CentOS' or ansible_distribution_major_version != '7')
+
+- name:             "suricata-update-host CentOS7: Install Suricata-update"
+  pip:
+    name:           suricata-update
+    state:          latest
+    executable:     pip3
+    extra_args:     --upgrade --user
+  become:           no
+  register:         pip_centos
+  when: 
+    - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+
+- debug:
+    msg:  "{{ pip_centos.stdout_lines }}"
+  when: 
+    - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+
+- name:             "suricata-update-host: Make sure /var/corelight/suricata/ exists"
+  file:
+    path:           /var/corelight/suricata/
+    state:          directory
+    mode:           '0755'
+  become:           true
+
+- name:             "suricata-update-host: Make sure Suricata-update path exists"
+  file:
+    path:           "{{ suricata_update_path }}"
+    state:          directory
+    mode:           '0755'
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}"
+
+- name:             "suricata-update-host: Create Suricata-update config"
+  template:
+    src:            suricata-update.yaml.j2
+    dest:           "{{ suricata_update_path }}/update.yaml"
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}"
+    mode:           '0755'
+
+- name:             "suricata-update-host: Create Suricata-update disable config"
+  template:
+    src:            suricata-update-disable.conf.j2
+    dest:           "{{ suricata_update_path }}/disable.conf"
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}"
+    mode:           '0755'
+
+- name:             "suricata-update-host: Create Suricata-update enable config"
+  template:
+    src:            suricata-update-enable.conf.j2
+    dest:           "{{ suricata_update_path }}/enable.conf"
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}"
+    mode:           '0755'
+
+- name:             "suricata-update-host: Create Suricata-update modify config"
+  template:
+    src:            suricata-update-modify.conf.j2
+    dest:           "{{ suricata_update_path }}/modify.conf"
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}"
+    mode:           '0755'
+
+- name:             "suricata-update-host: Copy Suricata Custom Rule files to sensor"
+  copy:
+    src:            "{{ role_path }}/files/suricata_custom_rules/"
+    dest:           "{{ suricata_custom_rules_path }}"
+    mode:           0644
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}"
+  register:         results10
+
+- debug:
+    var:            results10.stdout_lines
+
+- name:             "suricata-update-host: Update Suricata-update Sources"
+  command:          $HOME/.local/bin/suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  changed_when:     false
+  become:           no
+
+- name:             "suricata-update-host: Collect list of enabled sources"
+  command:          $HOME/.local/bin/suricata-update list-enabled-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  register:         enabled_sources
+  changed_when:     false
+  become:           no
+
+- name:             "suricata-update-host: List of enabled sources"
+  debug:
+    var:            enabled_sources.stdout_lines
+
+- name:             "suricata-update-host: Enable remote sources with secret-codes"
+  command:          $HOME/.local/bin/suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  with_items:       "{{ enable_suricata_secret_code_sources|default([]) }}"
+  when:             'item.name not in enabled_sources.stdout'
+  no_log:           true
+  become:           no
+  register:         results4
+
+- debug:
+    var:            results4.stdout_lines
+
+- name:             "suricata-update-host: Enable remote sources without secret-codes"
+  command:          $HOME/.local/bin/suricata-update enable-source "{{ item }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  with_items:       "{{ enable_suricata_remote_sources|default([]) }}"
+  when:             'item not in enabled_sources.stdout'
+  become:           no
+  register:         results5
+
+- debug:
+    var:            results5.stdout_lines
+
+- name:             "suricata-update-host: Enable remote sources not in the index"
+  command:          $HOME/.local/bin/suricata-update add-source "{{ item.name }}" "{{ item.url }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  with_items:       "{{ enable_suricata_custom_url_sources|default([]) }}"
+  when:             'item.name not in enabled_sources.stdout'
+  become:           no
+  register:         results6
+
+- debug:
+    var:            results6.stdout_lines
+
+- name:             "suricata-update-host: Remove Suricata-update remote sources tasks"
+  include_tasks:    suricata-update-remove-source.yml
+  loop:             "{{ enabled_sources.stdout_lines | select('match', '^  - [a-z]') | list | regex_replace('  - ') }}"
+  when:
+    - 'item not in (enable_suricata_remote_sources|default([])|string)' 
+    - 'item not in (enable_suricata_secret_code_sources|default([])|string)'
+    - 'item not in (enable_suricata_custom_url_sources|default([])|string)'
+  register:         results7
+
+- debug:
+    var:            results7.stdout_lines
+
+# Suricata-update per version
+- name:             "suricata-update-host: Run Suricata-update for each version"
+  command:          $HOME/.local/bin/suricata-update  -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}" --no-reload --no-test
+  with_items:       "{{ suricata_versions }}"
+  become:           no
+  register:         results8
+  ignore_errors:    true
+
+- debug:
+    var:            results8.stdout_lines
+  ignore_errors:    true
+
+- name:             "suricata-update-host: Copy Suricata-update Rules to Corelight-Suricata Rule folder"
+  copy:
+    remote_src:     yes
+    src:            "{{ suricata_update_path }}/rules/{{ suricata_version }}/suricata.rules"
+    dest:           "{{ suricata_rule_path }}"
+    mode:           0644
+  when:
+    - ('suricata_update_host' not in group_names)
+  register:         results9
+
+- debug:
+    var:            results9.stdout_lines
+
+- name:             "suricata-update-host: Fetch new suricata.rules file"
+  fetch:
+    src:            "{{ suricata_update_path }}/rules/{{ item }}/suricata.rules"
+    dest:           "{{ role_path }}/files/{{ item }}/"
+    flat:           yes
+  with_items:       "{{ suricata_versions }}"

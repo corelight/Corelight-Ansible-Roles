@@ -1,0 +1,95 @@
+---
+- name:                     "cron_localhost: Set Cron Job Facts Block"
+  block:
+    - set_fact:
+        enable_cron_job:    absent
+      when:
+        - (enable_cron is false or suricata_update_enable != 'local')
+    - set_fact:
+        enable_cron_job:     present
+      when:
+        - enable_cron is true
+        - (suricata_update_enable == 'local' or suricata_update_host == 'localhost')
+  delegate_to:    localhost
+  run_once:       true
+
+- block:
+    - name:             "cron_localhost: Make sure Suricata-update/ansible path exists"
+      file:
+        path:           "{{ suricata_update_path }}/ansible"
+        state:          directory
+        mode:           '0755'
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+
+    - name:             "cron_localhost: Make sure Cron Job log path exists"
+      file:
+        path:           "{{ cron_job_log_path }}"
+        state:          directory
+        mode:           '0755'
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+
+    - name:             "cron_localhost: Clone Corelight Suricata-update Role Repo"
+      git:
+        repo:           https://github.com/corelight/Ansible-Suricata-update-cron-job.git
+        dest:           "{{ suricata_update_path }}/ansible"
+        force:          yes
+      become:           no
+
+    - name:             "cron_localhost: Make sure vars path exists"
+      file:
+        path:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars"
+        state:          directory
+        mode:           '0755'
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+
+    - name:             "cron_localhost: Copy Role vars"
+      copy:
+        src:            "{{ role_path }}/vars/main.yml"
+        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/main.yml"
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+        mode:           '0755'
+
+    - name:             "cron_localhost: Copy Inventory file"
+      copy:
+        src:            "{{ inventory_path }}"
+        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/inventory.yml"
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+        mode:           '0755'
+
+    - name:             "cron_localhost: Copy Secrets file"
+      copy:
+        src:            "{{ secrets_path }}"
+        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/secrets.yml"
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+        mode:           '0644'
+
+    - name:             "cron_localhost: Create Suricata-update cron file"
+      template:
+        src:            suricata-update-cron.j2
+        dest:           "{{ suricata_update_path }}/ansible/suricata-update-cron-job"
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+        mode:           u=rwx,g=rx,o=rx
+  when:
+    - enable_cron is true
+  delegate_to:    localhost
+  run_once:       true
+
+
+- name:               "cron_localhost: Ensure Suricata-update runs daily on Suricata-update host"
+  cron:
+    name:             suricata-update-all
+    hour:             "{{ cron_job_hour }}"
+    minute:           "{{ cron_job_minute }}"
+    cron_file:        suricata-update-cron-job
+    job:              "{{ suricata_update_path }}/ansible/suricata-update-cron-job"
+    user:             "{{ ansible_user }}"
+    state:            "{{ enable_cron_job }}"
+  delegate_to:    localhost
+  run_once:       true

@@ -1,0 +1,26 @@
+---
+- name:           "ubuntu_cron: Install required packages"
+  apt:
+    pkg:
+    - software-properties-common
+    - git
+    update_cache: yes
+    state:        latest
+
+- name:           "ubuntu_cron: Add Ansible Repository"
+  apt_repository:
+    repo:         'ppa:ansible/ansible'
+    update_cache: yes
+
+- name:           "ubuntu_cron: Install ansible"
+  apt:
+    name:         ansible
+    update_cache: yes
+    state:        latest
+    autoclean:    yes
+
+- name:           "ubuntu_cron: Install corelight-client"
+  pip:
+    name:         corelight-client
+    state:        latest
+    executable:   pip3

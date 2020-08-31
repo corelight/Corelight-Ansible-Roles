@@ -1,0 +1,18 @@
+---
+- name:             "suricata-update: Run Suricata-update"
+  command:          suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
+  with_items:       "{{ suricata_versions }}"
+  become:           no
+  register:         results1
+
+- debug:
+    var:          results1.stdout_lines
+  run_once:       true
+
+- name:             "suricata-update: Copy Suricata-update Rules to Corelight-Suricata Rule folder"
+  copy:
+    src:            "{{ suricata_update_path }}/rules/{{ suricata_version }}/suricata.rules"
+    dest:           "{{ suricata_rule_path }}"
+    mode:           0644
+  when:
+    - "'suricata_update_host' not in group_names"
