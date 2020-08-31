@@ -1,0 +1,12 @@
+{% for package in corelight_packages %}
+@load Corelight/{{ package }}
+{% if package == "ssh-inference" %}
+@load Corelight/ssh-inference/Corelight/ssh-inference
+{% endif %}
+{% endfor %}
+
+{% for package in included_packages %}
+@load packages/{{ package }}
+{% endfor %}
+
+@load /etc/corelight/packages

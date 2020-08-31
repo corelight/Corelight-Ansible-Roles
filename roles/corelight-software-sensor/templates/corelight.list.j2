@@ -1,0 +1,11 @@
+{% if ansible_facts['architecture'] == 'arm64' %}
+deb [arch=arm64] https://{{ corelight_repo_url }}/deb/{{ corelight_release_branch }} {{ ansible_distribution_release}} main 
+{% endif %}
+
+{% if ansible_facts['architecture'] == 'aarch64' %}
+deb [arch=arm64] https://{{ corelight_repo_url }}/deb/{{ corelight_release_branch }} {{ ansible_distribution_release}} main 
+{% endif %}
+
+{% if ansible_facts['architecture'] == 'x86_64' %}
+deb https://{{ corelight_repo_url }}/deb/{{ corelight_release_branch }} {{ ansible_distribution_release}} main 
+{% endif %}

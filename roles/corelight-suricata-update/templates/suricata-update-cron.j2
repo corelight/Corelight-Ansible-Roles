@@ -1,0 +1,1 @@
+ansible-playbook -i "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/inventory.yml" "{{ suricata_update_path }}/ansible/suricata-update-cron-play.yml" --extra-vars '{"target":"{{ cron_job_target }}"}' --extra-vars '@"{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/secrets.yml"' > "{{ cron_job_log_path }}/ansible-suricata-update.log"

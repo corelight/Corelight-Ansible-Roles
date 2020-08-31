@@ -1,0 +1,15 @@
+---
+- name:           "suricata-update-remove-source: Check if enabled source file exists"
+  stat:
+    path:         "{{ suricata_update_path }}/update/sources/{{ item | regex_replace('^([a-z]*)/(.*)$', '\\1-\\2') }}.yaml"
+  register:       enabled_source_file
+
+- name:           "suricata-update-remove-source: Check if disabled source file exists"
+  stat:
+    path:         "{{ suricata_update_path }}/update/sources/{{ item | regex_replace('^([a-z]*)/(.*)$', '\\1-\\2') }}.yaml.disabled"
+  register:       disabled_source_file
+
+- name:           "suricata-update-remove-source: Remove remote sources"
+  command:        $HOME/.local/bin/suricata-update remove-source "{{ item }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  when:           enabled_source_file.stat.exists or disabled_source_file.stat.exists
+  become:         no

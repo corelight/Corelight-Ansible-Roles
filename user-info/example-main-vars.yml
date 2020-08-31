@@ -1,0 +1,64 @@
+---
+### This file should be renamed to 'main-vars.yml' ###
+
+# Only changes from the default variables need to be listed here
+
+secrets_path:                           "../../../user-info/secrets.yml"
+inventory_path:                         "../../../user-info/inventory.yml"
+main_vars_path:                         "../../../user-info/main-vars.yml"
+# path to secrets file password file should be in the secrets file
+secrets_pswd_file:                    "/secret file name in a secret location"
+
+
+#### Package Management ####
+
+corelight_packages:
+  - ssh-inference
+  - ConnViz
+  - CommunityID
+
+included_packages:
+  - bro-long-connections
+  - conn-burst
+  - unknown-mime-type-discovery
+  - bro-simple-scan
+  - hassh
+  - ja3
+
+zeek_packages:
+  - name:                 "icannTLD"
+    path:                 "corelight/icannTLD"
+  - name:                 "CVE-2020-5902-F5BigIP"
+    path:                 "https://github.com/corelight/CVE-2020-5902-F5BigIP"
+
+#zeek_packages to upgrade
+upgrade_packages:
+  - name:                 "corelight/icannTLD"
+
+#zeek_packages to remove
+remove_packages:
+  - name:                   "corelight/bro-drwatson"
+
+
+# Suricata-update Cron Job Variables
+create_cron_job_only:                   false     # true or false, if set to true only tasks to create/update the cron job will run
+enable_cron:                            true      # true or false, to enable the cron job on the cron_job_host
+cron_job_target:                        all       # name of the group or host sensor for Suricata-update to update the rules on
+cron_job_host:                          host1     # name of the group or name of a host to run the cron job on
+
+# Suricata-update Variables
+suricata_update_host: host1
+
+enable_suricata_remote_sources:
+  - 'sslbl/ssl-fp-blacklist'
+
+enable_suricata_custom_url_sources:
+  - name: 'abuse.ch-URLhaus-IDS'
+    url: 'https://urlhaus.abuse.ch/downloads/urlhaus_suricata.tar.gz'
+
+enable_rules:
+  - 2019401
+  - re:heartbleed
+
+modify_rules:
+  - 2019401 "seconds \d+" "seconds 3600"

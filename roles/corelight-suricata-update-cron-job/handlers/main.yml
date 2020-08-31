@@ -1,0 +1,6 @@
+---
+- name:           Reload Suricata rules
+  shell:          kill -USR2 $(pidof corelight-suricata)
+  args:
+    executable:   /bin/bash
+  become:         yes

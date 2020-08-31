@@ -1,0 +1,137 @@
+---
+
+# pexpect is used to run commands are respond to prompts
+- name:             "software_sensor_common: Install pexpect"
+  pip:
+    name:           pexpect
+
+- name:             "software_sensor_common: Install zkg dependencies"
+  pip:
+    name:
+      - gitpython
+      - semantic_version
+      - btest
+      - configparser
+    extra_args:     --user
+    executable:     pip3
+
+
+- name:             "software_sensor_common: Create corelight.cfg"
+  template:
+    src:            corelight.cfg.j2
+    dest:           /etc/corelight.cfg
+    owner:          root
+    group:          root
+  notify:           restart software sensor
+
+- name:             "software_sensor_common: Create local.zeek"
+  template:
+    src:            local.zeek.j2
+    dest:           /etc/corelight/local.zeek
+    owner:          root
+    group:          root
+  notify:           restart software sensor
+
+- name:             "software_sensor_common: Create /root/.zkg if it does not exist"
+  file:
+    path:           /root/.zkg
+    owner:          root
+    group:          root
+    mode:           '0755'
+    state:          directory
+
+- name:             "software_sensor_common: Copy zkg config to sw-sensor"
+  copy:
+    src:            ../templates/zkg-config
+    dest:           /root/.zkg/config
+    mode:           0644
+  notify:           restart software sensor
+
+- name:             "software_sensor_common: License the sensor"
+  template:
+    src:            corelight-license.txt.j2
+    dest:           /etc/corelight-license.txt
+    owner:          root
+    group:          root
+    mode:           644
+  notify:           restart software sensor
+
+- name:             "software_sensor_common: Copy Input Framework files to sensor"
+  copy:
+    src:            "{{ role_path }}/files/input_files/"
+    dest:           /etc/corelight/input_files/
+    mode:           0644
+
+- name:             "software_sensor_common: Copy Suricata Rule files to sensor"
+  copy:
+    src:            "{{ role_path }}/files/suricata_custom_rules/"
+    dest:           "{{ suricata_rule_path }}"
+    mode:           0644
+  when:
+    - suricata_enable == 'T'
+    - suricata_update_enable == 'disable'
+
+- name:             "software_sensor_common: Refresh Script Index"
+  command:          zkg refresh
+  changed_when:     false
+
+- name:             "software_sensor_common: Collect list of installed scripts"
+  command:          zkg list
+  register:         installed_scripts
+  changed_when:     false
+
+- debug:
+    var:            installed_scripts.stdout_lines
+
+- name:             "software_sensor_common: Install Scripts"
+  expect:
+    command:        zkg install --skiptests "{{ item.path }}"
+    responses:
+      Proceed(.*):  "y"
+  with_items:       "{{ zeek_packages }}"
+  when:
+    - 'zeek_packages != None'
+    - 'item.name not in installed_scripts.stdout'
+  changed_when:     false
+
+- name:             "software_sensor_common: Remove Scripts"
+  expect:
+    command:        zkg remove "{{ item.name }}"
+    responses:
+      Proceed(.*):  "y"
+  with_items:       "{{ remove_packages }}"
+  when:
+    - 'remove_packages != None'
+    - 'item.name in installed_scripts.stdout'
+  changed_when:     false
+
+- name:             "software_sensor_common: Upgrade Scripts"
+  expect:
+    command:        zkg upgrade --skiptests "{{ item.name }}"
+    responses:
+      Proceed(.*):  "y"
+  with_items:       "{{ upgrade_packages }}"
+  when:
+    - 'upgrade_packages != None'
+    - 'item.name in installed_scripts.stdout'
+  changed_when:     false
+
+- name:             "software_sensor_common: Collect upgrade results"
+  command:          zkg list
+  changed_when:     false
+  register:         post_installed_scripts
+
+- name:             "software_sensor_common: Start and Enable Corelight Software Sensor"
+  service:
+    name:           corelight
+    state:          started
+    enabled:        yes
+    daemon-reload:  yes
+
+- name:             "software_sensor_common: Restart after install/remove/upgrade"
+  debug:
+    msg:            "A script was installed/removed/upgraded, corelight restart required"
+  when:
+    - installed_scripts.stdout != post_installed_scripts.stdout
+  changed_when:     installed_scripts.stdout != post_installed_scripts.stdout
+  notify:           restart software sensor

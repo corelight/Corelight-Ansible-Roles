@@ -1,0 +1,155 @@
+---
+- name:             Load vars
+  include_vars:
+    file:           '{{ item }}'
+  with_items:
+    - "{{ secrets_path }}"
+    - "{{ main_vars_path }}"
+
+- name:             "main: Gather localhost facts"
+  setup:
+  delegate_to:      localhost
+  run_once:         true
+
+- name:             "main: Gather Software Sensor facts"
+  setup:
+  ignore_errors:    true
+  when:
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - "suricata_update_enable != 'disabled'"
+
+- name:           "main: Install pip3 on Debian"
+  apt:
+    name:         python3-pip
+    state:        latest
+  when:
+    - "suricata_update_enable == 'local'"
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - "ansible_os_family == 'Debian'"
+    - create_cron_job_only is false
+
+- name:           "main: Install pip3 on RHEL"
+  yum:
+    name:         python3-pip
+    state:        latest
+  when:
+    - "suricata_update_enable == 'local'"
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - "ansible_os_family == 'RedHat'"
+    - create_cron_job_only is false
+
+- name:           "CentOS7: Enable CentOS Extra repos"
+  yum:
+    name:         epel-release
+    state:        latest
+  when: 
+    - "suricata_update_enable == 'local'"
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+    - create_cron_job_only is false
+
+- name:           "CentOS7: Install python-setuptools"
+  yum:
+    name:         python-setuptools
+    state:        latest
+  when: 
+    - "suricata_update_enable == 'local'"
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+    - create_cron_job_only is false
+
+- name:           "CentOS7: Install pip2"
+  yum:
+    name:         python-pip
+    state:        latest
+  when: 
+    - "suricata_update_enable == 'local'"
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+    - create_cron_job_only is false
+
+- name:             "main: Make sure the Corelight-client is installed on localhost"
+  pip:
+    name:           corelight-client
+    state:          latest
+    executable:     pip3
+  delegate_to:      localhost
+  run_once:         true
+
+- name:             "main: Include collect suricata version tasks"
+  include_tasks:    ./collect_suricata_versions.yml
+  when:
+    - (suricata_update_enable == 'remote' or (suricata_update_host == inventory_hostname and 'software_sensors' in group_names))
+    - create_cron_job_only is false
+
+- name:             "main: Include suricata-update-localhost tasks"
+  include_tasks:    ./suricata-update-localhost.yml
+  run_once:         true
+  when:
+    - "suricata_update_host == inventory_hostname"
+    - "ansible_connection == 'local'"
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - create_cron_job_only is false
+
+- name:             "main: Include suricata-update-host tasks"
+  include_tasks:    ./suricata-update-host.yml
+  when:
+    - "suricata_update_host == inventory_hostname"
+    - "suricata_update_enable == 'local'"
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (ansible_os_family == 'RedHat' or ansible_os_family == 'Debian')
+    - create_cron_job_only is false
+
+- name:             "main: Include suricata-update-local tasks"
+  include_tasks:    ./suricata-update-local.yml
+  when:
+    - "suricata_update_host != inventory_hostname"
+    - "suricata_update_enable == 'local'"
+    - "'software_sensors' in group_names"
+    - "'suricata_update_host' not in group_names"
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - create_cron_job_only is false
+
+- name:             "main: Include Suricata Rules Clients Tasks"
+  include_tasks:    ./suricata-rules-clients.yml
+  when:
+    - "suricata_update_enable == 'remote'"
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - create_cron_job_only is false
+
+- name:             "main: Message"
+  debug:
+    msg:            "Cron Job Tasks"
+  run_once:         true
+  when: do_cron is true
+
+- name:             "main: Include Cron Job Tasks for localhost"
+  include_tasks:    ./cron_localhost.yml
+  when:
+    - "cron_job_host == 'localhost'"
+    - "suricata_update_host != 'localhost'"
+    - do_cron is true
+
+- name:             "main: Warning"
+  debug:
+    msg:            "cron_job_host and cron_job_target both equal all - NO cron job will be created"
+  when:
+    - "cron_job_host == 'all'"
+    - "cron_job_target == 'all'"
+    - do_cron is true
+
+- name:             "main: Include Cron Job Tasks for suricata_update_host"
+  include_tasks:    ./cron_update_host.yml
+  when:
+    - (cron_job_host == inventory_hostname or (cron_job_host == 'all' and cron_job_target != 'all'))
+    - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
+    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
+    - do_cron is true

@@ -1,0 +1,196 @@
+# You only need to set the following value if the hostname the system has already is
+# not an acceptable name to use in the logs and other export locations.
+#Corelight::system_name       corelight-sniff01
+{% if enable_custom_system_name == 'T' %}
+Corelight::system_name                              {{ corelight_system_name }}
+{% endif %}
+
+# Below is an example "sniff" option.  Interfaces are separated with commas and the number
+# of workers is optionally specified after the interface with a tilde (~).
+# If the "corelight" process is already started, once this option is configured, the cluster
+# will automatically start up. You don't need to take any additional action.
+#Corelight::sniff             eth0~4,eth1~2
+Corelight::sniff                                    {{ sniff_interfaces }}~{{ num_workers }}
+
+# You likely don't want to change this. By default, the packaged (RPM/DEB) versions of
+# the Corelight Software Sensor create this location.
+Corelight::disk_space                               {{ corelight_disk_space }}
+
+# If you would like to avoid sharing stats with Corelight for debugging and health
+# monitoring purposes, change this value to "F".
+Corelight_Cloud::share_stats                        {{ corelight_share_stats }}
+
+# Local networks
+Site::local_nets                                    {{ local_networks }}
+
+# Zeek script(s) to load. This can normally be left alone and you can edit the local.zeek
+# script to load additional scripts.
+Corelight::load_scripts                             {{ load_scripts }}
+
+# A BPF filter of traffic that you would like to ignore.
+Corelight::ignore_bpf                               {{ ignore_bpf }}
+
+# The amount of memory in Megabytes that you'd like to set as a maximum allowed per process.
+# This can prevent accidental script mistakes or unexpected side effects from completely taking
+# over all memory on your system.
+Corelight::memory_limit_mb                          {{ memory_limit }}
+
+
+#####################
+# Suricata Settings #
+#####################
+
+# Enable or disable Suricata
+Suricata::enable                                    {{ suricata_enable }}
+
+# The directory where your rule files are stored.
+Suricata::rule_path                                 {{ suricata_rule_path }}
+
+# A list of rules to load from the Suricata::rule_path directory.
+Suricata::rule_files                                {{ suricata_rule_files }}
+
+#############################################
+# Analyzer Specific Settings                #
+#############################################
+
+### WARNING!  This is a beta feature! ###
+# Enable the beta archive expansion plugin.
+# This will cause Zeek to dig further into archive files likes Zips and # tar.gz.
+Corelight::archive_expand_enable                    {{ archive_expand_enable }}
+
+#############################################
+# Streaming Exporter configs are below here #
+#############################################
+
+# JSON into Splunk's HEC (HTTP Event Collector) API
+Corelight::hec_enable                               {{ hec_enable }}
+Corelight::hec_url                                  {{ hec_url }}
+Corelight::hec_token                                {{ hec_token }}
+Corelight::hec_sourcetype_prefix                    {{ hec_sourcetype_prefix }}
+Corelight::hec_verify_cert                          {{ hec_verify_cert }}
+
+# JSON to a Kafka server
+Corelight::kafka_enable                             {{ kafka_enable }}
+Corelight::kafka_servers                            {{ kafka_servers }}
+Corelight::kafka_topic_prefix                       {{ kafka_topic_prefix }}
+Corelight::kafka_enable_ssl                         {{ kafka_enable_ssl }}
+Corelight::kafka_sasl_username                      {{ kafka_sasl_username }}
+Corelight::kafka_sasl_password                      {{ kafka_sasl_password }}
+Corelight::kafka_ssl_ca_location                    {{ kafka_ssl_ca_location }}
+
+# JSON over TCP export
+Corelight::json_enable                              {{ json_enable }}
+Corelight::json_server                              {{ json_server }}
+
+# JSON over TCP syslog export
+Corelight::syslog_enable                            {{ syslog_enable }}
+Corelight::syslog_server                            {{ syslog_server}}
+# This is a lower case syslog priority
+Corelight::syslog_facility                          {{ syslog_facility }}
+# This is a lower case syslog severity
+Corelight::syslog_severity                          {{ syslog_severity }}
+# Valid optons are rfc5424_octet_framing, rfc5424_non_transparent, or rfc3164
+Corelight::syslog_format                            {{ syslog_format }}
+
+# JSON to a redis server.  This can only use the RPUSH command right now.
+Corelight::redis_enable                             {{ redis_enable }}
+Corelight::redis_host                               {{ redis_host }}
+Corelight::redis_port                               {{ redis_port }}
+Corelight::redis_password                           {{ redis_password}}
+# A string that will be prepended to the path name.  If you don't want it, you can leave this field blank.
+Corelight::redis_key_prefix                         {{ redis_key_prefix }}
+
+####################################
+# Batch Log configs are below here #
+####################################
+
+# Global settings for batch logs
+# This group of settings is not dynamic at the moment and the software sensor must
+# be restarted in order to apply them.
+Corelight::batch_log_format                         {{ batch_log_format }}
+Corelight::batch_log_rotation_interval              {{ batch_log_rotation_interval }}
+Corelight::batch_log_gzip                           {{ batch_log_gzip }}
+
+# Rotate logs to a more permanent on the file system.
+Corelight::batch_log_disk_enable                    {{ batch_log_disk_enable }}
+# If this is a complete path it will extract there, if relative, it will extract to local disk
+# area that was given to the Software Sensor.
+Corelight::batch_log_disk_path                      {{ batch_log_disk_path }}
+# Enable this to make the software sensor automatically maintain disk utilization.
+Corelight::batch_log_disk_cleanup_enable            {{ batch_log_disk_cleanup_enable }}
+# Keep disk usage at the specified log storage location under a specified percentage.
+Corelight::batch_log_disk_cleanup_pct_max           {{ batch_log_disk_cleanup_pct_max }}
+
+# Batch log export over SFTP/SCP
+Corelight::batch_log_ssh_enable                     {{ batch_log_ssh_enable }}
+# Following options are "sftp" or "scp".
+Corelight::batch_log_ssh_mode                       {{ batch_log_ssh_mode }}
+Corelight::batch_log_ssh_server                     {{ batch_log_ssh_server }}
+Corelight::batch_log_ssh_port                       {{ batch_log_ssh_port }}
+Corelight::batch_log_ssh_user                       {{ batch_log_ssh_user }}
+# Leave this empty is doing key based authentication
+Corelight::batch_log_ssh_password                   {{ batch_log_ssh_password}}
+# Point to a privkey file on disk or encode the privkey directy in this variable hex escaped. (i.e. \xFF)
+Corelight::batch_log_ssh_privkey                    {{ batch_log_ssh_privkey }}
+# Leave this empty if the key has no passphrase
+Corelight::batch_log_ssh_privkey_passphrase         {{ batch_log_ssh_privkey_passphrase }}
+# Path on the remote file system to write logs.  If relative path given, it will be relative to remote users home dir..
+Corelight::batch_log_ssh_path                       {{ batch_log_ssh_path }}
+
+#########################################
+# Extracted File configs are below here #
+#########################################
+
+# Global settings for extracted files
+Corelight::extracted_files_max_bytes                {{ extracted_files_max_bytes }}
+# This is an additional way to provide a way to limit files that get extracted based on the "Corelight Filter Language"
+#   Documentation for this variable and the language is forthcoming.
+Corelight::extracted_files_filter                   {{ extracted_files_filter }}
+
+# Global settings to define the types of files to extract.
+# MIME types supported by Zeek can be seen here: https://github.com/zeek/zeek/tree/master/scripts/base/frameworks/files/magic
+# Specify desired mimetypes as a comma separated list and here is an example below:
+#Corelight::extracted_files_mime_types             image/jpeg,text/html
+Corelight::extracted_files_mime_types               {{ extracted_files_mime_types }}
+# These are groups of mimetypes and are added to any mime types above.
+Corelight::extracted_files_group_archives           {{ extracted_files_group_archives }}
+Corelight::extracted_files_group_executables        {{ extracted_files_group_executables }}
+Corelight::extracted_files_group_flash              {{ extracted_files_group_flash }}
+Corelight::extracted_files_group_java               {{ extracted_files_group_java }}
+Corelight::extracted_files_group_office_documents   {{ extracted_files_group_office_documents }}
+Corelight::extracted_files_group_pdfs               {{ extracted_files_group_pdfs }}
+
+# Extracted file export to local file system
+Corelight::extracted_files_disk_enable              {{ extracted_files_disk_enable }}
+# If this is a complete path it will extract there, if relative, it will extract to local disk
+# area that was given to the Software Sensor.
+Corelight::extracted_files_disk_directory           {{ extracted_files_disk_directory }}
+# Enable this to make the software sensor automatically maintain disk utilization.
+Corelight::extracted_files_disk_cleanup_enable      {{ extracted_files_disk_cleanup_enable }}
+# Keep disk usage at the specified file extraction location under a specified percentage.
+Corelight::extracted_files_disk_cleanup_pct_max     {{ extracted_files_disk_cleanup_pct_max }}  
+
+# Extracted file export over SFTP/SCP
+Corelight::extracted_files_ssh_enable               {{ extracted_files_ssh_enable }}
+# Following options are "sftp" or "scp".
+Corelight::extracted_files_ssh_mode                 {{ extracted_files_ssh_mode }}
+Corelight::extracted_files_ssh_server               {{ extracted_files_ssh_server }}
+Corelight::extracted_files_ssh_port                 {{ extracted_files_ssh_port }}
+Corelight::extracted_files_ssh_user                 {{ extracted_files_ssh_user }}
+# Leave this empty is doing key based authentication
+Corelight::extracted_files_ssh_password             {{ extracted_files_ssh_password }}
+# Point to a privkey file on disk or encode the privkey directy in this variable hex escaped. (i.e. \xFF)
+Corelight::extracted_files_ssh_privkey              {{ extracted_files_ssh_privkey }}
+# Leave this empty if the key has no passphrase
+Corelight::extracted_files_ssh_privkey_passphrase   {{ extracted_files_ssh_privkey_passphrase }}
+Corelight::extracted_files_ssh_path                 {{ extracted_files_ssh_path }}
+
+###############################
+# Metrics Data Export config  #
+###############################
+
+# Prometheus metrics export
+CorelightMetrics::prometheus_enable                 {{ prometheus_enable }}
+# Set to T in order to produce metrics per process instead of overall totals.
+CorelightMetrics::prometheus_metrics_per_process    {{ prometheus_metrics_per_process }}
+CorelightMetrics::prometheus_listen                 {{ prometheus_listen }}

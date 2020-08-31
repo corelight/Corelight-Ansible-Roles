@@ -1,0 +1,42 @@
+- name:                 Add relevant sensors to suricata_remote group
+  group_by:
+    key:                suricata_remote
+
+- name:                 Collect physical or virtual sensor Suricata version
+  command:              corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
+  register:             suricata_status
+  delegate_to:          localhost
+  when:
+    - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+
+- name:                 Collect software sensor Suricata version
+  include_tasks:        "{{ role_path }}/tasks/collect-suricata-sw-versions.yml"
+  when:
+    - "'software_sensors' in group_names"
+
+- name:                 Set Version Facts
+  set_fact:
+    suricata_version:   "{{ suricata_status.stdout_lines | select('match', '^(.)*?version') | list | regex_replace('[^0-9]*([0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2})(.+)$', '\\1') }}"
+    cacheable:          yes
+
+- name:                 Write Suricata Versions to file
+  template:
+    src:                suricata_versions.j2
+    dest:               "{{ role_path }}/vars/suricata_version_facts.json"
+    mode:               0644
+  delegate_to:          localhost
+  run_once:             true
+
+- include_vars:
+    file:               "{{ role_path }}/vars/suricata_version_facts.json"
+
+- name:                 Remove duplicate versions
+  set_fact:
+    suricata_versions:  "{{ hostvars[inventory_hostname]['suricata_versions'] | unique }}"
+  delegate_to:          localhost
+  run_once:             true
+
+- name:                 Suricata versions
+  debug:
+    msg:                "{{ suricata_versions }}"
+  run_once:             true
