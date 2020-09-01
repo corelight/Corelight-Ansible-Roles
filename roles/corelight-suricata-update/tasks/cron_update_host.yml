@@ -51,7 +51,7 @@
 
     - name:             "cron_update_host: Clone Corelight Suricata-update Role Repo"
       git:
-        repo:           https://github.com/corelight/Ansible-Suricata-update-cron-job.git
+        repo:           https://github.com/corelight/Corelight-Ansible-Roles.git
         dest:           "{{ suricata_update_path }}/ansible"
         force:          yes
       become:           no
@@ -65,7 +65,7 @@
 
     - name:             "cron_update_host: Make sure vars path exists"
       file:
-        path:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars"
+        path:           "{{ suricata_update_path }}/ansible/common-user-provided-info"
         state:          directory
         mode:           '0755'
         owner:          "{{ ansible_user }}"
@@ -74,7 +74,7 @@
     - name:             "cron_update_host: Copy Role vars"
       copy:
         src:            "{{ main_vars_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/main.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common-user-provided-info/main-vars.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -82,7 +82,7 @@
     - name:             "cron_update_host: Copy Inventory file"
       copy:
         src:            "{{ inventory_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/inventory.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common-user-provided-info/inventory.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -90,7 +90,7 @@
     - name:             "cron_update_host: Copy Secrets file"
       copy:
         src:            "{{ secrets_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/secrets.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common-user-provided-info/secrets.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -109,7 +109,7 @@
     - name:             "cron_update_host: Create Suricata-update cron file"
       template:
         src:            suricata-update-cron.j2
-        dest:           "{{ suricata_update_path }}/ansible/suricata-update-cron-job"
+        dest:           "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           u=rwx,g=rx,o=rx
@@ -122,8 +122,8 @@
     name:             suricata-update-all
     hour:             "{{ cron_job_hour }}"
     minute:           "{{ cron_job_minute }}"
-    cron_file:        suricata-update-cron-job
-    job:              "{{ suricata_update_path }}/ansible/suricata-update-cron-job"
+    cron_file:        corelight-suricata-update-cron-job
+    job:              "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
     user:             "{{ ansible_user }}"
     state:            "{{ enable_cron_job }}"
   when:

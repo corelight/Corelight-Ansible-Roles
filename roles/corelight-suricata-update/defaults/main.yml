@@ -6,7 +6,7 @@ UID:
 ### Cron Job Variables ###
 # To enable the cron job on any system other than localhost,
 # the target system MUST have 'suricata_update_enable' set to 'local'.
-create_cron_job_only:                   false     # true or false, if set to true Suricata-update will not run
+only_perform_cron_job_tasks:                   false     # true or false, if set to true Suricata-update will not run
 enable_cron:                            false     # true or false
 cron_job_hour:                          "0"       # 0-23
 cron_job_minute:                        "0"       # 0-59
@@ -14,10 +14,10 @@ cron_job_target:                        all       # name of the group or host se
 cron_job_target_type:                   group     # group or host
 cron_job_host:                          localhost # name of the group or name of a host **ONLY USE 'localhost' WHEN ANSIBLE AND SURICATA-UPDATE ARE ON SEPERATE HOSTS
 cron_job_log_path:                      "{{ suricata_update_path }}/logs"
-secrets_path:                           "../../../user-info/secrets.yml"
-inventory_path:                         "../../../user-info/inventory.yml"
-main_vars_path:                         "../../../user-info/main-vars.yml"
-do_cron: true
+secrets_path:                           "../../../common-user-provided-info/secrets.yml"
+inventory_path:                         "../../../common-user-provided-info/inventory.yml"
+main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
+perform_cron_job_tasks: true
 #### Suricata Variables ####
 
 # Suricata Settings

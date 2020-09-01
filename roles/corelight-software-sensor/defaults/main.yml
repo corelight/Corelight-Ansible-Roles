@@ -1,7 +1,7 @@
 ---
-secrets_path:                           "../../../user-info/secrets.yml"
-inventory_path:                         "../../../user-info/inventory.yml"
-main_vars_path:                         "../../../user-info/main-vars.yml"
+secrets_path:                           "../../../common-user-provided-info/secrets.yml"
+inventory_path:                         "../../../common-user-provided-info/inventory.yml"
+main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
 
 corelight_repo_url:
 corelight_release_branch:               stable
