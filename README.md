@@ -6,20 +6,24 @@ Common user provided information and variables are expected to be in the folder 
 
 The Software Sensor Role will install, configure and license the Corelight Software Sensor on any Linux system, including Raspberry Pis.
 
-    - For a complete list of Software Sensor configuration options, see corelight-software-sensor/templates/corelight.cfg.j2
-    - For a complete list of variables, see corelight-software-sensor/defaults/main.yml
-    - If Suricata is enabled and Suricata-update is not used, the custom Suricata rule files to be used (if any) need to be located in the 'files/suricata_custom_rules/' folder.
-    - For more details, see corelight-software-sensor/README.md
+```none
+- For a complete list of Software Sensor configuration options, see corelight-software-sensor/templates/corelight.cfg.j2
+- For a complete list of variables, see corelight-software-sensor/defaults/main.yml
+- If Suricata is enabled and Suricata-update is not used, the custom Suricata rule files to be used (if any) need to be located in the 'files/suricata_custom_rules/' folder.
+- For more details, see corelight-software-sensor/README.md
+```
 
 ## corelight-suricata-update Role
 
 The Suricata-update Role will install, configure and manage rule sources for ALL Suricata enabled Corelight Sensors, including Enterprise Sensors.
 
-    - This role will detect the Corelight-Suricata version in use on all sensors and run Suricata-update for each unique version
-    - This role will also setup and manage a Cron Job, on any Linux system, to update the Suricata rules daily
-    - **Suricata-update will run as the Ansible User, NOT as Root**
-    - For a complete list of variables, see corelight-suricata-update/defaults/main.yml
-    - For more details, see corelight-suricata-update/README.md
+```none
+- This role will detect the Corelight-Suricata version in use on all sensors and run Suricata-update for each unique version
+- This role will also setup and manage a Cron Job, on any Linux system, to update the Suricata rules daily
+- **Suricata-update will run as the Ansible User, NOT as Root**
+- For a complete list of variables, see corelight-suricata-update/defaults/main.yml
+- For more details, see corelight-suricata-update/README.md
+```
 
 ## Corelight-suricata-update-cron-job
 
@@ -167,7 +171,6 @@ enable_suricata_secret_code_sources:
 - All sensors need to be placed into groups.
   - A parent group called 'sensors' with child groups for the different type of sensors. (software_sensors, physical_sensors, virtual_sensors)
   - If using a stand-alone host for Suricata-update, the host should be placed in a parent group called 'suricata_update_host'.
-
 
 ## Example Inventory file - (this is just one of several possible inventory file formats)
 
