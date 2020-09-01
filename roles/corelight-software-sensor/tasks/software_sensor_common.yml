@@ -69,7 +69,7 @@
     mode:           0644
   when:
     - suricata_enable == 'T'
-    - suricata_update_enable == 'disable'
+    - suricata_update_enable == 'disabled'
 
 - name:             "software_sensor_common: Refresh Script Index"
   command:          zkg refresh

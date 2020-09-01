@@ -6,7 +6,7 @@ UID:
 ### Cron Job Variables ###
 # To enable the cron job on any system other than localhost,
 # the target system MUST have 'suricata_update_enable' set to 'local'.
-only_perform_cron_job_tasks:                   false     # true or false, if set to true Suricata-update will not run
+only_perform_cron_job_tasks:            false     # true or false, if set to true Suricata-update will not run
 enable_cron:                            false     # true or false
 cron_job_hour:                          "0"       # 0-23
 cron_job_minute:                        "0"       # 0-59
