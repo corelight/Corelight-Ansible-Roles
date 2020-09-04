@@ -1,14 +1,15 @@
 ---
-secrets_path:                           "../../../common-user-provided-info/secrets.yml"
-inventory_path:                         "../../../common-user-provided-info/inventory.yml"
-main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
 
 corelight_repo_url:
 corelight_release_branch:               stable
 
+sensor_update_only:                     false
 #### Corelight-Suricata Variables ####
 # Corelight-Suricata Settings
-suricata_enable:                        F
+suricata_enable:                        false
 # Use Suricata-update should be set in the inventory file for each sensor.
   # options are:
   # local = use suricata-update in this ansible role
@@ -81,7 +82,7 @@ archive_expand_enable:                  F
 hec_enable:                             F
 hec_url:                                https://mysplunk.com:8088/services/collector
 hec_token:
-hec_sourcetype_prefix:
+hec_sourcetype_prefix:                  corelight_
 hec_verify_cert:                        F
 
 # Kafka Configuration

@@ -3,9 +3,9 @@
 
 # Only changes from the default variables need to be listed here
 
-secrets_path:                           "../../../common-user-provided-info/secrets.yml"
-inventory_path:                         "../../../common-user-provided-info/inventory.yml"
-main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
 # path to secrets file password file should be in the secrets file
 secrets_pswd_file:                    "/secret file name in a secret location"
 

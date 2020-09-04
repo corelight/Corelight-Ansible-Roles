@@ -1,7 +1,10 @@
 ---
-secrets_path:                           "../../../common-user-provided-info/secrets.yml"
-inventory_path:                         "../../../common-user-provided-info/inventory.yml"
-main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
+
+# Corelight-Suricata Settings
+suricata_enable:                        false
 
 # fleet_managed enable or disable
 fleet_managed:                          disable

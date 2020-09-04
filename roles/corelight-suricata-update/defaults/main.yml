@@ -11,14 +11,15 @@ enable_cron:                            false     # true or false
 cron_job_hour:                          "0"       # 0-23
 cron_job_minute:                        "0"       # 0-59
 cron_job_target:                        all       # name of the group or host sensor for Suricata-update
-cron_job_target_type:                   group     # group or host
 cron_job_host:                          localhost # name of the group or name of a host **ONLY USE 'localhost' WHEN ANSIBLE AND SURICATA-UPDATE ARE ON SEPERATE HOSTS
 cron_job_log_path:                      "{{ suricata_update_path }}/logs"
-secrets_path:                           "../../../common-user-provided-info/secrets.yml"
-inventory_path:                         "../../../common-user-provided-info/inventory.yml"
-main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
 perform_cron_job_tasks: true
 #### Suricata Variables ####
+# Corelight-Suricata Settings
+suricata_enable:                        false
 
 # Suricata Settings
 suricata_rule_path:                     /etc/corelight/rules
