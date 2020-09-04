@@ -85,13 +85,13 @@
   run_once:         true
 
 - name:             "main: Include collect suricata version tasks"
-  include_tasks:    ./collect_suricata_versions.yml
+  include_tasks:    collect_suricata_versions.yml
   when:
     - (suricata_update_enable == 'remote' or (suricata_update_host == inventory_hostname and 'software_sensors' in group_names))
     - only_perform_cron_job_tasks is false
 
 - name:             "main: Include suricata-update-localhost tasks"
-  include_tasks:    ./suricata-update-localhost.yml
+  include_tasks:    suricata-update-localhost.yml
   run_once:         true
   when:
     - "suricata_update_host == inventory_hostname"
@@ -100,7 +100,7 @@
     - only_perform_cron_job_tasks is false
 
 - name:             "main: Include suricata-update-host tasks"
-  include_tasks:    ./suricata-update-host.yml
+  include_tasks:    suricata-update-host.yml
   when:
     - "suricata_update_host == inventory_hostname"
     - "suricata_update_enable == 'local'"
@@ -109,7 +109,7 @@
     - only_perform_cron_job_tasks is false
 
 - name:             "main: Include suricata-update-local tasks"
-  include_tasks:    ./suricata-update-local.yml
+  include_tasks:    suricata-update-local.yml
   when:
     - "suricata_update_host != inventory_hostname"
     - "suricata_update_enable == 'local'"
@@ -119,7 +119,7 @@
     - only_perform_cron_job_tasks is false
 
 - name:             "main: Include Suricata Rules Clients Tasks"
-  include_tasks:    ./suricata-rules-clients.yml
+  include_tasks:    suricata-rules-clients.yml
   when:
     - "suricata_update_enable == 'remote'"
     - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
@@ -132,7 +132,7 @@
   when: perform_cron_job_tasks is true
 
 - name:             "main: Include Cron Job Tasks for localhost"
-  include_tasks:    ./cron_localhost.yml
+  include_tasks:    cron_localhost.yml
   when:
     - "cron_job_host == 'localhost'"
     - "suricata_update_host != 'localhost'"
@@ -147,7 +147,7 @@
     - perform_cron_job_tasks is true
 
 - name:             "main: Include Cron Job Tasks for suricata_update_host"
-  include_tasks:    ./cron_update_host.yml
+  include_tasks:    cron_update_host.yml
   when:
     - (cron_job_host == inventory_hostname or (cron_job_host == 'all' and cron_job_target != 'all'))
     - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
