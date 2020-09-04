@@ -65,7 +65,7 @@
 
     - name:             "cron_update_host: Make sure vars path exists"
       file:
-        path:           "{{ suricata_update_path }}/ansible/common-user-provided-info"
+        path:           "{{ suricata_update_path }}/ansible/common"
         state:          directory
         mode:           '0755'
         owner:          "{{ ansible_user }}"
@@ -74,7 +74,7 @@
     - name:             "cron_update_host: Copy Role vars"
       copy:
         src:            "{{ main_vars_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/common-user-provided-info/main-vars.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common/main-vars.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -82,7 +82,7 @@
     - name:             "cron_update_host: Copy Inventory file"
       copy:
         src:            "{{ inventory_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/common-user-provided-info/inventory.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common/inventory.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -90,7 +90,7 @@
     - name:             "cron_update_host: Copy Secrets file"
       copy:
         src:            "{{ secrets_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/common-user-provided-info/secrets.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common/secrets.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'

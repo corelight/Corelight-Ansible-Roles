@@ -39,7 +39,7 @@
 
     - name:             "cron_localhost: Make sure vars path exists"
       file:
-        path:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars"
+        path:           "{{ suricata_update_path }}/ansible/common"
         state:          directory
         mode:           '0755'
         owner:          "{{ ansible_user }}"
@@ -47,8 +47,8 @@
 
     - name:             "cron_localhost: Copy Role vars"
       copy:
-        src:            "{{ role_path }}/vars/main.yml"
-        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/main.yml"
+        src:            "{{ main_vars_path }}"
+        dest:           "{{ suricata_update_path }}/ansible/common/main-vars.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -56,7 +56,7 @@
     - name:             "cron_localhost: Copy Inventory file"
       copy:
         src:            "{{ inventory_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/inventory.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common/inventory.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
@@ -64,7 +64,7 @@
     - name:             "cron_localhost: Copy Secrets file"
       copy:
         src:            "{{ secrets_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/roles/suricata-update-cron-job/vars/secrets.yml"
+        dest:           "{{ suricata_update_path }}/ansible/common/secrets.yml"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0644'

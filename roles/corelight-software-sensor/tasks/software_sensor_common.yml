@@ -58,17 +58,17 @@
 
 - name:             "software_sensor_common: Copy Input Framework files to sensor"
   copy:
-    src:            "{{ role_path }}/files/input_files/"
+    src:            "../../../common/files/input_files/"
     dest:           /etc/corelight/input_files/
     mode:           0644
 
 - name:             "software_sensor_common: Copy Suricata Rule files to sensor"
   copy:
-    src:            "{{ role_path }}/files/suricata_custom_rules/"
+    src:            "../../../common/files/suricata_custom_rules/"
     dest:           "{{ suricata_rule_path }}"
     mode:           0644
   when:
-    - suricata_enable == 'T'
+    - suricata_enable  is true
     - suricata_update_enable == 'disabled'
 
 - name:             "software_sensor_common: Refresh Script Index"
