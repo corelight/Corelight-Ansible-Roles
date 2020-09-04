@@ -71,7 +71,7 @@ modify_rules:                               # rules to modify
   - MODBUS_SERVER:
   - ENIP_CLIENT:
   - ENIP_SERVER:
-- To receive teh modified address-groups:
+- To receive the modified address-groups:
   - Software Sensors need the variable 'suricata_enable: "true"'
   - Physical Sensors need the variable 'suricata_update_enable: "remote"'
 

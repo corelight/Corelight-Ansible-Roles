@@ -41,7 +41,7 @@ remove_packages:
 
 
 # Suricata-update Cron Job Variables
-only_perform_cron_job_tasks:                   false     # true or false, if set to true only tasks to create/update the cron job will run
+only_perform_cron_job_tasks:            false     # true or false, if set to true only tasks to create/update the cron job will run
 enable_cron:                            true      # true or false, to enable the cron job on the cron_job_host
 cron_job_target:                        all       # name of the group or host sensor for Suricata-update to update the rules on
 cron_job_host:                          host1     # name of the group or name of a host to run the cron job on

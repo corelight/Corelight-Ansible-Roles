@@ -62,51 +62,51 @@ upgrade_packages:
 
 # You only need to set the system_name value if the hostname is
 # not an acceptable name to use in the logs and other export locations.
-enable_custom_system_name:              F
+enable_custom_system_name:              false
 corelight_system_name:                  corelight-sniff01
 
 num_workers:                            2
 sniff_interfaces:                       eth0
 
 corelight_disk_space:                   /var/corelight
-corelight_share_stats:                  T
+corelight_share_stats:                  true
 local_networks:                         10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,100.64.0.0/10,127.0.0.0/8,fe80::/10,::1/128
 load_scripts:                           /etc/corelight/local.zeek
 ignore_bpf:
 memory_limit:                           6500
 
 # Analyzer Specific Settings
-archive_expand_enable:                  F
+archive_expand_enable:                  false
 
 # HEC Configuration
-hec_enable:                             F
+hec_enable:                             false
 hec_url:                                https://mysplunk.com:8088/services/collector
 hec_token:
 hec_sourcetype_prefix:                  corelight_
-hec_verify_cert:                        F
+hec_verify_cert:                        true
 
 # Kafka Configuration
-kafka_enable:                           F
+kafka_enable:                           false
 kafka_servers:                          1.2.3.4:9092
 kafka_topic_prefix:
-kafka_enable_ssl:                       T
+kafka_enable_ssl:                       true
 kafka_sasl_username:
 kafka_sasl_password:
 kafka_ssl_ca_location:
 
 # JSON over TCP Configuration
-json_enable:                            F
+json_enable:                            false
 json_server:                            1.2.3.4:12345
 
 # JSON over TCP Syslog Config
-syslog_enable:                          F
+syslog_enable:                          false
 syslog_server:                          1.2.3.4:514
 syslog_facility:                        local0
 syslog_severity:                        info
 syslog_format:                          rfc5424_octet_framing
 
 # Redis Configuration
-redis_enable:                           F
+redis_enable:                           false
 redis_host:                             127.0.0.1
 redis_port:                             6379
 redis_password:
@@ -115,14 +115,14 @@ redis_key_prefix:                       corelight-
 # Batch Log Configuration
 batch_log_format:                       json
 batch_log_rotation_interval:            3600
-batch_log_gzip:                         F
+batch_log_gzip:                         false
 
-batch_log_disk_enable:                  T
+batch_log_disk_enable:                  true
 batch_log_disk_path:                    ./logs
-batch_log_disk_cleanup_enable:          F
+batch_log_disk_cleanup_enable:          false
 batch_log_disk_cleanup_pct_max:         80
 
-batch_log_ssh_enable:                   F
+batch_log_ssh_enable:                   false
 batch_log_ssh_mode:                     sftp
 batch_log_ssh_server:                   1.2.3.4
 batch_log_ssh_port:                     22
@@ -137,19 +137,19 @@ extracted_files_max_bytes:              5242880
 extracted_files_filter:
 
 extracted_files_mime_types:
-extracted_files_group_archives:         T
-extracted_files_group_executables:      T
-extracted_files_group_flash:            T
-extracted_files_group_java:             T
-extracted_files_group_office_documents: T
-extracted_files_group_pdfs:             T
+extracted_files_group_archives:         true
+extracted_files_group_executables:      true
+extracted_files_group_flash:            true
+extracted_files_group_java:             true
+extracted_files_group_office_documents: true
+extracted_files_group_pdfs:             true
 
-extracted_files_disk_enable:            F
+extracted_files_disk_enable:            false
 extracted_files_disk_directory:         ./extracted_files
-extracted_files_disk_cleanup_enable:    F
+extracted_files_disk_cleanup_enable:    false
 extracted_files_disk_cleanup_pct_max:   80
 
-extracted_files_ssh_enable:             F
+extracted_files_ssh_enable:             false
 extracted_files_ssh_mode:               sftp
 extracted_files_ssh_server:             1.2.3.4
 extracted_files_ssh_port:               22
@@ -160,6 +160,6 @@ extracted_files_ssh_privkey_passphrase:
 extracted_files_ssh_path:               ./corelight-extracted-files
 
 # Metrics Configuration
-prometheus_enable:                      F
-prometheus_metrics_per_process:         F
+prometheus_enable:                      false
+prometheus_metrics_per_process:         false
 prometheus_listen:                      "127.0.0.1:8989"
