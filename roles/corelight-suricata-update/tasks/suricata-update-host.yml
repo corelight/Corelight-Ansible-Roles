@@ -156,15 +156,8 @@
 
 # Suricata-update per version
 - name:             "suricata-update-host: Run Suricata-update for each version"
-  command:          $HOME/.local/bin/suricata-update  -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}" --no-reload --no-test
-  with_items:       "{{ suricata_versions }}"
-  become:           no
-  register:         results8
-  ignore_errors:    true
-
-- debug:
-    var:            results8.stdout_lines
-  ignore_errors:    true
+  include_tasks:    suricata-update-per-version.yml
+  loop:             "{{ suricata_versions }}"
 
 - name:             "suricata-update-host: Copy Suricata-update Rules to Corelight-Suricata Rule folder"
   copy:
