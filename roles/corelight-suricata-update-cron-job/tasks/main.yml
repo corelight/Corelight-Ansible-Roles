@@ -13,21 +13,21 @@
     - "'physical_sensors' not in group_names"
 
 - name:             "main: Include collect suricata version tasks"
-  include_tasks:    "{{ role_path }}/tasks/collect-suricata-versions.yml"
+  include_tasks:    collect-suricata-versions.yml
   when:
     - (suricata_update_enable == 'remote' or (suricata_update_host == inventory_hostname and 'software_sensors' in group_names))
 
 - name:             "main: Include suricata-update tasks"
-  include_tasks:    "{{ role_path }}/tasks/suricata-update.yml"
+  include_tasks:    suricata-update.yml
   when:
     - "ansible_connection == 'local'"
 
 - name:             "main: Include suricata-update-local tasks"
-  include_tasks:    "{{ role_path }}/tasks/suricata-update-local.yml"
+  include_tasks:    suricata-update-local.yml
   when:
     - "inventory_hostname == 'localhost'"
 
 - name:             "main: Include Suricata Rules Clients Tasks"
-  include_tasks:    "{{ role_path }}/tasks/suricata-rules-clients.yml"
+  include_tasks:    suricata-rules-clients.yml
   when:
     - "suricata_update_enable == 'remote'"

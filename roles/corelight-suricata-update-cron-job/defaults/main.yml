@@ -1,7 +1,10 @@
 ---
-secrets_path:                           "../../../common-user-provided-info/secrets.yml"
-inventory_path:                         "../../../common-user-provided-info/inventory.yml"
-main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
+
+# Corelight-Suricata Settings
+suricata_enable:                        false
 
 # fleet_managed enable or disable
 fleet_managed:                          disable
@@ -12,10 +15,8 @@ UID:
 # the target system MUST have 'suricata_update_enable' set to 'local'.
 enable_cron:                            false     # true or false
 cron_job_target:                        all       # name of the group or host sensor for Suricata-update
-cron_job_target_type:                   group     # group or host
 
 #### Suricata Variables ####
-
 # Suricata Settings
 suricata_rule_path:                     /etc/corelight/rules
 

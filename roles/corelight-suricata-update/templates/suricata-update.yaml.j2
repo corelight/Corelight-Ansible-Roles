@@ -1,5 +1,7 @@
+{% if 'software_sensors' in group_names %}
 suricata-conf: /var/corelight/suricata/.suricata.yaml
 suricata: /usr/bin/corelight-suricata
+{% endif %}
 data-directory: {{ suricata_update_path }}
 
 # Configuration with disable filters.

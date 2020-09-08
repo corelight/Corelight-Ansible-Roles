@@ -1,7 +1,7 @@
 # You only need to set the following value if the hostname the system has already is
 # not an acceptable name to use in the logs and other export locations.
 #Corelight::system_name       corelight-sniff01
-{% if enable_custom_system_name == 'T' %}
+{% if enable_custom_system_name is true %}
 Corelight::system_name                              {{ corelight_system_name }}
 {% endif %}
 
@@ -18,7 +18,11 @@ Corelight::disk_space                               {{ corelight_disk_space }}
 
 # If you would like to avoid sharing stats with Corelight for debugging and health
 # monitoring purposes, change this value to "F".
-Corelight_Cloud::share_stats                        {{ corelight_share_stats }}
+{% if corelight_share_stats is true %}
+Corelight_Cloud::share_stats                        T
+{% else %}
+Corelight_Cloud::share_stats                        F
+{% endif %}
 
 # Local networks
 Site::local_nets                                    {{ local_networks }}
@@ -41,7 +45,11 @@ Corelight::memory_limit_mb                          {{ memory_limit }}
 #####################
 
 # Enable or disable Suricata
-Suricata::enable                                    {{ suricata_enable }}
+{% if suricata_enable is true %}
+Suricata::enable                                    T
+{% else %}
+Suricata::enable                                    F
+{% endif %}
 
 # The directory where your rule files are stored.
 Suricata::rule_path                                 {{ suricata_rule_path }}
@@ -56,34 +64,62 @@ Suricata::rule_files                                {{ suricata_rule_files }}
 ### WARNING!  This is a beta feature! ###
 # Enable the beta archive expansion plugin.
 # This will cause Zeek to dig further into archive files likes Zips and # tar.gz.
-Corelight::archive_expand_enable                    {{ archive_expand_enable }}
+{% if archive_expand_enable is true %}
+Corelight::archive_expand_enable                                    T
+{% else %}
+Corelight::archive_expand_enable                                    F
+{% endif %}
 
 #############################################
 # Streaming Exporter configs are below here #
 #############################################
 
 # JSON into Splunk's HEC (HTTP Event Collector) API
-Corelight::hec_enable                               {{ hec_enable }}
+{% if hec_enable is true %}
+Corelight::hec_enable                               T
+{% else %}
+Corelight::hec_enable                               F
+{% endif %}
 Corelight::hec_url                                  {{ hec_url }}
 Corelight::hec_token                                {{ hec_token }}
 Corelight::hec_sourcetype_prefix                    {{ hec_sourcetype_prefix }}
-Corelight::hec_verify_cert                          {{ hec_verify_cert }}
+{% if hec_verify_cert is true %}
+Corelight::hec_verify_cert                          T
+{% else %}
+Corelight::hec_verify_cert                          F
+{% endif %}
 
 # JSON to a Kafka server
-Corelight::kafka_enable                             {{ kafka_enable }}
+{% if kafka_enable is true %}
+Corelight::kafka_enable                             T
+{% else %}
+Corelight::kafka_enable                             F
+{% endif %}
 Corelight::kafka_servers                            {{ kafka_servers }}
 Corelight::kafka_topic_prefix                       {{ kafka_topic_prefix }}
-Corelight::kafka_enable_ssl                         {{ kafka_enable_ssl }}
+{% if kafka_enable_ssl is true %}
+Corelight::kafka_enable_ssl                         T
+{% else %}
+Corelight::kafka_enable_ssl                         F
+{% endif %}
 Corelight::kafka_sasl_username                      {{ kafka_sasl_username }}
 Corelight::kafka_sasl_password                      {{ kafka_sasl_password }}
 Corelight::kafka_ssl_ca_location                    {{ kafka_ssl_ca_location }}
 
 # JSON over TCP export
-Corelight::json_enable                              {{ json_enable }}
+{% if json_enable is true %}
+Corelight::json_enable                              T
+{% else %}
+Corelight::json_enable                              F
+{% endif %}
 Corelight::json_server                              {{ json_server }}
 
 # JSON over TCP syslog export
-Corelight::syslog_enable                            {{ syslog_enable }}
+{% if syslog_enable is true %}
+Corelight::syslog_enable                            T
+{% else %}
+Corelight::syslog_enable                            F
+{% endif %}
 Corelight::syslog_server                            {{ syslog_server}}
 # This is a lower case syslog priority
 Corelight::syslog_facility                          {{ syslog_facility }}
@@ -93,7 +129,11 @@ Corelight::syslog_severity                          {{ syslog_severity }}
 Corelight::syslog_format                            {{ syslog_format }}
 
 # JSON to a redis server.  This can only use the RPUSH command right now.
-Corelight::redis_enable                             {{ redis_enable }}
+{% if redis_enable is true %}
+Corelight::redis_enable                             T
+{% else %}
+Corelight::redis_enable                             F
+{% endif %}
 Corelight::redis_host                               {{ redis_host }}
 Corelight::redis_port                               {{ redis_port }}
 Corelight::redis_password                           {{ redis_password}}
@@ -109,20 +149,36 @@ Corelight::redis_key_prefix                         {{ redis_key_prefix }}
 # be restarted in order to apply them.
 Corelight::batch_log_format                         {{ batch_log_format }}
 Corelight::batch_log_rotation_interval              {{ batch_log_rotation_interval }}
-Corelight::batch_log_gzip                           {{ batch_log_gzip }}
+{% if batch_log_gzip is true %}
+Corelight::batch_log_gzip                           T
+{% else %}
+Corelight::batch_log_gzip                           F
+{% endif %}
 
 # Rotate logs to a more permanent on the file system.
-Corelight::batch_log_disk_enable                    {{ batch_log_disk_enable }}
+{% if batch_log_disk_enable is true %}
+Corelight::batch_log_disk_enable                    T
+{% else %}
+Corelight::batch_log_disk_enable                    F
+{% endif %}
 # If this is a complete path it will extract there, if relative, it will extract to local disk
 # area that was given to the Software Sensor.
 Corelight::batch_log_disk_path                      {{ batch_log_disk_path }}
 # Enable this to make the software sensor automatically maintain disk utilization.
-Corelight::batch_log_disk_cleanup_enable            {{ batch_log_disk_cleanup_enable }}
+{% if batch_log_disk_cleanup_enable is true %}
+Corelight::batch_log_disk_cleanup_enable            T
+{% else %}
+Corelight::batch_log_disk_cleanup_enable            F
+{% endif %}
 # Keep disk usage at the specified log storage location under a specified percentage.
 Corelight::batch_log_disk_cleanup_pct_max           {{ batch_log_disk_cleanup_pct_max }}
 
 # Batch log export over SFTP/SCP
-Corelight::batch_log_ssh_enable                     {{ batch_log_ssh_enable }}
+{% if batch_log_ssh_enable is true %}
+Corelight::batch_log_ssh_enable                     T
+{% else %}
+Corelight::batch_log_ssh_enable                     F
+{% endif %}
 # Following options are "sftp" or "scp".
 Corelight::batch_log_ssh_mode                       {{ batch_log_ssh_mode }}
 Corelight::batch_log_ssh_server                     {{ batch_log_ssh_server }}
@@ -153,31 +209,67 @@ Corelight::extracted_files_filter                   {{ extracted_files_filter }}
 #Corelight::extracted_files_mime_types             image/jpeg,text/html
 Corelight::extracted_files_mime_types               {{ extracted_files_mime_types }}
 # These are groups of mimetypes and are added to any mime types above.
-Corelight::extracted_files_group_archives           {{ extracted_files_group_archives }}
-Corelight::extracted_files_group_executables        {{ extracted_files_group_executables }}
-Corelight::extracted_files_group_flash              {{ extracted_files_group_flash }}
-Corelight::extracted_files_group_java               {{ extracted_files_group_java }}
-Corelight::extracted_files_group_office_documents   {{ extracted_files_group_office_documents }}
-Corelight::extracted_files_group_pdfs               {{ extracted_files_group_pdfs }}
+{% if extracted_files_group_archives is true %}
+Corelight::extracted_files_group_archives           T
+{% else %}
+Corelight::extracted_files_group_archives           F
+{% endif %}
+{% if extracted_files_group_executables is true %}
+Corelight::extracted_files_group_executables        T
+{% else %}
+Corelight::extracted_files_group_executables        F
+{% endif %}
+{% if extracted_files_group_flash is true %}
+Corelight::extracted_files_group_flash              T
+{% else %}
+Corelight::extracted_files_group_flash              F
+{% endif %}
+{% if extracted_files_group_java is true %}
+Corelight::extracted_files_group_java               T
+{% else %}
+Corelight::extracted_files_group_java               F
+{% endif %}
+{% if extracted_files_group_office_documents is true %}
+Corelight::extracted_files_group_office_documents   T
+{% else %}
+Corelight::extracted_files_group_office_documents   F
+{% endif %}
+{% if extracted_files_group_pdfs is true %}
+Corelight::extracted_files_group_pdfs               T
+{% else %}
+Corelight::extracted_files_group_pdfs               F
+{% endif %}
 
 # Extracted file export to local file system
-Corelight::extracted_files_disk_enable              {{ extracted_files_disk_enable }}
+{% if extracted_files_disk_enable is true %}
+Corelight::extracted_files_disk_enable              T
+{% else %}
+Corelight::extracted_files_disk_enable              F
+{% endif %}
 # If this is a complete path it will extract there, if relative, it will extract to local disk
 # area that was given to the Software Sensor.
 Corelight::extracted_files_disk_directory           {{ extracted_files_disk_directory }}
 # Enable this to make the software sensor automatically maintain disk utilization.
-Corelight::extracted_files_disk_cleanup_enable      {{ extracted_files_disk_cleanup_enable }}
+{% if extracted_files_disk_cleanup_enable is true %}
+Corelight::extracted_files_disk_cleanup_enable      T
+{% else %}
+Corelight::extracted_files_disk_cleanup_enable      F
+{% endif %}
 # Keep disk usage at the specified file extraction location under a specified percentage.
 Corelight::extracted_files_disk_cleanup_pct_max     {{ extracted_files_disk_cleanup_pct_max }}  
 
 # Extracted file export over SFTP/SCP
-Corelight::extracted_files_ssh_enable               {{ extracted_files_ssh_enable }}
+{% if extracted_files_ssh_enable is true %}
+Corelight::extracted_files_ssh_enable               T
+{% else %}
+Corelight::extracted_files_ssh_enable               F
+{% endif %}
 # Following options are "sftp" or "scp".
 Corelight::extracted_files_ssh_mode                 {{ extracted_files_ssh_mode }}
 Corelight::extracted_files_ssh_server               {{ extracted_files_ssh_server }}
 Corelight::extracted_files_ssh_port                 {{ extracted_files_ssh_port }}
 Corelight::extracted_files_ssh_user                 {{ extracted_files_ssh_user }}
-# Leave this empty is doing key based authentication
+# Leave this empty if doing key based authentication
 Corelight::extracted_files_ssh_password             {{ extracted_files_ssh_password }}
 # Point to a privkey file on disk or encode the privkey directy in this variable hex escaped. (i.e. \xFF)
 Corelight::extracted_files_ssh_privkey              {{ extracted_files_ssh_privkey }}
@@ -190,7 +282,15 @@ Corelight::extracted_files_ssh_path                 {{ extracted_files_ssh_path 
 ###############################
 
 # Prometheus metrics export
-CorelightMetrics::prometheus_enable                 {{ prometheus_enable }}
+{% if prometheus_enable is true %}
+Corelight::prometheus_enable                        T
+{% else %}
+Corelight::prometheus_enable                        F
+{% endif %}
 # Set to T in order to produce metrics per process instead of overall totals.
-CorelightMetrics::prometheus_metrics_per_process    {{ prometheus_metrics_per_process }}
+{% if prometheus_metrics_per_process is true %}
+Corelight::prometheus_metrics_per_process           T
+{% else %}
+Corelight::prometheus_metrics_per_process           F
+{% endif %}
 CorelightMetrics::prometheus_listen                 {{ prometheus_listen }}

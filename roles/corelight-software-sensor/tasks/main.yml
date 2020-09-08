@@ -12,13 +12,23 @@
     - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
 
 - name:             Include Debian Tasks
-  include_tasks:    ./debian.yml
-  when:             "ansible_os_family == 'Debian'"
+  include_tasks:    debian.yml
+  when:
+    - "ansible_os_family == 'Debian'"
+    -  sensor_update_only is false
 
 - name:             "main: Include RHEL Tasks"
-  include_tasks:    ./redhat.yml
-  when:             "ansible_os_family == 'RedHat'"
+  include_tasks:    redhat.yml
+  when:
+    - "ansible_os_family == 'RedHat'"
+    -  sensor_update_only is false
 
 - name:             "main: Include Software Sensor Common Tasks"
-  include_tasks:    ./software_sensor_common.yml
-  when:             "'software_sensors' in group_names"
+  include_tasks:    software_sensor_common.yml
+  when:
+    - "'software_sensors' in group_names"
+    - sensor_update_only is false
+
+- name:             "main: Include Software Sensor Update Only Tasks"
+  include_tasks:    software_sensor_update_only.yml
+  when:             sensor_update_only is true

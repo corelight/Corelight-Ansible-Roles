@@ -3,22 +3,31 @@
 fleet_managed:                          disabled
 fleet_ip:
 UID:
+
 ### Cron Job Variables ###
 # To enable the cron job on any system other than localhost,
 # the target system MUST have 'suricata_update_enable' set to 'local'.
 only_perform_cron_job_tasks:            false     # true or false, if set to true Suricata-update will not run
-enable_cron:                            false     # true or false
+
+perform_cron_job_tasks:                 true      # if enabled, will enable or disable a cron job and configure the cron job host
+
+# For cron_job_host, ONLY USE 'localhost' when Ansible and the cron job are local and Suricata-update is on a remote host
+cron_job_host:                          localhost # name of the group or name of a host
+enable_cron:                            false     # true or false, enables or disables the cron job
 cron_job_hour:                          "0"       # 0-23
 cron_job_minute:                        "0"       # 0-59
 cron_job_target:                        all       # name of the group or host sensor for Suricata-update
-cron_job_target_type:                   group     # group or host
-cron_job_host:                          localhost # name of the group or name of a host **ONLY USE 'localhost' WHEN ANSIBLE AND SURICATA-UPDATE ARE ON SEPERATE HOSTS
-cron_job_log_path:                      "{{ suricata_update_path }}/logs"
-secrets_path:                           "../../../common-user-provided-info/secrets.yml"
-inventory_path:                         "../../../common-user-provided-info/inventory.yml"
-main_vars_path:                         "../../../common-user-provided-info/main-vars.yml"
-perform_cron_job_tasks: true
+
+cron_job_log_path:                      "/var/log/suricata_update"
+
+# required settings for coping the files to a remote cron job host
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
+
 #### Suricata Variables ####
+# Corelight-Suricata Settings
+suricata_enable:                        false
 
 # Suricata Settings
 suricata_rule_path:                     /etc/corelight/rules
