@@ -33,7 +33,7 @@
     - name:             "cron_localhost: Create Suricata-update cron file"
       template:
         src:            suricata-update-cron.j2
-        dest:           "{{ suricata_update_path }}/ansible/suricata-update-cron-job"
+        dest:           "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           u=rwx,g=rx,o=rx
@@ -49,7 +49,7 @@
     hour:             "{{ cron_job_hour }}"
     minute:           "{{ cron_job_minute }}"
     cron_file:        suricata-update-cron-job
-    job:              "{{ suricata_update_path }}/ansible/suricata-update-cron-job"
+    job:              "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
     user:             "{{ ansible_user }}"
     state:            "{{ enable_cron_job }}"
   delegate_to:    localhost

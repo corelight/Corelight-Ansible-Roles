@@ -54,7 +54,10 @@
         repo:           https://github.com/corelight/Corelight-Ansible-Roles.git
         dest:           "{{ suricata_update_path }}/ansible"
         force:          yes
+        version:        dev
       become:           no
+      when:
+        - "ansible_connection != 'local'"
 
     - name:             "cron_update_host: Copy Ansible Config"
       copy:
@@ -70,6 +73,8 @@
         mode:           '0755'
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
+      when:
+        - "ansible_connection != 'local'"
 
     - name:             "cron_update_host: Copy Role vars"
       copy:
@@ -78,6 +83,8 @@
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
+      when:
+        - "ansible_connection != 'local'"
 
     - name:             "cron_update_host: Copy Inventory file"
       copy:
@@ -86,6 +93,8 @@
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
         mode:           '0755'
+      when:
+        - "ansible_connection != 'local'"
 
     - name:             "cron_update_host: Copy Secrets file"
       copy:
@@ -95,6 +104,8 @@
         group:          "{{ ansible_user }}"
         mode:           '0755'
         decrypt:        no
+      when:
+        - "ansible_connection != 'local'"
 
     - name:             "cron_update_host: Copy Secrets Password file"
       copy:
@@ -106,7 +117,7 @@
       when:
         - "ansible_connection != 'local'"
 
-    - name:             "cron_update_host: Create Suricata-update cron file"
+    - name:             "cron_update_host: Create Suricata-update local cron file"
       template:
         src:            suricata-update-cron.j2
         dest:           "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
@@ -116,6 +127,19 @@
   when:
     - enable_cron is true
     - (target == inventory_hostname or target == 'all')
+    - "ansible_connection == 'local'"
+
+    - name:             "cron_update_host: Create Suricata-update remote cron file"
+      template:
+        src:            suricata-update-cron-remote.j2
+        dest:           "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
+        owner:          "{{ ansible_user }}"
+        group:          "{{ ansible_user }}"
+        mode:           u=rwx,g=rx,o=rx
+  when:
+    - enable_cron is true
+    - (target == inventory_hostname or target == 'all')
+    - "ansible_connection != 'local'"
 
 - name:               "cron_update_host: Ensure Suricata-update runs daily on Suricata-update host"
   cron:
