@@ -1,0 +1,9 @@
+---
+- name:             "suricata-update-host: Run Suricata-update for each version"
+  command:          $HOME/.local/bin/suricata-update  -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}" --no-reload --no-test
+  become:           no
+  register:         results8
+
+- name:             "Suricata-update results"
+  debug:
+    var:            results8.stdout_lines

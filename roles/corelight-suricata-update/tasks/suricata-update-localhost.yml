@@ -86,7 +86,7 @@
 
 - name:             "suricata-update-localhost: Copy Suricata Custom Rule files to sensor"
   copy:
-    src:            "{{ role_path }}/files/suricata_custom_rules/"
+    src:            "../../../common/files/suricata_custom_rules/"
     dest:           "{{ suricata_custom_rules_path }}"
     mode:           0644
     owner:          "{{ ansible_user }}"
