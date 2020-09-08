@@ -2,14 +2,13 @@
 - name:                     "cron_localhost: Set Cron Job Facts Block"
   block:
     - set_fact:
-        enable_cron_job:    absent
+        disable_cron_job:    yes
       when:
-        - (enable_cron is false or suricata_update_enable != 'local')
+        - enable_cron is false
     - set_fact:
-        enable_cron_job:     present
+        disable_cron_job:     no
       when:
         - enable_cron is true
-        - (suricata_update_enable == 'local' or suricata_update_host == 'localhost')
   delegate_to:    localhost
   run_once:       true
 
@@ -39,8 +38,8 @@
         mode:           u=rwx,g=rx,o=rx
   when:
     - enable_cron is true
-  delegate_to:    localhost
-  run_once:       true
+  delegate_to:        localhost
+  run_once:           true
 
 
 - name:               "cron_localhost: Ensure Suricata-update runs daily on Suricata-update host"
@@ -51,6 +50,7 @@
     cron_file:        suricata-update-cron-job
     job:              "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
     user:             "{{ ansible_user }}"
-    state:            "{{ enable_cron_job }}"
-  delegate_to:    localhost
-  run_once:       true
+    disabled:         "{{ disable_cron_job }}"
+    state:            present
+  delegate_to:        localhost
+  run_once:           true
