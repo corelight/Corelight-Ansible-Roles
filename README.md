@@ -31,9 +31,11 @@ The Software Sensor Role will install, configure and license the Corelight Softw
 
 ## corelight-suricata-update Role
 
-The Suricata-update Role will install, configure and manage rule sources for ALL Suricata enabled Corelight Sensors, including Enterprise Sensors.  It can also modify any of the predefined Suricata address-groups on both the software sensor and Enterprise Sensors.  This role will:
+The Suricata-update Role will install, configure and manage rule sources for ALL Suricata enabled Corelight Sensors, including Enterprise Sensors.  It can also modify any of the predefined Suricata address-groups on both the software sensor and Enterprise Sensors.  Additionally, this role can create, modify, enable or disable a cron job to update Suricata rules daily.  This role will:
 
 ```none
+- configure Suricata-update rule sources
+- modify predefined Suricata address-groups on both the Software Sensor and Enterprise Sensors
 - detect the Corelight-Suricata version in use on all sensors and run Suricata-update for each unique version
 - setup and manage a Cron Job, on any Linux system, to update the Suricata rules daily
 - **run Suricata-update as the Ansible User, NOT as Root**
@@ -45,6 +47,11 @@ The Suricata-update Role will install, configure and manage rule sources for ALL
 ## Corelight-suricata-update-cron-job
 
 This role only executes Suricata-update and does not configure or manage it.  It is used to run Suricata-update via Ansible and a Cron Job on a daily bases.  All configuration and setup should be performed with the corelight-suricata-update Ansible Role.
+
+```none
+- detect the Corelight-Suricata version in use on all sensors and run Suricata-update for each unique version
+- **run Suricata-update as the Ansible User, NOT as Root**
+```
 
 ## Requirements
 
@@ -102,15 +109,15 @@ all:
     fleet_ip:
 ```
 
-## Included Example Playbooks
+## Included Playbooks
 
 - The corelight.yml playbook will include both the corelight-software-sensor and corelight-suricata-update roles.  If you have software sensors in your inventory, this is the recommended playbook to run.
-- The sw-sensor.yml playbook will only include the corelight-software-sensor role.
-- The sw-sensor_update_only.yml playbook will only update the Software Sensor config.  It will not install anything.
-- The suricata-update.yml playbook will only include the corelight-suricata-update role.
-- The suricata-update-cron-play.yml will only run Suricata-update.  It will not install anything or modify Suricata-update sources.
+- The sw-sensor-install.yml playbook will include the corelight-software-sensor role.  It will install and configure the Software Sensor.
+- The sw-sensor-update.yml playbook will also include the corelight-software-sensor role.  However, it will only update the Software Sensor config.  It will not install anything.
+- The suricata-update-config-run.yml playbook will include the corelight-suricata-update role.  It will install, configure and run Suricata-update.
+- The suricata-update-run.yml will only run Suricata-update.  It will not install anything or modify Suricata-update sources.
 
-### Example corelight.yml playbook
+### corelight.yml playbook
 
 ```yaml
 ---
@@ -137,13 +144,13 @@ all:
 ### Command to run the playbook
 
 ```none
-ansible-playbook -i common/inventory.yml corelight.yml
+ansible-playbook -i common/inventory.yml playbooks/corelight.yml
 ```
 
 The playbook will prompt for the name of the Software Sensor to be configured and if the name you provide is an individual host or a group of hosts.  Alternately, you can provide the sensor name with --extra-vars in the command line
 
 ```none
-ansible-playbook -i common/inventory.yml corelight.yml --extra-vars '{"target":"all"}'
+ansible-playbook -i common/inventory.yml playbooks/corelight.yml --extra-vars '{"target":"all"}'
 ```
 
 If all of the managed hosts use the same SSH password and sudo password, you can have Ansible prompt for each with the options ```--ask-pass --ask-become-pass```
@@ -151,10 +158,15 @@ If all of the managed hosts use the same SSH password and sudo password, you can
 If you are using the secrets file to supply SSH or sudo passwords, use --extra-vars to load the secrets file at the start of the playbook.
 
 ```none
-ansible-playbook -i common/inventory.yml corelight.yml --extra-vars '{"target":"all"}' --extra-vars '@common/secrets.yml'
+ansible-playbook -i common/inventory.yml playbooks/corelight.yml --extra-vars '{"target":"all"}' --extra-vars '@common/secrets.yml'
 ```
 
 If the sensor host has been setup with SSH keys, you will not need to provide the 'ask-pass' or 'become password'.
+
+### Example scripts have also been included to simplify the commands to run the playbooks
+
+- The scripts are setup to run from the scripts directory.
+- If you modify the scripts, rename them to start with ansible* so they are not overwritten on the next 'git pull'.
 
 ## License
 

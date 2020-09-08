@@ -30,45 +30,6 @@
         owner:          "{{ ansible_user }}"
         group:          "{{ ansible_user }}"
 
-    - name:             "cron_localhost: Clone Corelight Suricata-update Role Repo"
-      git:
-        repo:           https://github.com/corelight/Ansible-Suricata-update-cron-job.git
-        dest:           "{{ suricata_update_path }}/ansible"
-        force:          yes
-      become:           no
-
-    - name:             "cron_localhost: Make sure vars path exists"
-      file:
-        path:           "{{ suricata_update_path }}/ansible/common"
-        state:          directory
-        mode:           '0755'
-        owner:          "{{ ansible_user }}"
-        group:          "{{ ansible_user }}"
-
-    - name:             "cron_localhost: Copy Role vars"
-      copy:
-        src:            "{{ main_vars_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/common/main-vars.yml"
-        owner:          "{{ ansible_user }}"
-        group:          "{{ ansible_user }}"
-        mode:           '0755'
-
-    - name:             "cron_localhost: Copy Inventory file"
-      copy:
-        src:            "{{ inventory_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/common/inventory.yml"
-        owner:          "{{ ansible_user }}"
-        group:          "{{ ansible_user }}"
-        mode:           '0755'
-
-    - name:             "cron_localhost: Copy Secrets file"
-      copy:
-        src:            "{{ secrets_path }}"
-        dest:           "{{ suricata_update_path }}/ansible/common/secrets.yml"
-        owner:          "{{ ansible_user }}"
-        group:          "{{ ansible_user }}"
-        mode:           '0644'
-
     - name:             "cron_localhost: Create Suricata-update cron file"
       template:
         src:            suricata-update-cron.j2

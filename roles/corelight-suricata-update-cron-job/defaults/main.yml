@@ -15,10 +15,8 @@ UID:
 # the target system MUST have 'suricata_update_enable' set to 'local'.
 enable_cron:                            false     # true or false
 cron_job_target:                        all       # name of the group or host sensor for Suricata-update
-cron_job_target_type:                   group     # group or host
 
 #### Suricata Variables ####
-
 # Suricata Settings
 suricata_rule_path:                     /etc/corelight/rules
 

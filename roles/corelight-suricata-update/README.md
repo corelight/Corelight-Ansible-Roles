@@ -9,7 +9,7 @@ The Suricata-update Role will install and configure Suricata-update on any Linux
 - This role does not include the initial setup of the host OS.
 - Install the Corelight-client on the localhost
 - Install Suricata-update and it's dependencies
-- **Suricata-update will run as the Ansible User, NOT as Root**
+- Suricata-update will run as the Ansible User, **NOT as Root**
 
 ## Suricata-update Configuration
 
@@ -85,8 +85,9 @@ suricata_address_groups:
 
 NOTE: suricata_address_groups must be a valid IP or CIDR or one of the following variables: $HOME_NET, $EXTERNAL_NET, any. You can use signs like ‘!’ and ‘[]’, e.g. ![255.255.255.255,0.0.0.0/16]. Heading/trailing whitespaces, whitespaces between list items, and whitespaces around the '!' symbol are allowed.
 
-## Cron Job host setup (other than localhost)
+## Cron Job host setup
 
+- for localhost, nothing is cloned and no files are copied
 - Running the cron job on a host other than localhost requires additional variables to be defined to ensure all of the required files are copied to the cron job host (if they are not in the default location)
 - Add Ansible Repository
 - Install Ansible and it's dependencies
@@ -109,6 +110,7 @@ secrets_pswd_file: "/secret file name in a secret location" # add to the secrets
 ## Create a Cron Job to run Suricata-update daily
 
 - Create a cron job on the localhost OR the selected Suricata-update Host
+  - to run the cron job on the localhost, see the **Important Note** below
 - Allow the user to select the hour and minute of the day to run
 
 ```yaml
@@ -119,7 +121,11 @@ cron_job_target: all        # name of the group or host sensor for Suricata-upda
 cron_job_host:   host1      # name of the a host **ONLY USE 'localhost' WHEN ANSIBLE AND SURICATA-UPDATE ARE ON SEPARATE HOSTS
 ```
 
-NOTE:  If you want the cron job host to be the same host your are currently running Ansible from, add the host to the inventory and use it's name.  Then 'ansible_connection: local.
+**Important Note:**  ONLY USE 'localhost' as the 'cron_job_host' when Ansible and the cron job are on localhost and Suricata-update is on a remote host.  If the cron job and Suricata-update are both on the same 'localhost', use the hosts name in the inventory file and add the following variable to the host:
+
+```yaml
+ansible_connection: local
+```
 
 ```yaml
 all:
