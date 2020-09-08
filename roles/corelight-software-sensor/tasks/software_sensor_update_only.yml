@@ -1,21 +1,4 @@
 ---
-
-# pexpect is used to run commands are respond to prompts
-- name:             "software_sensor_common: Install pexpect"
-  pip:
-    name:           pexpect
-
-- name:             "software_sensor_common: Install zkg dependencies"
-  pip:
-    name:
-      - gitpython
-      - semantic_version
-      - btest
-      - configparser
-    extra_args:     --user
-    executable:     pip3
-
-
 - name:             "software_sensor_common: Create corelight.cfg"
   template:
     src:            corelight.cfg.j2
@@ -30,30 +13,6 @@
     dest:           /etc/corelight/local.zeek
     owner:          root
     group:          root
-  notify:           restart software sensor
-
-- name:             "software_sensor_common: Create /root/.zkg if it does not exist"
-  file:
-    path:           /root/.zkg
-    owner:          root
-    group:          root
-    mode:           '0755'
-    state:          directory
-
-- name:             "software_sensor_common: Copy zkg config to sw-sensor"
-  copy:
-    src:            ../templates/zkg-config
-    dest:           /root/.zkg/config
-    mode:           0644
-  notify:           restart software sensor
-
-- name:             "software_sensor_common: License the sensor"
-  template:
-    src:            corelight-license.txt.j2
-    dest:           /etc/corelight-license.txt
-    owner:          root
-    group:          root
-    mode:           644
   notify:           restart software sensor
 
 - name:             "software_sensor_common: Copy Input Framework files to sensor"

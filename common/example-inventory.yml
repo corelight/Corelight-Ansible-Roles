@@ -18,7 +18,7 @@ all:
             swsensor2:
               ansible_host: ipaddress
               ansible_user: username
-              suricata_enable: T
+              suricata_enable: true
               suricata_update_enable: remote
         physical_sensors:
           hosts:
