@@ -1,5 +1,3 @@
-cd "{{ role_path }}"
-cd ../..
 echo "Run Date:" > "{{ cron_job_log_path }}/ansible-suricata-update.log"
 date >> "{{ cron_job_log_path }}/ansible-suricata-update.log"
 ansible-playbook -i "{{ suricata_update_path }}/ansible/common/inventory.yml" "{{ suricata_update_path }}/ansible/suricata-update-run.yml" --extra-vars '{"target":"{{ cron_job_target }}"}' --extra-vars '@"{{ suricata_update_path }}/ansible/common/secrets.yml"' >> "{{ cron_job_log_path }}/ansible-suricata-update.log" 
