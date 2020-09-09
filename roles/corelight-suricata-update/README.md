@@ -71,19 +71,23 @@ modify_rules:                               # rules to modify
   - MODBUS_SERVER:
   - ENIP_CLIENT:
   - ENIP_SERVER:
-- To receive the modified address-groups:
-  - Software Sensors need the variable 'suricata_enable: "true"'
-  - Physical Sensors need the variable 'suricata_update_enable: "remote"'
+
+To receive the modified address-groups:
+
+- Software Sensors need the variable 'suricata_enable: "true"'
+- Physical Sensors need the variable 'suricata_update_enable: "remote"'
+
+NOTE: suricata_address_groups must be a valid IP or CIDR or one of the following variables: $HOME_NET, $EXTERNAL_NET, any. You can use signs like ‘!’ and ‘[]’, e.g. ![255.255.255.255,0.0.0.0/16]. Heading/trailing whitespaces, whitespaces between list items, and whitespaces around the '!' symbol are allowed.
+
+### Example main vars file entry
 
 ```yaml
 suricata_address_groups:
   - name: AIM_SERVERS
-    group: "[192.168.1.1,192.168.13.0/24]"
+    group: "[192.168.1.100,192.168.2.0/24]"
   - name: DNS_SERVERS
     group: "[192.168.1.7,192.168.1.8]"
 ```
-
-NOTE: suricata_address_groups must be a valid IP or CIDR or one of the following variables: $HOME_NET, $EXTERNAL_NET, any. You can use signs like ‘!’ and ‘[]’, e.g. ![255.255.255.255,0.0.0.0/16]. Heading/trailing whitespaces, whitespaces between list items, and whitespaces around the '!' symbol are allowed.
 
 ## Cron Job host setup
 
