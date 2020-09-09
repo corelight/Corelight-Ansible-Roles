@@ -34,6 +34,7 @@ zeek_packages:
 #zeek_packages to upgrade
 upgrade_packages:
   - name:                 "corelight/icannTLD"
+  - name:                 "CVE-2020-5902-F5BigIP"
 
 #zeek_packages to remove
 remove_packages:

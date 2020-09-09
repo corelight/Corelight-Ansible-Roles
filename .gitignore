@@ -5,3 +5,4 @@ inventory.yml
 suricata.rules
 suricata_version_facts.json
 ansible*
+settings.json

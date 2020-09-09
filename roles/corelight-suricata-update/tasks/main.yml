@@ -146,18 +146,9 @@
     - "suricata_update_host != 'localhost'"
     - perform_cron_job_tasks is true
 
-- name:             "main: Warning"
-  debug:
-    msg:            "cron_job_host and cron_job_target both equal all - NO cron job will be created"
-  when:
-    - "cron_job_host == 'all'"
-    - "cron_job_target == 'all'"
-    - perform_cron_job_tasks is true
-
-- name:             "main: Include Cron Job Tasks for suricata_update_host"
+- name:             "main: Include Cron Job Tasks for non-localhost"
   include_tasks:    cron_update_host.yml
   when:
-    - (cron_job_host == inventory_hostname or (cron_job_host == 'all' and cron_job_target != 'all'))
+    - cron_job_host == inventory_hostname
     - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
-    - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
     - perform_cron_job_tasks is true
