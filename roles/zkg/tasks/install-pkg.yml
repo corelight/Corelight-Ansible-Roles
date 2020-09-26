@@ -1,0 +1,33 @@
+---
+- name:             "install-pkg: Install Scripts"
+  expect:
+    command:        zkg install --skiptests "{{ item.path }}"
+    responses:
+      Proceed(.*):  "y"
+  with_items:       "{{ zeek_packages }}"
+  when:
+    - 'zeek_packages != None'
+    - 'item.name not in installed_scripts.stdout'
+  notify:           create bundle
+  register:         install_depends
+
+- name:             "install-pkg: Write depends to file"
+  template:
+    src:            "zkg_depends.j2"
+    dest:           "{{ role_path }}/vars/depends_packages.json"
+    mode:           0644
+  changed_when:     false
+
+- name:             "install-pkg: include depends"
+  include_vars:
+    file:           depends_packages.json
+
+- name:             "install-pkg: Modify main-vars"
+  lineinfile:
+    path:           "common/main-vars.yml"
+    line:           "    dependency:                           {{ item.dependency }}"
+    insertafter:    "{{ item.name }}"
+  with_items:       "{{ depend_packages }}"
+  when:
+    - 'depend_packages != None'
+    - install_depends.changed

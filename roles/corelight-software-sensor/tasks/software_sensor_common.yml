@@ -92,34 +92,47 @@
   when:
     - 'zeek_packages != None'
     - 'item.name not in installed_scripts.stdout'
-  changed_when:     false
+  notify:           restart software sensor
+  register:         install_depends
 
-- name:             "software_sensor_common: Remove Scripts"
-  expect:
-    command:        zkg remove "{{ item.name }}"
-    responses:
-      Proceed(.*):  "y"
-  with_items:       "{{ remove_packages }}"
-  when:
-    - 'remove_packages != None'
-    - 'item.name in installed_scripts.stdout'
+- name:             "install-pkg: Write depends to file"
+  template:
+    src:            "zkg_depends.j2"
+    dest:           "{{ role_path }}/vars/depends_packages.json"
+    mode:           0644
   changed_when:     false
+  delegate_to:      localhost
+  run_once:         true
+
+- name:             "install-pkg: include depends"
+  include_vars:
+    file:           depends_packages.json
+  delegate_to:      localhost
+  run_once:         true
+
+- name:             "install-pkg: Modify main-vars"
+  lineinfile:
+    path:           "common/main-vars.yml"
+    line:           "    dependency:                           {{ item.dependency }}"
+    insertafter:    "{{ item.name }}"
+  with_items:       "{{ depend_packages }}"
+  when:             'depend_packages != None'
+  delegate_to:      localhost
+  run_once:         true
+
+- name:             "software_sensor_common: Include remove_packages tasks"
+  include_tasks:    remove-packages.yml
 
 - name:             "software_sensor_common: Upgrade Scripts"
-  expect:
-    command:        zkg upgrade --skiptests "{{ item.name }}"
-    responses:
-      Proceed(.*):  "y"
-  with_items:       "{{ upgrade_packages }}"
+  command:          zkg upgrade {{ item.name }} --force
+  with_items:       "{{ zeek_packages }}"
   when:
-    - 'upgrade_packages != None'
+    - 'item.auto_upgrade is true'
     - 'item.name in installed_scripts.stdout'
-  changed_when:     false
-
-- name:             "software_sensor_common: Collect upgrade results"
-  command:          zkg list
-  changed_when:     false
-  register:         post_installed_scripts
+  register:         results
+  changed_when:
+    - results.stdout != 'All packages already up-to-date.'
+  notify:           restart software sensor
 
 - name:             "software_sensor_common: Start and Enable Corelight Software Sensor"
   service:
@@ -127,11 +140,3 @@
     state:          started
     enabled:        yes
     daemon-reload:  yes
-
-- name:             "software_sensor_common: Restart after install/remove/upgrade"
-  debug:
-    msg:            "A script was installed/removed/upgraded, corelight restart required"
-  when:
-    - installed_scripts.stdout != post_installed_scripts.stdout
-  changed_when:     installed_scripts.stdout != post_installed_scripts.stdout
-  notify:           restart software sensor

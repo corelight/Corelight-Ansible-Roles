@@ -1,0 +1,49 @@
+---
+- name:                 "remove-packages: Write installed_scripts to file"
+  template:
+    src:                "zkg_remove.j2"
+    dest:               "{{ role_path }}/vars/remove_packages.json"
+    mode:               0644
+  changed_when:         false
+  delegate_to:          localhost
+  run_once:             true
+
+- name:                 "remove-packages: Remove zeek_packages from list"
+  lineinfile:
+    path:               "{{ role_path }}/vars/remove_packages.json"
+    regexp:             '{{ item.name }}'
+    state:              absent
+  with_items:           "{{ zeek_packages }}"
+  changed_when:         false
+  when:
+    - 'zeek_packages != None'
+  delegate_to:          localhost
+  run_once:             true
+
+- name:                 "remove-packages: Remove dependencies from list"
+  lineinfile:
+    path:               "{{ role_path }}/vars/remove_packages.json"
+    regexp:             "{{ item.dependency }}"
+    state:              absent
+  with_items:           "{{ zeek_packages }}"
+  changed_when:         false
+  when:
+    - 'zeek_packages != None'
+    - item.dependency is defined
+  delegate_to:          localhost
+  run_once:             true
+
+- name:             "remove-packages: Include remove_packages vars"
+  include_vars:
+    file:           "{{ role_path }}/vars/remove_packages.json"
+
+- name:  list packages to be removed
+  debug:
+    msg:  "{{ remove_packages }}"
+
+- name:             "remove-packages: Remove Scripts"
+  command:          zkg remove {{ item }} --force
+  with_items:       "{{ remove_packages }}"
+  when:
+    - 'remove_packages != None'
+  notify:           restart software sensor
