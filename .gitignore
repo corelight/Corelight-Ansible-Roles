@@ -6,3 +6,5 @@ suricata.rules
 suricata_version_facts.json
 ansible*
 settings.json
+remove_packages.json
+depends_packages.json

@@ -1,0 +1,22 @@
+---
+- name:           "zkg-prep: Install zkg"
+  pip:
+    name:         zkg
+    state:        latest
+    executable:   pip3
+
+# pexpect is used to run commands are respond to prompts
+- name:             "zkg-prep: Install pexpect"
+  pip:
+    name:           pexpect
+    executable:     pip3
+
+- name:             "zkg-prep: Install zkg dependencies"
+  pip:
+    name:
+      - gitpython
+      - semantic_version
+      - btest
+      - configparser
+    extra_args:     --user
+    executable:     pip3

@@ -45,19 +45,16 @@ included_packages:
 # - hassh
 # - ja3
 
-### Custom Scripts to install
+### Custom Scripts to install or upgrade
 # Each package should have a name & path
 # All of the Input Framework files should be placed in the ${role-path}/files/input_files/ folder
 zeek_packages:
 # - name:
 #   path:
+#   auto_upgrade:
 
 ### Custom Scripts to remove
 remove_packages:
-# - name:
-
-### Custom Scripts to upgrade
-upgrade_packages:
 # - name:
 
 # You only need to set the system_name value if the hostname is
@@ -84,6 +81,7 @@ hec_url:                                https://mysplunk.com:8088/services/colle
 hec_token:
 hec_sourcetype_prefix:                  corelight_
 hec_verify_cert:                        true
+hec_writer_verbose:                     false   # enable debugging
 
 # Kafka Configuration
 kafka_enable:                           false

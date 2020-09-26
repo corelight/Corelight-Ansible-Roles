@@ -1,0 +1,23 @@
+---
+- name:             Load vars
+  include_vars:
+    file:           '{{ item }}'
+  with_items:
+    - "{{ secrets_path }}"
+    - "{{ main_vars_path }}"
+
+- name:             "main: Include zkg-prep Tasks"
+  include_tasks:    zkg-prep.yml
+  when:             inventory_hostname == 'localhost'
+
+- name:             "main: Include create-bundle Tasks"
+  include_tasks:    create-bundle.yml
+  when:             inventory_hostname == 'localhost'
+
+# - name:             "main: Include upload-input-files Tasks"
+#   include_tasks:    upload-input-files.yml
+#   when:             inventory_hostname != 'localhost'
+
+- name:             "main: Include upload-bundle Tasks"
+  include_tasks:    upload-bundle.yml
+  when:             inventory_hostname != 'localhost'

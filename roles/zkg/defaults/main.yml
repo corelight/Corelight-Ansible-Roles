@@ -1,0 +1,17 @@
+---
+secrets_path:                           "../../../common/secrets.yml"
+inventory_path:                         "../../../common/inventory.yml"
+main_vars_path:                         "../../../common/main-vars.yml"
+
+# fleet_managed enable or disable
+fleet_managed:                          disable
+fleet_ip:
+UID:
+
+### Custom Scripts to install or upgrade
+# Each package should have a name & path
+# All of the Input Framework files should be placed in the ${role-path}/files/input_files/ folder
+zeek_packages:
+# - name:
+#   path:
+#   auto_upgrade:
