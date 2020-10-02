@@ -1,5 +1,24 @@
 # Corelight-Ansible-Roles Release Notes
 
+v1.1.0
+
+## zkg Role
+
+- New role to automate installation, upgrading and/or removing Zeek Packages.
+  - To install a package, add the name and path to 'zeek_packages' in the var file
+  - To automatically upgrade a package (if an upgrade is available when the role is ran), add 'auto_upgrade: yes' to the item in 'zeek_packages' in the var file
+  - To remove a package, simply remove the package from the 'zeek_packages' in the var file
+- Automatically create a new bundle (if a package changed)
+- Automatically upload the bundle to the selected physical or virtual sensors
+
+## Software Sensor Role
+
+- Simplified Zeek Package management to match the zkg Role
+
+## Scripts
+
+- Added an example script for the zkg role
+
 v1.0.0
 
 ## Common

@@ -88,6 +88,11 @@ Corelight::hec_verify_cert                          T
 {% else %}
 Corelight::hec_verify_cert                          F
 {% endif %}
+{% if hec_writer_verbose is true %}
+Corelight_HEC_Writer::verbose                       T
+{% else %}
+Corelight_HEC_Writer::verbose                       F
+{% endif %}
 
 # JSON to a Kafka server
 {% if kafka_enable is true %}

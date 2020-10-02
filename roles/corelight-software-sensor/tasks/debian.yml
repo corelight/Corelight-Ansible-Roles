@@ -13,6 +13,7 @@
   pip:
     name:         zkg
     state:        latest
+    executable:   pip3
 
 - name:           "debian: Add repo key"
   apt_key:

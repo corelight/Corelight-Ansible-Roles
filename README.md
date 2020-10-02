@@ -44,13 +44,26 @@ The Suricata-update Role will install, configure and manage rule sources for ALL
 - For a complete list of variables, see corelight-suricata-update/defaults/main.yml
 - For more details, see corelight-suricata-update/README.md
 
-## Corelight-suricata-update-cron-job
+## Corelight-suricata-update-cron-job Role
 
 This role only executes Suricata-update and does not configure or manage it.  It is used to run Suricata-update via Ansible and a Cron Job on a daily bases.  All configuration and setup should be performed with the corelight-suricata-update Ansible Role.
 
 ```none
 - detect the Corelight-Suricata version in use on all sensors and run Suricata-update for each unique version
 - **run Suricata-update as the Ansible User, NOT as Root**
+```
+
+## zkg Role
+
+This role automates the installation, upgrading and/or removing Zeek Packages on physical or virtual sensors.  Software Sensors packages are managed with the corelight-software-sensor Role.
+
+```none
+- To install a package, add the name and path to 'zeek_packages' in the var file
+- To automatically upgrade a package (if an upgrade is available when the role is ran), add 'auto_upgrade: yes' to the item in 'zeek_packages' in the var file
+- To remove a package, simply remove the package from the 'zeek_packages' in the var file
+- If a dependent package is installed, it will automatically be added to the item in the var file as 'dependency: <package name>'
+- Automatically create a new bundle (if a package changed)
+- Automatically upload the bundle to the selected physical or virtual sensors
 ```
 
 ## Requirements
