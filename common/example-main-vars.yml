@@ -26,19 +26,12 @@ included_packages:
   - ja3
 
 zeek_packages:
-  - name:                 "icannTLD"
-    path:                 "corelight/icannTLD"
-  - name:                 "CVE-2020-5902-F5BigIP"
-    path:                 "https://github.com/corelight/CVE-2020-5902-F5BigIP"
-
-#zeek_packages to upgrade
-upgrade_packages:
-  - name:                 "corelight/icannTLD"
-  - name:                 "CVE-2020-5902-F5BigIP"
-
-#zeek_packages to remove
-remove_packages:
-  - name:                   "corelight/bro-drwatson"
+  - name:                   icannTLD
+    path:                   corelight/icannTLD
+    auto_upgrade:           yes
+  - name:                   CVE-2020-5902-F5BigIP
+    path:                   https://github.com/corelight/CVE-2020-5902-F5BigIP
+    auto_upgrade:           true
 
 
 # Suricata-update Cron Job Variables

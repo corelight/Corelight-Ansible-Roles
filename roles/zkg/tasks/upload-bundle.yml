@@ -1,0 +1,14 @@
+---
+- name:             "upload-bundle: Push bundles to physical/virtual sensors"
+  command:          corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate bro bundle upload --bundle "{{ role_path }}/files/ansible_role.bundle"
+  delegate_to:      localhost
+  when:
+    - fleet_managed != 'enabled'
+    - 'zeek_packages != None'
+
+- name:             "upload-bundle: Remove bundles from physical/virtual sensors"
+  command:          corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate bro bundle remove
+  delegate_to:      localhost
+  when:
+    - fleet_managed != 'enabled'
+    - 'zeek_packages == None'

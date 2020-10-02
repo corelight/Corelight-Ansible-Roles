@@ -1,0 +1,4 @@
+remove_packages:
+{% for item in installed_scripts.stdout_lines %}
+  - {{ item | regex_replace('^(.+)\s+[(].*$', '\\1') }}
+{% endfor %}

@@ -54,22 +54,12 @@ included_packages:
 ```
 
 ```yaml
-# External Scripts to install
+# External Scripts to install or upgrade
+# To remove a zeek package, simply remove it from the 'zeek_packages' list.
 zeek_packages:
 - name: "script_name"
   path: "script_path"
-```
-
-```yaml
-# External Scripts to remove
-remove_packages:
-- name: "script_name"
-```
-
-```yaml
-# External Scripts to upgrade
-upgrade_packages:
-- name: "script_name"
+  auto_upgrade: yes
 ```
 
 ## Suricata and Suricata-update
