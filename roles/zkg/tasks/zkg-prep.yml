@@ -20,3 +20,9 @@
       - configparser
     extra_args:     --user
     executable:     pip3
+
+- name:             "zkg-prep: Install Corelight-client"
+  pip:
+    name:           corelight-client
+    state:          latest
+    executable:     pip3
