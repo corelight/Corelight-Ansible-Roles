@@ -127,8 +127,8 @@ all:
 - The corelight.yml playbook will include both the corelight-software-sensor and corelight-suricata-update roles.  If you have software sensors in your inventory, this is the recommended playbook to run.
 - The sw-sensor-install.yml playbook will include the corelight-software-sensor role.  It will install and configure the Software Sensor.
 - The sw-sensor-update.yml playbook will also include the corelight-software-sensor role.  However, it will only update the Software Sensor config.  It will not install anything.
-- The suricata-update-config-run.yml playbook will include the corelight-suricata-update role.  It will install, configure and run Suricata-update.
-- The suricata-update-run.yml will only run Suricata-update.  It will not install anything or modify Suricata-update sources.
+- The suricata-update.yml playbook will include the corelight-suricata-update role.  It will install, configure and run Suricata-update.
+- The suricata-update-cron-job.yml will include the corelight-suricata-update-cron-job role.  It will only run Suricata-update.  It will not install anything or modify Suricata-update sources.
 
 ### corelight.yml playbook
 
