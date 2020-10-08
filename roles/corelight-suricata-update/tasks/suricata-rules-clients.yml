@@ -6,7 +6,7 @@
     mode:           0644
   when:
     - "'software_sensors' in group_names"
-  notify:           restart software sensor
+  notify:           Reload Suricata rules
   register:         results1
 
 - debug:

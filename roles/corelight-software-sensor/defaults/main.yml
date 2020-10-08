@@ -53,9 +53,10 @@ zeek_packages:
 #   path:
 #   auto_upgrade:
 
-### Custom Scripts to remove
+# To remove a package, simply remove it from the Zeek_packages list.
+# The remove_packages list will automatically be created.
 remove_packages:
-# - name:
+
 
 # You only need to set the system_name value if the hostname is
 # not an acceptable name to use in the logs and other export locations.

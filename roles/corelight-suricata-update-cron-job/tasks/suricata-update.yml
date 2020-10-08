@@ -1,18 +1,32 @@
 ---
-- name:             "suricata-update: Run Suricata-update"
-  command:          suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
-  with_items:       "{{ suricata_versions }}"
-  become:           no
-  register:         results1
+- name:             "suricata-update-host: Run Suricata-update for each version"
+  include_tasks:    suricata-update-per-version.yml
+  loop:             "{{ suricata_versions }}"
 
-- debug:
-    var:          results1.stdout_lines
-  run_once:       true
-
-- name:             "suricata-update: Copy Suricata-update Rules to Corelight-Suricata Rule folder"
+- name:             "suricata-update: Copy Suricata-update Rules to Corelight-Suricata Rule folder from local"
   copy:
     src:            "{{ suricata_update_path }}/rules/{{ suricata_version }}/suricata.rules"
     dest:           "{{ suricata_rule_path }}"
     mode:           0644
   when:
     - "'suricata_update_host' not in group_names"
+    - "ansible_connection == 'local'"
+
+- name:             "suricata-update: Copy Suricata-update Rules to Corelight-Suricata Rule folder from remote"
+  copy:
+    remote_src:     yes
+    src:            "{{ suricata_update_path }}/rules/{{ suricata_version }}/suricata.rules"
+    dest:           "{{ suricata_rule_path }}"
+    mode:           0644
+  when:
+    - ('suricata_update_host' not in group_names)
+    - "ansible_connection != 'local'"
+
+- name:             "suricata-update-host: Fetch new suricata.rules file"
+  fetch:
+    src:            "{{ suricata_update_path }}/rules/{{ item }}/suricata.rules"
+    dest:           "{{ role_path }}/files/{{ item }}/"
+    flat:           yes
+  with_items:       "{{ suricata_versions }}"
+  when:
+    - "ansible_connection != 'local'"

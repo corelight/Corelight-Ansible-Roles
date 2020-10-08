@@ -1,7 +1,7 @@
 # Suricata-update-cron-job Ansible Role
 
 - The role will only run Suricata-update and push Suricata rules to enabled Corelight sensors
-- The Cron Job uses this role to run Suricata-update via Ansible on a daily bases
+- This role is designed to be run from a Cron Job to run Suricata-update via Ansible on a daily bases
 - All configuration and setup should be performed with the Corelight Suricata-update Ansible Role
 
 ## Requirements
