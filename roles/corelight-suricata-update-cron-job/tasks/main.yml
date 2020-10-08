@@ -1,10 +1,17 @@
 ---
 - name:             "main: Load vars"
   include_vars:
-    file:           '{{ item }}'
+    file:           "{{ item }}"
   with_items:
     - "{{ secrets_path }}"
     - "{{ main_vars_path }}"
+
+- name:             "main: Set update_host to ansible_connection: local"
+  set_fact:
+    ansible_connection: local
+  when:
+    - "suricata_update_host == cron_job_host"
+    - "suricata_update_host == inventory_hostname"
 
 - name:             "main: Gather Software Sensor facts"
   setup:
@@ -20,12 +27,12 @@
 - name:             "main: Include suricata-update tasks"
   include_tasks:    suricata-update.yml
   when:
-    - "ansible_connection == 'local'"
+    - "suricata_update_host == inventory_hostname"
 
-- name:             "main: Include suricata-update-local tasks"
-  include_tasks:    suricata-update-local.yml
-  when:
-    - "inventory_hostname == 'localhost'"
+# - name:             "main: Include suricata-update-local tasks"
+#   include_tasks:    suricata-update-local.yml
+#   when:
+#     - "inventory_hostname == 'localhost'"
 
 - name:             "main: Include Suricata Rules Clients Tasks"
   include_tasks:    suricata-rules-clients.yml

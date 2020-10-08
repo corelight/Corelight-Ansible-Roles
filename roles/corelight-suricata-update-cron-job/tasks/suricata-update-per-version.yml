@@ -1,0 +1,31 @@
+---
+- name:             "suricata-update-per-version: Run Suricata-update for each version"
+  command:          suricata-update  --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
+  become:           no
+  register:         results8
+
+- name:             "Suricata-update results"
+  debug:
+    var:            results8.stdout_lines
+  run_once:         true
+
+- name:             "suricata-update-per-version: Collect number of enabled rules"
+  set_fact:
+    suricata_rules:   "{{ results8.stdout_lines | select('match', '^(.)*?Writing') | list | regex_replace('^(.)*?enabled[^0-9]*([^;]*)(.+)$', '\\2') }}"
+    cacheable:          yes
+
+- name:             "Number of Rules for v{{ item }}"
+  debug:
+    var:            "suricata_rules"
+
+- name:             "Greater than 100,000 rules error message"
+  debug:
+    msg:            "Suricata rulesets with more than 100,000 rules will timeout during the health check and fail.  Reduce the ruleset and run the playbook again."
+  when:
+    - suricata_rules | int > 100000
+
+- name:             "Stop processing if more than 100,000 rules are enabled"
+  meta:             end_play
+  when:
+    - suricata_rules | int > 100000
+  failed_when:      true
