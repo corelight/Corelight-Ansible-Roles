@@ -82,9 +82,9 @@ suricata_custom_rules_path:             /etc/corelight/suricata-update/custom-ru
 # sslbl/ja3-fingerprints
 # etnetera/aggressive
 # tgreen/hunting
-enable_suricata_remote_sources:
- - 'sslbl/ssl-fp-blacklist'
- - 'et/open'
+# enable_suricata_remote_sources:
+#  - 'sslbl/ssl-fp-blacklist'
+#  - 'et/open'
 
 # Suricata-update custom remote rule sources (not published through suricata-update index)
 # The URL can point to a compressed ruleset or directly to the rules.

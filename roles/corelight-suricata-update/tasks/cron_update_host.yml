@@ -58,7 +58,7 @@
         repo:           https://github.com/corelight/Corelight-Ansible-Roles.git
         dest:           "{{ suricata_update_path }}/ansible"
         force:          yes
-        version:        dev
+        # version:        dev
       become:           no
 
     - name:             "cron_update_host: Copy Ansible Config"

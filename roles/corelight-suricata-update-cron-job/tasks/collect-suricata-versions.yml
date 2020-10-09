@@ -1,11 +1,5 @@
-- name:                 Add relevant sensors to suricata_remote group
-  group_by:
-    key:                suricata_remote
-
 - name:                 Collect physical or virtual sensor Suricata version
-  command:              corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
-  register:             suricata_status
-  delegate_to:          localhost
+  include_tasks:        collect-suricata-ph-versions.yml
   when:
     - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
 
@@ -13,6 +7,10 @@
   include_tasks:        "{{ role_path }}/tasks/collect-suricata-sw-versions.yml"
   when:
     - "'software_sensors' in group_names"
+
+- name:                 Add relevant sensors to suricata_remote group
+  group_by:
+    key:                suricata_remote
 
 - name:                 Set Version Facts
   set_fact:
