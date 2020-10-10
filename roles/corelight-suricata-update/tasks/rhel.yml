@@ -11,7 +11,7 @@
   when:
     - "ansible_distribution_major_version == '7'"
 
-- name:             "rhel: Install Suricata-update"
+- name:             "rhel: Install Suricata-update == v7"
   pip:
     name:           suricata-update
     state:          latest
@@ -21,7 +21,7 @@
   when: 
     - "ansible_distribution_major_version == '7'"
 
-- name:             "rhel: Install Suricata-update"
+- name:             "rhel: Install Suricata-update != v7"
   pip:
     name:           suricata-update
     state:          latest
