@@ -1,0 +1,31 @@
+---
+- name:           "rhel: Install pip3"
+  yum:
+    name:         python3-pip
+    state:        latest
+
+- name:           "rhel: Install libselinux-python on RHEL7"
+  yum:
+    name:         libselinux-python
+    state:        latest
+  when:
+    - "ansible_distribution_major_version == '7'"
+
+- name:             "rhel: Install Suricata-update"
+  pip:
+    name:           suricata-update
+    state:          latest
+    executable:     pip3
+    extra_args:     --upgrade --user
+  become:           no
+  when: 
+    - "ansible_distribution_major_version == '7'"
+
+- name:             "rhel: Install Suricata-update"
+  pip:
+    name:           suricata-update
+    state:          latest
+    executable:     pip3
+  become:           no
+  when: 
+    - "ansible_distribution_major_version != '7'"

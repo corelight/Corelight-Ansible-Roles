@@ -1,0 +1,52 @@
+---
+- name:             "suricata-update-install: Include Debian tasks"
+  include_tasks:    debian.yml
+  when:
+    - "ansible_os_family == 'Debian'"
+
+- name:             "suricata-update-install: Include RHEL tasks"
+  include_tasks:    rhel.yml
+  when:
+    - "ansible_os_family == 'RedHat'"
+
+- name:             "suricata-update-install: Include CentOS tasks"
+  include_tasks:    centos.yml
+  when:
+    - "ansible_distribution == 'CentOS'"
+
+- name:             "suricata-update-install: Install Suricata-update dependencies"
+  pip:
+    name:           pyyaml
+    executable:     pip3
+
+- name:             "suricata-update-install: Make sure the Corelight-client is installed on local"
+  pip:
+    name:           corelight-client
+    state:          latest
+    executable:     pip3
+  when:
+    - "ansible_connection == 'local'"
+
+- name:             "suricata-update-install: Make sure the Corelight-client is installed on localhost"
+  pip:
+    name:           corelight-client
+    state:          latest
+    executable:     pip3
+  delegate_to:      localhost
+  when:
+    - "ansible_connection != 'local'"
+
+- name:             "suricata-update-install: Make sure /var/corelight/suricata/ exists"
+  file:
+    path:           /var/corelight/suricata/
+    state:          directory
+    mode:           '0755'
+  become:           true
+
+- name:             "suricata-update-install: Make sure Suricata-update path exists"
+  file:
+    path:           "{{ suricata_update_path }}"
+    state:          directory
+    mode:           '0755'
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}" 
