@@ -9,8 +9,6 @@
         disable_cron_job:     no
       when:
         - enable_cron is true
-  delegate_to:    localhost
-  run_once:       true
 
 - block:
     - name:             "cron_localhost: Make sure Suricata-update/ansible path exists"
@@ -38,9 +36,6 @@
         mode:           u=rwx,g=rx,o=rx
   when:
     - enable_cron is true
-  delegate_to:        localhost
-  run_once:           true
-
 
 - name:               "cron_localhost: Ensure Suricata-update runs daily on Suricata-update host"
   cron:
@@ -52,5 +47,3 @@
     user:             "{{ ansible_user }}"
     disabled:         "{{ disable_cron_job }}"
     state:            present
-  delegate_to:        localhost
-  run_once:           true

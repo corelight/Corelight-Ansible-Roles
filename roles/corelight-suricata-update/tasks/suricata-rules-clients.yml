@@ -13,7 +13,7 @@
     var:            results1
 
 - name:             "suricata-rules-clients: Push Suricata-update Rules to Physical or Virtual sensors"
-  command:          corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
+  command:          \usr\local\bin\corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
   delegate_to:      localhost
   when:
     - "'software_sensors' not in group_names"
@@ -24,7 +24,7 @@
     var:            results2.stdout_lines
 
 - name:             "suricata-rules-clients: Push Suricata-update Rules to Fleet Managed Physical or Virtual sensors"
-  command:          corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
+  command:          \usr\local\bin\corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
   delegate_to:      localhost
   when:
     - "'software_sensors' not in group_names"

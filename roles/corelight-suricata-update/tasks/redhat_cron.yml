@@ -6,9 +6,10 @@
     state:        latest
 
 - name:           "redhat_cron: Install ansible"
-  yum:
+  pip:
     name:         ansible
     state:        latest
+    executable:   pip3
 
 - name:           "redhat_cron: Install corelight-client"
   pip:
