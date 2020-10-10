@@ -50,7 +50,7 @@
 - name:             "main: Include suricata-update-run tasks"
   include_tasks:    suricata-update-run.yml
   when:
-    - (suricata_update_enable == 'remote' or (suricata_update_host == inventory_hostname and 'software_sensors' in group_names))
+    - "suricata_update_host == inventory_hostname"
     - only_perform_cron_job_tasks is false
 
 # Install suricata-update on a stand-a-lone software sensor
