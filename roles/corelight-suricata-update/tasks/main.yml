@@ -47,6 +47,7 @@
     - (suricata_update_enable == 'remote' or (suricata_update_host == inventory_hostname and 'software_sensors' in group_names))
     - only_perform_cron_job_tasks is false
 
+# suricata-update run
 - name:             "main: Include suricata-update-run tasks"
   include_tasks:    suricata-update-run.yml
   when:
@@ -79,22 +80,19 @@
     - (target == inventory_hostname or target == 'all' or inventory_hostname == suricata_update_host or inventory_hostname == cron_job_host)
     - only_perform_cron_job_tasks is false
 
-- name:             "main: Message"
-  debug:
-    msg:            "Cron Job Tasks"
-  run_once:         true
-  when: perform_cron_job_tasks is true
-
 - name:             "main: Include Cron Job Tasks for localhost"
   include_tasks:    cron_localhost.yml
   when:
-    - "cron_job_host == 'localhost'"
-    - "suricata_update_host != 'localhost'"
+    - cron_job_host == inventory_hostname
+    - suricata_update_host == inventory_hostname
+    - "ansible_connection == 'local'"
     - perform_cron_job_tasks is true
 
 - name:             "main: Include Cron Job Tasks for non-localhost"
   include_tasks:    cron_update_host.yml
   when:
     - cron_job_host == inventory_hostname
+    - suricata_update_host == inventory_hostname
+    - "ansible_connection != 'local'"
     - ('software_sensors' in group_names or 'suricata_update_host' in group_names)
     - perform_cron_job_tasks is true
