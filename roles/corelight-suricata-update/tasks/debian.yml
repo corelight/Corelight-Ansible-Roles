@@ -1,0 +1,13 @@
+---
+- name:           "debian: Install pip3 on Debian"
+  apt:
+    name:         python3-pip
+    state:        latest
+
+- name:             "debian: Install Suricata-update"
+  pip:
+    name:           suricata-update
+    state:          latest
+    executable:     pip3
+  become:           no
+  register:         pip

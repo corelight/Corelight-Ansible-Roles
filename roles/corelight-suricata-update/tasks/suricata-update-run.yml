@@ -1,0 +1,39 @@
+---
+# Suricata-update per version
+- name:             "suricata-update-run: Run Suricata-update for each version"
+  include_tasks:    suricata-update-per-version.yml
+  loop:             "{{ suricata_versions }}"
+
+
+- name:             "suricata-update-run: Copy Suricata-update Rules to Corelight-Suricata Rule folder"
+  copy:
+    remote_src:     yes
+    src:            "{{ suricata_update_path }}/rules/{{ suricata_version }}/suricata.rules"
+    dest:           "{{ suricata_rule_path }}"
+    mode:           0644
+  when:
+    - ('suricata_update_host' not in group_names)
+  register:         results9
+
+- debug:
+    var:            results9.stdout_lines
+
+# copy 
+- name:             "suricata-update-run: Fetch new suricata.rules file"
+  copy:
+    src:            "{{ suricata_update_path }}/rules/{{ item }}/suricata.rules"
+    dest:           "{{ role_path }}/files/{{ item }}/"
+    mode:           0644
+  with_items:       "{{ suricata_versions }}"
+  when:
+    - "ansible_connection == 'local'"
+
+#fetch
+- name:             "suricata-update-run: Fetch new suricata.rules file"
+  fetch:
+    src:            "{{ suricata_update_path }}/rules/{{ item }}/suricata.rules"
+    dest:           "{{ role_path }}/files/{{ item }}/"
+    flat:           yes
+  with_items:       "{{ suricata_versions }}"
+ when:
+  - "ansible_connection != 'local'"
