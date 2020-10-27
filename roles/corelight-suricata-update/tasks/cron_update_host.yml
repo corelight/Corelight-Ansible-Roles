@@ -115,18 +115,6 @@
         group:          "{{ ansible_user }}"
         mode:           u=rwx,g=rx,o=rx
   when:
-    - "ansible_connection != 'local'"
-    - enable_cron is true
-
-- name:             "cron_update_host: Create Suricata-update local cron file"
-  template:
-    src:            suricata-update-cron.j2
-    dest:           "{{ suricata_update_path }}/ansible/corelight-suricata-update-cron-job"
-    owner:          "{{ ansible_user }}"
-    group:          "{{ ansible_user }}"
-    mode:           u=rwx,g=rx,o=rx
-  when:
-    - "ansible_connection == 'local'"
     - enable_cron is true
 
 - name:               "cron_update_host: Ensure Suricata-update runs daily on Cron Job host"
