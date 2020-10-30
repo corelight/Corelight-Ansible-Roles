@@ -11,7 +11,7 @@ The Software Sensor Role will install, configure and license the Corelight Softw
 - Add the Corelight Repository source
 - Install the Corelight Software Sensor
 - Customize the Software Sensor's configuration
-  - See templates/corelight.cfg.j2 for all of the Software Sensor configurable variables.
+  - See templates/corelight-softsensor.conf.j2 for all of the Software Sensor configurable variables.
 - License the Software Sensor (License must be added to secrets)
 
 The following variables should be added to the inventory file for each host that is different from the default setting:
