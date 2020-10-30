@@ -18,8 +18,16 @@
 
 - name:             "software_sensor_common: Create corelight.cfg"
   template:
-    src:            corelight.cfg.j2
+    src:            corelight-softsensor.conf.j2
     dest:           /etc/corelight.cfg
+    owner:          root
+    group:          root
+  notify:           restart software sensor
+
+- name:             "software_sensor_common: Create corelight-softsensor.conf"
+  template:
+    src:            corelight-softsensor.conf.j2
+    dest:           /etc/corelight-softsensor.conf
     owner:          root
     group:          root
   notify:           restart software sensor
