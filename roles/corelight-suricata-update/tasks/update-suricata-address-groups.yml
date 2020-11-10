@@ -19,8 +19,9 @@
     - fleet_managed == 'disabled'
 
 - name:             "update-suricata-address-groups: Update Suricata address-groups on Fleet Managed Physical or Virtual sensors"
-  command:          corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate configuration update --suricata.address_groups."{{ item.name | lower }}" "{{ item.group }}"
+  command:          corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate configuration update --suricata.address_groups."{{ item.name | lower }}" "{{ item.group }}"
   delegate_to:      localhost
+  with_items:       "{{ suricata_address_groups }}"
   when:
     - ('physical_sensors' in group_names or 'virtual_sensor' in group_names)
     - fleet_managed == 'enabled'

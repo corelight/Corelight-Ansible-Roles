@@ -73,6 +73,14 @@
     - only_perform_cron_job_tasks is false
     - suricata_address_groups is defined
 
+- name:             "main: Include Update Suricata Address Groups Tasks"
+  include_tasks:    update-suricata-port-groups.yml
+  when:
+    - (suricata_enable is true or ('physical_sensors' in group_names and suricata_update_enable != 'disabled'))
+    - (target == inventory_hostname or target == 'all')
+    - only_perform_cron_job_tasks is false
+    - suricata_port_groups is defined
+
 - name:             "main: Include Suricata Rules Clients Tasks"
   include_tasks:    suricata-rules-clients.yml
   when:
