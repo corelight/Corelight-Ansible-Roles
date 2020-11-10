@@ -44,7 +44,7 @@
     var:            results10.stdout_lines
 
 - name:             "suricata-update-config: Update Suricata-update Sources"
-  command:          $HOME/.local/bin/suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  command:          $HOME/.local/bin/suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}" --no-check-certificate
   changed_when:     false
   become:           no
 
