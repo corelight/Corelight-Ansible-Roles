@@ -39,3 +39,5 @@ all:
               UID:
   vars:
     fleet_ip:
+    fleet_username:
+    fleet_password: "should be in the secrets.yml file"
