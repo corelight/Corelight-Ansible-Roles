@@ -12,6 +12,8 @@ Corelight::system_name                              {{ corelight_system_name }}
 #Corelight::sniff             eth0~4,eth1~2
 Corelight::sniff                                    {{ sniff_interfaces }}~{{ num_workers }}
 
+# Corelight::disk_space is the base directory or directory root for the Software Sensor.  All relative
+# paths configured below will be based on this directory.
 # You likely don't want to change this. By default, the packaged (RPM/DEB) versions of
 # the Corelight Software Sensor create this location.
 Corelight::disk_space                               {{ corelight_disk_space }}
@@ -51,7 +53,7 @@ Suricata::enable                                    T
 Suricata::enable                                    F
 {% endif %}
 
-# The directory where your rule files are stored.
+# The absolute path to the directory where your rule files are stored.
 Suricata::rule_path                                 {{ suricata_rule_path }}
 
 # A list of rules to load from the Suricata::rule_path directory.
@@ -62,8 +64,8 @@ Suricata::rule_files                                {{ suricata_rule_files }}
 #############################################
 
 ### WARNING!  This is a beta feature! ###
-# Enable the beta archive expansion plugin.
-# This will cause Zeek to dig further into archive files likes Zips and # tar.gz.
+# Enable the beta archive expansion plugin.  
+# This will cause the Software Sensor to dig further into archive files like Zips and tar.gz.
 {% if archive_expand_enable is true %}
 Corelight::archive_expand_enable                                    T
 {% else %}
@@ -90,8 +92,6 @@ Corelight::hec_verify_cert                          F
 {% endif %}
 {% if hec_writer_verbose is true %}
 Corelight_HEC_Writer::verbose                       T
-{% else %}
-Corelight_HEC_Writer::verbose                       F
 {% endif %}
 
 # JSON to a Kafka server
@@ -160,16 +160,18 @@ Corelight::batch_log_gzip                           T
 Corelight::batch_log_gzip                           F
 {% endif %}
 
-# Rotate logs to a more permanent on the file system.
+# Enable/disable writing logs to the disk file system
+#  T: Write batch logs to the disk file system, with rotation
+#  F: Don't write any logs to the disk file system at all
 {% if batch_log_disk_enable is true %}
 Corelight::batch_log_disk_enable                    T
 {% else %}
 Corelight::batch_log_disk_enable                    F
 {% endif %}
-# If this is a complete path it will extract there, if relative, it will extract to local disk
-# area that was given to the Software Sensor.
+# If this is a absolute path it will extract there, if relative, it is relative to the base directory
+# defined above with (Corelight::disk_space).
 Corelight::batch_log_disk_path                      {{ batch_log_disk_path }}
-# Enable this to make the software sensor automatically maintain disk utilization.
+# Enable this to make the software sensor automatically maintain disk utilization (only if batch_log_disk_enable is T)
 {% if batch_log_disk_cleanup_enable is true %}
 Corelight::batch_log_disk_cleanup_enable            T
 {% else %}
@@ -209,7 +211,7 @@ Corelight::extracted_files_max_bytes                {{ extracted_files_max_bytes
 Corelight::extracted_files_filter                   {{ extracted_files_filter }}
 
 # Global settings to define the types of files to extract.
-# MIME types supported by Zeek can be seen here: https://github.com/zeek/zeek/tree/master/scripts/base/frameworks/files/magic
+# Supported MIME types can be seen here: https://github.com/zeek/zeek/tree/master/scripts/base/frameworks/files/magic
 # Specify desired mimetypes as a comma separated list and here is an example below:
 #Corelight::extracted_files_mime_types             image/jpeg,text/html
 Corelight::extracted_files_mime_types               {{ extracted_files_mime_types }}
@@ -251,10 +253,10 @@ Corelight::extracted_files_disk_enable              T
 {% else %}
 Corelight::extracted_files_disk_enable              F
 {% endif %}
-# If this is a complete path it will extract there, if relative, it will extract to local disk
-# area that was given to the Software Sensor.
+# If this is a absolute path it will extract there, if relative, it is relative to the base directory
+# defined above with (Corelight::disk_space).
 Corelight::extracted_files_disk_directory           {{ extracted_files_disk_directory }}
-# Enable this to make the software sensor automatically maintain disk utilization.
+# Enable this to make the software sensor automatically maintain disk utilization. (only if extracted_files_disk_enable is T)
 {% if extracted_files_disk_cleanup_enable is true %}
 Corelight::extracted_files_disk_cleanup_enable      T
 {% else %}
@@ -288,14 +290,14 @@ Corelight::extracted_files_ssh_path                 {{ extracted_files_ssh_path 
 
 # Prometheus metrics export
 {% if prometheus_enable is true %}
-Corelight::prometheus_enable                        T
+CorelightMetrics::prometheus_enable                        T
 {% else %}
-Corelight::prometheus_enable                        F
+CorelightMetrics::prometheus_enable                        F
 {% endif %}
 # Set to T in order to produce metrics per process instead of overall totals.
 {% if prometheus_metrics_per_process is true %}
-Corelight::prometheus_metrics_per_process           T
+CorelightMetrics::prometheus_metrics_per_process           T
 {% else %}
-Corelight::prometheus_metrics_per_process           F
+CorelightMetrics::prometheus_metrics_per_process           F
 {% endif %}
 CorelightMetrics::prometheus_listen                 {{ prometheus_listen }}

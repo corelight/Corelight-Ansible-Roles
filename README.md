@@ -25,7 +25,7 @@ The Software Sensor Role will install, configure and license the Corelight Softw
 - If Suricata is enabled and Suricata-update is also enabled (local or remote), the custom Suricata rules files will not be copied to the Software Sensor.  They will be managed by Suricata-update.
 ```
 
-- For a complete list of Software Sensor configuration options, see corelight-software-sensor/templates/corelight.cfg.j2
+- For a complete list of Software Sensor configuration options, see corelight-software-sensor/templates/corelight-softsensor.conf.j2
 - For a complete list of variables, see corelight-software-sensor/defaults/main.yml
 - For more details, see corelight-software-sensor/README.md
 
