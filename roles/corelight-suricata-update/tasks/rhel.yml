@@ -26,6 +26,7 @@
     name:           suricata-update
     state:          latest
     executable:     pip3
+    extra_args:     --upgrade --user
   become:           no
   when: 
     - "ansible_distribution_major_version != '7'"
