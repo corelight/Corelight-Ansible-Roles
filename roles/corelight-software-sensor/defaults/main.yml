@@ -1,4 +1,6 @@
 ---
+ansible_connection:                     ssh
+
 secrets_path:                           "../../../common/secrets.yml"
 inventory_path:                         "../../../common/inventory.yml"
 main_vars_path:                         "../../../common/main-vars.yml"
