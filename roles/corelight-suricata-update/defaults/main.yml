@@ -1,4 +1,6 @@
 ---
+ansible_connection:                     ssh
+
 # fleet_managed enabled or disabled
 fleet_managed:                          disabled
 fleet_ip:
