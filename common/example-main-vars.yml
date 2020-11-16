@@ -1,13 +1,32 @@
 ---
 ### This file should be renamed to 'main-vars.yml' ###
-
 # Only changes from the default variables need to be listed here
+
 
 secrets_path:                           "../../../common/secrets.yml"
 inventory_path:                         "../../../common/inventory.yml"
 main_vars_path:                         "../../../common/main-vars.yml"
 # path to secrets file password file should be in the secrets file
 secrets_pswd_file:                    "/secret file name in a secret location"
+
+
+####################################
+#### Software Sensor Role Vars #####
+####################################
+
+num_workers:                              2
+sniff_interfaces:                         eth0 # should be defined in the inventory file for each software sensor
+
+local_networks:                           192.168.0.0/16,10.0.0.0/8 # only needed it different from default settings
+
+ignore_bpf:                               (net 192.168.1.224/28 && tcp port 9200)
+
+
+#### Export Log Streaming ####
+
+hec_enable:                               true
+hec_url:                                  "https://splunk.mynetwork.net:8088/services/collector"
+hec_verify_cert:                          false
 
 
 #### Package Management ####
@@ -25,6 +44,11 @@ included_packages:
   - hassh
   - ja3
 
+
+############################################
+#### ZKG and Software Sensor Role Vars #####
+############################################
+
 zeek_packages:
   - name:                   icannTLD
     path:                   corelight/icannTLD
@@ -33,6 +57,10 @@ zeek_packages:
     path:                   https://github.com/corelight/CVE-2020-5902-F5BigIP
     auto_upgrade:           true
 
+
+###################################
+#### Suricata-Update Role Vars ####
+###################################
 
 # Suricata-update Cron Job Variables
 only_perform_cron_job_tasks:            false     # true or false, if set to true only tasks to create/update the cron job will run
@@ -56,3 +84,12 @@ enable_rules:
 
 modify_rules:
   - 2019401 "seconds \d+" "seconds 3600"
+
+
+############################################
+#### Suricata-Update Cron Job Role Vars ####
+############################################
+
+# NOTE: This only needs to be set if you are running Ansible and the Cron Job on separate hosts.
+# path to secrets file password file should be in the secrets file
+secrets_pswd_file:                    "/secret file name in a secret location"

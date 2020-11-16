@@ -9,20 +9,43 @@
   when:
     - "ansible_os_family == 'RedHat'"
 
-- name:             "suricata-update-install: Include CentOS tasks"
-  include_tasks:    centos.yml
-  when:
-    - "ansible_distribution == 'CentOS'"
-
-- name:             "suricata-update-install: Install Suricata-update dependencies"
+# Install Suricata-update
+- name:             "suricata-update-install: Install Suricata-update"
   pip:
-    name:           pyyaml
+    name:           suricata-update
+    state:          latest
     executable:     pip3
+    extra_args:     --user --upgrade --upgrade-strategy only-if-needed
+  become:           no
 
-- name:             "suricata-update-install: Make sure the Corelight-client is installed on local"
+# Find Suricata-update and make sure it's in the $PATH
+- name:             "suricata-update-install: Find Suricata-update location"
+  find:
+    paths:          /
+    recurse:        yes
+    file_type:      file
+    patterns:       suricata-update
+  become:           yes
+  register:         suricata_full_path
+  changed_when:     false
+
+- name:             "suricata-update-install: Create suricata_path fact"
+  set_fact:
+    suricata_path:  "{{ suricata_full_path.files[0] | string | dirname | regex_replace('^[^/]*(.*)$', '\\1') }}"
+
+- name:             "suricata-update-install: Make sure Suricata-update is in the non-interactive PATH"
+  lineinfile:
+    dest:           "/etc/environment"
+    state:          present
+    regexp:         '^(PATH=\")({{ suricata_path }}:)?((?(2).*?(?!(?:.\"))|.*?(?!(?:{{ suricata_path }}))))(:{{ suricata_path }})?((?(4).*|\"))'
+    line:           '\1\3:{{ suricata_path }}\5'
+    backrefs:       yes
+
+- name:             "suricata-update-install: Make sure the Corelight-client is installed on local_connection"
   pip:
     name:           corelight-client
     state:          latest
+    extra_args:     --upgrade --upgrade-strategy only-if-needed
     executable:     pip3
   when:
     - "ansible_connection == 'local'"
@@ -32,9 +55,33 @@
     name:           corelight-client
     state:          latest
     executable:     pip3
+    extra_args:     --upgrade --upgrade-strategy only-if-needed
   delegate_to:      localhost
   when:
     - "ansible_connection != 'local'"
+
+# Find Corelight-client and make sure it's in the $PATH
+- name:             "suricata-update-install: Find Corelight-client location"
+  find:
+    paths:          /
+    recurse:        yes
+    file_type:      file
+    patterns:       corelight-client
+  become:           yes
+  register:         corelight_client_full_path
+  changed_when:     false
+
+- name:             "suricata-update-install: Create corelight_client_path fact"
+  set_fact:
+    corelight_client_path:  "{{ corelight_client_full_path.files[0] | string | dirname | regex_replace('^[^/]*(.*)$', '\\1') }}"
+
+- name:             "suricata-update-install: Make sure corelight_client is in the non-interactive PATH"
+  lineinfile:
+    dest:           "/etc/environment"
+    state:          present
+    regexp:         '^(PATH=\")({{ corelight_client_path }}:)?((?(2).*?(?!(?:.\"))|.*?(?!(?:{{ corelight_client_path }}))))(:{{ corelight_client_path }})?((?(4).*|\"))'
+    line:           '\1\3:{{ corelight_client_path }}\5'
+    backrefs:       yes
 
 - name:             "suricata-update-install: Make sure /var/corelight/suricata/ exists"
   file:

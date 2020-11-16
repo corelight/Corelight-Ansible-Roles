@@ -8,3 +8,5 @@ ansible*
 settings.json
 remove_packages.json
 depends_packages.json
+custom-rule-file-list.json
+remove-rule-file-list.json

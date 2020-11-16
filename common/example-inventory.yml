@@ -6,6 +6,7 @@ all:
             ansible_host: ipaddress
             ansible_user: username
             suricata_update_enable: local
+            ansible_connection: local       # Required if Ansible, Suricata-update and the cron job all run on the same host
     sensors:
       children:
         software_sensors:
@@ -26,6 +27,7 @@ all:
               ansible_host: ipaddress
               sensor_username: username
               suricata_update_enable: remote
+              fleet_managed: true
               UID:
             AP200-1:
               ansible_host: ipaddress
@@ -41,3 +43,5 @@ all:
     fleet_ip:
     fleet_username:
     fleet_password: "should be in the secrets.yml file"
+    http_proxy:
+    https_proxy:

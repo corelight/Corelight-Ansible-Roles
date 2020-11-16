@@ -16,7 +16,7 @@ suricata_enable:                        false
   # options are:
   # local = use suricata-update in this ansible role
   # remote = use suricata-update from another source
-  # disabled = don't use suricata-update
+  # false = don't use suricata-update
 suricata_update_enable:                 disabled
 # If Suricata-update is enable, custom rules will be placed in suricata_custom_rules_path
 # Suricata-update will collect the custom rules and combine them with the downloaded rules

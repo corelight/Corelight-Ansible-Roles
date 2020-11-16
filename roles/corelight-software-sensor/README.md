@@ -75,7 +75,7 @@ The following variables should be added to the inventory file for each host that
 
 ```yaml
 suricata_enable: false                  # true or false
-suricata_update_enable: disabled        # disabled, local or remote
+suricata_update_enable: false           # false, local or remote
 ```
 
 ## Requirements

@@ -29,8 +29,8 @@ suricata_rule_path:                     /etc/corelight/rules
 # options are:
 # local = use suricata-update in this ansible role
 # remote = use suricata-update from another source
-# disabled = don't use suricata-update
-suricata_update_enable:                 disabled
+# false = don't use suricata-update
+suricata_update_enable:                 false
 
 # Path to Suricata-update config and rule files
 suricata_update_path:                   /etc/corelight/suricata-update

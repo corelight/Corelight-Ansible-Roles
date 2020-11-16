@@ -1,0 +1,8 @@
+---
+{% if custom_rule_file_list.files | length > 0 %}
+custom_rule_files:
+{% for files in custom_rule_file_list.files%}
+  - name: {{ files.path |regex_replace('(.*)\\/(.*)', '\\2') }}
+    a_path: {{ files.path }}
+{% endfor %}
+{% endif %}

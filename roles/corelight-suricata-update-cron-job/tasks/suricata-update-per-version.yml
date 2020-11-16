@@ -1,8 +1,11 @@
 ---
 - name:             "suricata-update-per-version: Run Suricata-update for each version"
-  command:          $HOME/.local/bin/suricata-update  --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
+  command:          suricata-update  --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
   become:           no
   register:         results8
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "Suricata-update results"
   debug:
