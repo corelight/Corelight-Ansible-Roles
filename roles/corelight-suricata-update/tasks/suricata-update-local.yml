@@ -3,6 +3,9 @@
   pip:
     name:           pyyaml
     executable:     pip3
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "suricata-update-local: Install Suricata-update"
   pip:
@@ -11,6 +14,9 @@
     executable:     pip3
     extra_args:     --user --upgrade --upgrade-strategy only-if-needed
   become:           no
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 # Find Suricata-update and make sure it's in the $PATH
 - name:             "suricata-update-install: Find Suricata-update location"
