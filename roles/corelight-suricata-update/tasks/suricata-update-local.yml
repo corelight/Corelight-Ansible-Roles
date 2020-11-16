@@ -41,6 +41,15 @@
     line:           '\1\3:{{ suricata_path }}\5'
     backrefs:       yes
 
+- name:             "suricata-update-install: Make sure Suricata-update is in the secure_path"
+  lineinfile:
+    dest:           "/etc/sudoers"
+    state:          present
+    regexp:         '^(Defaults\s*secure_path=\")({{ suricata_path }}:)?((?(2).*?(?!(?:.\"))|.*?(?!(?:{{ suricata_path }}))))(:{{ suricata_path }})?((?(4).*|\"))'
+    line:           '\1\3:{{ suricata_path }}\5'
+    backrefs:       yes
+    validate:       /usr/sbin/visudo -cf %s
+
 - name:             "suricata-update-local: Make sure Suricata-update path exists"
   file:
     path:           "{{ suricata_update_path }}"
