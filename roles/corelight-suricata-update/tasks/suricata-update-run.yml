@@ -43,7 +43,6 @@
   include_tasks:    suricata-update-per-version.yml
   loop:             "{{ suricata_versions }}"
 
-
 - name:             "suricata-update-run: Copy Suricata-update Rules to Corelight-Suricata Rule folder"
   copy:
     remote_src:     yes

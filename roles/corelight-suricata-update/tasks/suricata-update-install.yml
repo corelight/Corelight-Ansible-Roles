@@ -17,6 +17,9 @@
     executable:     pip3
     extra_args:     --user --upgrade --upgrade-strategy only-if-needed
   become:           no
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 # Find Suricata-update and make sure it's in the $PATH
 - name:             "suricata-update-install: Find Suricata-update location"
@@ -49,6 +52,9 @@
     executable:     pip3
   when:
     - "ansible_connection == 'local'"
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "suricata-update-install: Make sure the Corelight-client is installed on localhost"
   pip:
@@ -59,6 +65,9 @@
   delegate_to:      localhost
   when:
     - "ansible_connection != 'local'"
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 # Find Corelight-client and make sure it's in the $PATH
 - name:             "suricata-update-install: Find Corelight-client location"

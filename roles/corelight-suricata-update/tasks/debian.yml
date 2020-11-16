@@ -5,3 +5,6 @@
     state:                latest
     install_recommends:   yes
     update_cache:         yes
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"

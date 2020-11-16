@@ -60,6 +60,9 @@
         force:          yes
         # version:        dev
       become:           no
+      environment:
+        http_proxy:     "{{ http_proxy_env | default() }}"
+        https_proxy:    "{{ https_proxy_env | default() }}"
 
     - name:             "cron_update_host: Copy Ansible Config"
       copy:
