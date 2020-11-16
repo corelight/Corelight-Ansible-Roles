@@ -10,6 +10,9 @@
     - 'item.name not in installed_scripts.stdout'
   notify:           create bundle
   register:         install_depends
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "install-pkg: Write depends to file"
   template:

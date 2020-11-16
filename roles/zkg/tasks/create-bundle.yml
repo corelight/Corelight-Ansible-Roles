@@ -2,6 +2,9 @@
 - name:             "create-bundle: Refresh Script Index"
   command:          zkg refresh
   changed_when:     false
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "create-bundle: Collect list of installed scripts"
   command:          zkg list --nodesc
@@ -29,3 +32,6 @@
   changed_when:
     - results.stdout != 'All packages already up-to-date.'
   notify:           create bundle
+    environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
