@@ -43,5 +43,5 @@ all:
     fleet_ip:
     fleet_username:
     fleet_password: "should be in the secrets.yml file"
-    http_proxy:
-    https_proxy:
+    http_proxy_env:
+    https_proxy_env:
