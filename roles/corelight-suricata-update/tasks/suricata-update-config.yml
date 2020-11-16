@@ -31,25 +31,86 @@
     group:          "{{ ansible_user }}"
     mode:           '0755'
 
-- name:             "suricata-update-config: Copy Suricata Custom Rule files to sensor"
+# find existing custom rule files
+- name:             "suricata-update-config: collect list of existing custom rules"
+  find:
+    paths:          "{{ suricata_custom_rules_path }}"
+    file_type:      file
+    patterns:       '*.rules'
+  register:         existing_rule_file_list
+
+- name:             "suricata-update-config: Write rule file list to a file"
+  template:
+    src:            "remove-rule-file-list.j2"
+    dest:           "{{ role_path }}/vars/remove-rule-file-list.json"
+    mode:           0644
+  delegate_to:      localhost
+  changed_when:     false
+
+# find new custom rule files
+- name:             "suricata-update-config: collect list of custom rules"
+  find:
+    paths:          "{{ role_path }}/../../common/files/suricata_custom_rules/"
+    file_type:      file
+    patterns:       '*.rules'
+  register:         custom_rule_file_list
+  delegate_to:      localhost
+
+- name:             "suricata-update-config: Write custom rule file list to a file"
+  template:
+    src:            "custom-rule-file-list.j2"
+    dest:           "{{ role_path }}/vars/custom-rule-file-list.json"
+    mode:           0644
+  delegate_to:          localhost
+
+- name:             "suricata-update-config: Include custom rule file vars"
+  include_vars:
+    file:           "{{ role_path }}/vars/custom-rule-file-list.json"
+
+# remove unused custom rules
+- name:             "suricata-update-config: clean up remove list"
+  lineinfile:
+    path:           "{{ role_path }}/vars/remove-rule-file-list.json"
+    regexp:         "^(.*){{ item.name }}$"
+    state:          absent
+  with_items:       "{{ custom_rule_files }}"
+  changed_when:     false
+  delegate_to:      localhost
+  when:             custom_rule_files is defined
+
+- name:             "suricata-update-config: Include remove unused custom rules vars"
+  include_vars:
+    file:           "{{ role_path }}/vars/remove-rule-file-list.json"
+
+- name:             "suricata-update-config: Remove unused custom rules files"
+  file:
+    path:           "{{ item }}"
+    state:          absent
+  with_items:       "{{ remove_rule_files }}"
+  when:             remove_rule_files is defined
+
+# copy custom rules to suricata host
+- name:             "suricata-update-config: Copy Suricata Custom Rule files to suricata host"
   copy:
-    src:            "../../../common/files/suricata_custom_rules/"
+    src:            "../../../common/files/suricata_custom_rules/{{ item.name }}"
     dest:           "{{ suricata_custom_rules_path }}"
     mode:           0644
     owner:          "{{ ansible_user }}"
     group:          "{{ ansible_user }}"
-  register:         results10
-
-- debug:
-    var:            results10.stdout_lines
+  with_items:       "{{ custom_rule_files }}"
+  register:         results
+  when:             custom_rule_files is defined
 
 - name:             "suricata-update-config: Update Suricata-update Sources"
-  command:          $HOME/.local/bin/suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}" --no-check-certificate
+  command:          suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}" --no-check-certificate
   changed_when:     false
   become:           no
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "suricata-update-config: Collect list of enabled sources"
-  command:          $HOME/.local/bin/suricata-update list-enabled-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  command:          suricata-update list-enabled-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   register:         enabled_sources
   changed_when:     false
   become:           no
@@ -59,7 +120,7 @@
     var:            enabled_sources.stdout_lines
 
 - name:             "suricata-update-config: Enable remote sources with secret-codes"
-  command:          $HOME/.local/bin/suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  command:          suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   with_items:       "{{ enable_suricata_secret_code_sources|default([]) }}"
   when:             'item.name not in enabled_sources.stdout'
   no_log:           true
@@ -70,7 +131,7 @@
     var:            results4.stdout_lines
 
 - name:             "suricata-update-config: Enable remote sources without secret-codes"
-  command:          $HOME/.local/bin/suricata-update enable-source "{{ item }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  command:          suricata-update enable-source "{{ item }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   with_items:       "{{ enable_suricata_remote_sources|default([]) }}"
   when:             'item not in enabled_sources.stdout'
   become:           no
@@ -80,7 +141,7 @@
     var:            results5.stdout_lines
 
 - name:             "suricata-update-config: Enable remote sources not in the index"
-  command:          $HOME/.local/bin/suricata-update add-source "{{ item.name }}" "{{ item.url }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  command:          suricata-update add-source "{{ item.name }}" "{{ item.url }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   with_items:       "{{ enable_suricata_custom_url_sources|default([]) }}"
   when:             'item.name not in enabled_sources.stdout'
   become:           no

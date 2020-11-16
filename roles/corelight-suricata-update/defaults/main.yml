@@ -1,8 +1,8 @@
 ---
 ansible_connection:                     ssh
 
-# fleet_managed enabled or disabled
-fleet_managed:                          disabled
+# fleet_managed true or false
+fleet_managed:                          false
 fleet_ip:
 UID:
 
@@ -43,8 +43,8 @@ suricata_versions:                      []
 # options are:
 # local = use suricata-update in this ansible role
 # remote = use suricata-update from another source
-# disabled = don't use suricata-update
-suricata_update_enable:                 disabled
+# false = don't use suricata-update
+suricata_update_enable:                 false
 
 # What sensor do you want Suricata-update to run on?
 # List the a single host name to run Suricata-update on for all sensors set to remote

@@ -19,8 +19,8 @@ The Suricata-update Role will install and configure Suricata-update on any Linux
 - Copy the respective suricata.rules file to each enabled sensor
 
 ```yaml
-suricata_update_enable: disabled       # disabled, local or remote
-suricata_update_host:                  # host to run Suricata-update on
+suricata_update_enable: false           # false, local or remote
+suricata_update_host:                   # host to run Suricata-update on
 ```
 
 ## Suricata-update Rules

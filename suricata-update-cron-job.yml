@@ -2,6 +2,8 @@
 - hosts: all
   gather_facts: no
   become: yes
+  ignore_unreachable: yes
+  any_errors_fatal: true
   vars_prompt:
   - name: target
     prompt: Please enter the target host name or group name
@@ -10,4 +12,3 @@
   tasks:
     - include_role:
         name: corelight-suricata-update-cron-job
-

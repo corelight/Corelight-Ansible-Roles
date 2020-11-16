@@ -3,6 +3,9 @@
   command:          suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" 
   become:           no
   register:         results1
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
 
 - debug:
     var:          results1.stdout_lines
