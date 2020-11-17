@@ -1,10 +1,12 @@
 ---
 - name:           "zkg-prep: Install zkg"
   pip:
-    name:         zkg
-    state:        latest
-    executable:   pip3
+    name:           zkg
+    state:          latest
+    executable:     pip3
+    extra_args:     --user --upgrade --upgrade-strategy only-if-needed
   delegate_to:      localhost
+  become:           no
   run_once:         true
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
@@ -19,26 +21,27 @@
 #     http_proxy:     "{{ http_proxy_env | default() }}"
 #     https_proxy:    "{{ https_proxy_env | default() }}"
 
-- name:             "zkg-prep: Install zkg dependencies"
-  pip:
-    name:
-      - gitpython
-      - semantic_version
-      - btest
-      - configparser
-    extra_args:     --user
-    executable:     pip3
-  delegate_to:      localhost
-  run_once:         true
-  environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+# - name:             "zkg-prep: Install zkg dependencies"
+#   pip:
+#     name:
+#       - gitpython
+#       - semantic_version
+#       - btest
+#       - configparser
+#     extra_args:     --user --upgrade --
+#     executable:     pip3
+#   delegate_to:      localhost
+#   run_once:         true
+#   environment:
+#     http_proxy:     "{{ http_proxy_env | default() }}"
+#     https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "zkg-prep: Install Corelight-client"
   pip:
     name:           corelight-client
     state:          latest
     executable:     pip3
+    extra_args:     --user --upgrade --upgrade-strategy only-if-needed
   delegate_to:      localhost
   run_once:         true
   environment:
