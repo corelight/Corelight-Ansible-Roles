@@ -61,7 +61,7 @@
     src:            "custom-rule-file-list.j2"
     dest:           "{{ role_path }}/vars/custom-rule-file-list.json"
     mode:           0644
-  delegate_to:          localhost
+  delegate_to:      localhost
 
 - name:             "suricata-update-config: Include custom rule file vars"
   include_vars:
@@ -115,7 +115,7 @@
   changed_when:     false
   become:           no
 
-- name:             "suricata-update-host: List of enabled sources"
+- name:             "suricata-update-config: List of enabled sources"
   debug:
     var:            enabled_sources.stdout_lines
 

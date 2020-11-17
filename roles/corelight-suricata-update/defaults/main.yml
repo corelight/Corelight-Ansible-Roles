@@ -38,6 +38,10 @@ suricata_versions:                      []
 
 #### Suricata-update Variables ####
 
+# true or false, if set to false, address_groups or port_groups tasks will be skipped
+process_suricata_port_groups:           false
+process_suricata_address_groups:        false
+
 # Use Suricata-update should be set in the inventory file for each sensor.
 # If it's not listed, the default will apply.
 # options are:

@@ -62,6 +62,10 @@ zeek_packages:
 #### Suricata-Update Role Vars ####
 ###################################
 
+# The default setting for process port_groups or address_groups is false
+process_suricata_port_groups:           true      # true or false, if set to false, port_group tasks will be skipped
+process_suricata_address_groups:        true      # true or false, if set to false, address_group tasks will be skipped
+
 # Suricata-update Cron Job Variables
 only_perform_cron_job_tasks:            false     # true or false, if set to true only tasks to create/update the cron job will run
 enable_cron:                            true      # true or false, to enable the cron job on the cron_job_host
