@@ -11,12 +11,8 @@
 
 # Install Suricata-update
 - name:             "suricata-update-install: Install Suricata-update"
-  pip:
-    name:           suricata-update
-    state:          latest
-    executable:     pip3
-    extra_args:     --user --upgrade --upgrade-strategy only-if-needed
-  become:           no
+  shell: |
+    sudo -H pip3 install --upgrade --upgrade-strategy only-if-needed suricata-update
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
