@@ -4,9 +4,8 @@
     name:           zkg
     state:          latest
     executable:     pip3
-    extra_args:     --user --upgrade --upgrade-strategy only-if-needed
+    extra_args:     --upgrade --upgrade-strategy only-if-needed
   delegate_to:      localhost
-  become:           no
   run_once:         true
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
@@ -41,7 +40,7 @@
     name:           corelight-client
     state:          latest
     executable:     pip3
-    extra_args:     --user --upgrade --upgrade-strategy only-if-needed
+    extra_args:     --upgrade --upgrade-strategy only-if-needed
   delegate_to:      localhost
   run_once:         true
   environment:
