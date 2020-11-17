@@ -1,8 +1,6 @@
 - name:         Collect software sensor Suricata version
   shell:        corelight-suricata -V
-  become:       true
   register:     suricata_status
 
 - debug:
-    var:            suricata_status.stdout_lines
-  ignore_errors:    true
+    msg:            suricata_status

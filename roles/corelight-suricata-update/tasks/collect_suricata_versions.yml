@@ -16,3 +16,25 @@
   set_fact:
     suricata_version:   "{{ suricata_status.stdout_lines | select('match', '^(.)*?version') | list | regex_replace('[^0-9]*([0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2})(.+)$', '\\1') }}"
     cacheable:          yes
+
+- name:                 Write Suricata Versions to file
+  template:
+    src:                suricata_versions.j2
+    dest:               "{{ role_path }}/vars/suricata_version_facts.json"
+    mode:               0644
+  delegate_to:          localhost
+  run_once:             true
+
+- include_vars:
+    file:               suricata_version_facts.json
+
+- name:                 Remove duplicate versions
+  set_fact:
+    suricata_versions:  "{{ hostvars[inventory_hostname]['suricata_versions'] | unique }}"
+  delegate_to:          localhost
+  run_once:             true
+
+- name:                 Suricata versions
+  debug:
+    msg:                "{{ suricata_versions }}"
+  run_once:             true

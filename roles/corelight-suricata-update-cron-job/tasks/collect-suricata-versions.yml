@@ -4,7 +4,7 @@
     - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
 
 - name:                 Collect software sensor Suricata version
-  include_tasks:        "{{ role_path }}/tasks/collect-suricata-sw-versions.yml"
+  include_tasks:        collect-suricata-sw-versions.yml
   when:
     - "'software_sensors' in group_names"
 
@@ -26,7 +26,7 @@
   run_once:             true
 
 - include_vars:
-    file:               "{{ role_path }}/vars/suricata_version_facts.json"
+    file:               suricata_version_facts.json
 
 - name:                 Remove duplicate versions
   set_fact:
