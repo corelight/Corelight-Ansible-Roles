@@ -1,3 +1,6 @@
-- name:         Collect software sensor Suricata version
-  shell:        corelight-suricata -V
-  register:     suricata_status
+- name:             Collect software sensor Suricata version
+  shell:            corelight-suricata -V
+  register:         suricata_status
+
+- debug:
+    msg:            suricata_status

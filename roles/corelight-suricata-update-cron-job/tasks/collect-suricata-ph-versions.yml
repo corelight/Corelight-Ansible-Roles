@@ -1,10 +1,24 @@
 - name:                 Collect physical or virtual sensor Suricata version
-  shell:                corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
+  command:                corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
   register:             suricata_status
   delegate_to:          localhost
   become:               false
   when:
     - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+    - fleet_managed != 'enabled'
+
+- debug:
+    var:            suricata_status.stdout_lines
+  ignore_errors:    true
+
+- name:                 Collect physical or virtual sensor Suricata version
+  command:                corelight-client --fleet "{{ fleet_ip }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --uid "{{ UID }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
+  register:             suricata_status
+  delegate_to:          localhost
+  become:               false
+  when:
+    - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+    - fleet_managed == 'enabled'
 
 - debug:
     var:            suricata_status.stdout_lines
