@@ -6,8 +6,9 @@
   when:
     - 'zeek_packages != None'
     - 'item.name not in installed_scripts.stdout'
-  notify:           create bundle
   register:         install_depends
+  delegate_to:      localhost
+  run_once:         true
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
@@ -18,6 +19,8 @@
     dest:           "{{ role_path }}/vars/depends_packages.json"
     mode:           0644
   changed_when:     false
+  delegate_to:      localhost
+  run_once:         true
 
 - name:             "install-pkg: include depends"
   include_vars:
@@ -32,3 +35,5 @@
   when:
     - 'depend_packages != None'
     - install_depends.changed
+  delegate_to:      localhost
+  run_once:         true

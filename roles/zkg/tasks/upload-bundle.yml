@@ -2,13 +2,47 @@
 - name:             "upload-bundle: Push bundles to physical/virtual sensors"
   shell:            corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate bro bundle upload --bundle "{{ role_path }}/files/ansible_role.bundle"
   delegate_to:      localhost
+  become:           no
   when:
     - fleet_managed != 'enabled'
     - 'zeek_packages != None'
+    - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+    - (target == inventory_hostname or target == 'all')
+
+# - name:             "upload-bundle: Push bundles to physical/virtual sensors Fleet Managed"
+#   shell:            corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate bro bundle upload --bundle "{{ role_path }}/files/ansible_role.bundle"
+#   delegate_to:      localhost
+#   become:           no
+#   when:
+#     - fleet_managed == 'enabled'
+#     - 'zeek_packages != None'
+#     - (target == inventory_hostname or target == 'all')
 
 - name:             "upload-bundle: Remove bundles from physical/virtual sensors"
   shell:            corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate bro bundle remove
   delegate_to:      localhost
+  become:           no
   when:
     - fleet_managed != 'enabled'
     - 'zeek_packages == None'
+    - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+    - (target == inventory_hostname or target == 'all')
+
+# - name:             "upload-bundle: Remove bundles from physical/virtual sensors Fleet Managed"
+#   shell:            corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate bro bundle remove
+#   delegate_to:      localhost
+#   become:           no
+#   when:
+#     - fleet_managed == 'enabled'
+#     - 'zeek_packages == None'
+#     - (target == inventory_hostname or target == 'all')
+
+- name:             "upload-bundle: Copy bundle to common/files/zkg_bundles"
+  copy:
+    src:            "{{ role_path }}/files/ansible_role.bundle"
+    dest:           "{{ role_path }}/../../common/files/zkg_bundles/ansible_role.bundle"
+    mode:           0644
+  delegate_to:      localhost
+  run_once:         true
+  when:
+    - 'zeek_packages != None'

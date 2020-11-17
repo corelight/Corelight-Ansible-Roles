@@ -5,6 +5,8 @@
     dest:               "{{ role_path }}/vars/remove_packages.json"
     mode:               0644
   changed_when:         false
+  delegate_to:      localhost
+  run_once:         true
 
 - name:                 "remove-packages: Remove zeek_packages from list"
   lineinfile:
@@ -15,6 +17,8 @@
   changed_when:         false
   when:
     - 'zeek_packages != None'
+  delegate_to:      localhost
+  run_once:         true
 
 - name:                 "remove-packages: Remove dependencies from list"
   lineinfile:
@@ -26,6 +30,8 @@
   when:
     - 'zeek_packages != None'
     - item.dependency is defined
+  delegate_to:      localhost
+  run_once:         true
 
 - name:                 "remove-packages: Include remove_packages vars"
   include_vars:
@@ -34,13 +40,16 @@
 - name:                 "remove-packages: list packages to be removed"
   debug:
     msg:                "{{ remove_packages }}"
+  run_once:             true
 
 - name:                 "remove-packages: Remove Scripts"
   shell:                zkg remove {{ item }} --force
   with_items:           "{{ remove_packages }}"
   when:
     - 'remove_packages != None'
-  notify:               create bundle
+  register:             remove_pkgs
+  delegate_to:      localhost
+  run_once:         true
 
 - name:                 "remove-packages: Delete empty bundle"
   file:
@@ -48,3 +57,6 @@
     state:              absent
   when:
     - 'zeek_packages == None'
+  register:             empty_bundle
+  delegate_to:          localhost
+  run_once:             true

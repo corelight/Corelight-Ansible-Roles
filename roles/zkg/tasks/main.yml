@@ -8,12 +8,42 @@
 
 - name:             "main: Include zkg-prep Tasks"
   include_tasks:    zkg-prep.yml
-  when:             inventory_hostname == 'localhost'
+
+- name:             "main: Refresh Script Index"
+  shell:            zkg refresh
+  changed_when:     false
+  delegate_to:      localhost
+  run_once:         true
+  environment:
+    http_proxy:     "{{ http_proxy_env | default() }}"
+    https_proxy:    "{{ https_proxy_env | default() }}"
+
+- name:             "main: Collect list of installed scripts"
+  shell:            zkg list --nodesc
+  register:         installed_scripts
+  changed_when:     false
+  delegate_to:      localhost
+  run_once:         true
+
+- debug:
+    var:            installed_scripts.stdout_lines
+  run_once:             true
+
+- name:             "main: Include install-pkg Tasks"
+  include_tasks:    install-pkg.yml
+  when:
+    - 'zeek_packages != None'
+
+- name:             "main: Include remove_packages tasks"
+  include_tasks:    remove-packages.yml
+
+- name:             "main: Include upgrade_packages tasks"
+  include_tasks:    upgrade-packages.yml
 
 - name:             "main: Include create-bundle Tasks"
   include_tasks:    create-bundle.yml
-  when:             inventory_hostname == 'localhost'
 
-- name:             "main: Include upload-bundle Tasks"
+- name:             upload bundle
   include_tasks:    upload-bundle.yml
-  when:             inventory_hostname != 'localhost'
+  when:
+    - (create_bundle.changed or empty_bundle.changed)
