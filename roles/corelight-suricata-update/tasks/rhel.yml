@@ -29,7 +29,7 @@
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
 
-- name:           "rhel: Install libselinux-python on RHEL7"
+- name:           "rhel: Install libselinux-python on RHEL7 / CentOS7"
   yum:
     name:         libselinux-python
     state:        latest

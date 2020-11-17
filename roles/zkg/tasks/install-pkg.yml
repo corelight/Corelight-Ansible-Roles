@@ -1,9 +1,7 @@
 ---
 - name:             "install-pkg: Install Scripts"
-  expect:
-    command:        zkg install --skiptests "{{ item.path }}"
-    responses:
-      Proceed(.*):  "y"
+  shell: |
+    yes | zkg install --skiptests "{{ item.path }}"
   with_items:       "{{ zeek_packages }}"
   when:
     - 'zeek_packages != None'

@@ -9,13 +9,13 @@
     https_proxy:    "{{ https_proxy_env | default() }}"
 
 # pexpect is used to run commands are respond to prompts
-- name:             "zkg-prep: Install pexpect"
-  pip:
-    name:           pexpect
-    executable:     pip3
-  environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+# - name:             "zkg-prep: Install pexpect"
+#   pip:
+#     name:           pexpect
+#     executable:     pip3
+#   environment:
+#     http_proxy:     "{{ http_proxy_env | default() }}"
+#     https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "zkg-prep: Install zkg dependencies"
   pip:

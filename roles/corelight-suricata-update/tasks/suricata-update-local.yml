@@ -99,7 +99,7 @@
     var:            results10.stdout_lines
 
 - name:             "suricata-update-local: Update Suricata-update Sources"
-  command:          suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  shell:            suricata-update update-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   changed_when:     false
   become:           no
   environment:
@@ -107,7 +107,7 @@
     https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "suricata-update-local: Collect list of enabled sources"
-  command:          suricata-update list-enabled-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  shell:            suricata-update list-enabled-sources -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   register:         enabled_sources
   changed_when:     false
   become:           no
@@ -116,7 +116,7 @@
     var:            enabled_sources.stdout_lines
 
 - name:             "suricata-update-local: Enable remote sources with secret-codes"
-  command:          suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  shell:            suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   with_items:       "{{ enable_suricata_secret_code_sources|default([]) }}"
   when:             'item.name not in enabled_sources.stdout'
   no_log:           true
@@ -127,7 +127,7 @@
     var:            results4.stdout_lines
 
 - name:             "suricata-update-local: Enable remote sources without secret-codes"
-  command:          suricata-update enable-source "{{ item }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  shell:            suricata-update enable-source "{{ item }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   with_items:       "{{ enable_suricata_remote_sources|default([]) }}"
   when:             'item not in enabled_sources.stdout'
   become:           no
@@ -137,7 +137,7 @@
     var:            results5.stdout_lines
 
 - name:             "suricata-update-local: Enable remote sources not in the index"
-  command:          suricata-update add-source "{{ item.name }}" "{{ item.url }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  shell:            suricata-update add-source "{{ item.name }}" "{{ item.url }}" -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   with_items:       "{{ enable_suricata_custom_url_sources|default([]) }}"
   when:             'item.name not in enabled_sources.stdout'
   become:           no
@@ -160,7 +160,7 @@
 
 # Suricata-update
 - name:             "suricata-update-local: Run Suricata-update"
-  command:          suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
+  shell:            suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -D "{{ suricata_update_path }}"
   become:           no
   register:         results8
   environment:

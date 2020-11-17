@@ -1,6 +1,6 @@
 ---
 - name:             "suricata-update-per-version: Run Suricata-update for each version"
-  command:          suricata-update  --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
+  shell:            suricata-update  --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" -o "{{ suricata_update_path }}/rules/{{ item }}" --suricata-version "{{ item }}"
   become:           no
   register:         results8
   environment:
