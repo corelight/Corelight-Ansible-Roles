@@ -9,13 +9,19 @@
   when:
     - "ansible_os_family == 'RedHat'"
 
-# Install Suricata-update
-- name:             "suricata-update-install: Install Suricata-update"
+# Install Suricata-update without proxy
+- name:             "suricata-update-install: Install Suricata-update with sudo -H without a proxy"
   shell: |
     sudo -H pip3 install --upgrade --upgrade-strategy only-if-needed suricata-update
-  environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+  when:
+    - https_proxy_env is not defined
+
+# Install Suricata-update behind a proxy
+- name:             "suricata-update-install: Install Suricata-update with sudo -H behind a proxy"
+  shell: |
+    sudo -H pip3 install --upgrade --upgrade-strategy only-if-needed --proxy {{ https_proxy_env }} suricata-update
+  when:
+    - https_proxy_env is defined
 
 # Find Suricata-update and make sure it's in the $PATH
 - name:             "suricata-update-install: Find Suricata-update location"
@@ -111,6 +117,8 @@
     path:           /var/corelight/suricata/
     state:          directory
     mode:           '0755'
+    owner:          "{{ ansible_user }}"
+    group:          "{{ ansible_user }}" 
   become:           true
 
 - name:             "suricata-update-install: Make sure Suricata-update path exists"

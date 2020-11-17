@@ -21,7 +21,7 @@
   register:         results2
 
 - debug:
-    var:            results2.stdout_lines
+    var:            results2
 
 - name:             "suricata-rules-clients: Push Suricata-update Rules to Fleet Managed Physical or Virtual sensors"
   shell:            corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
@@ -32,4 +32,4 @@
   register:         results3
 
 - debug:
-    var:            results3.stdout_lines
+    var:            results3
