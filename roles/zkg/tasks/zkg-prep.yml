@@ -4,6 +4,8 @@
     name:         zkg
     state:        latest
     executable:   pip3
+  delegate_to:      localhost
+  run_once:         true
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
@@ -26,6 +28,8 @@
       - configparser
     extra_args:     --user
     executable:     pip3
+  delegate_to:      localhost
+  run_once:         true
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
@@ -35,6 +39,8 @@
     name:           corelight-client
     state:          latest
     executable:     pip3
+  delegate_to:      localhost
+  run_once:         true
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
