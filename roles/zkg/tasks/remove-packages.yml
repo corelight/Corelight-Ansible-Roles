@@ -36,7 +36,7 @@
     msg:                "{{ remove_packages }}"
 
 - name:                 "remove-packages: Remove Scripts"
-  command:              zkg remove {{ item }} --force
+  shell:                zkg remove {{ item }} --force
   with_items:           "{{ remove_packages }}"
   when:
     - 'remove_packages != None'

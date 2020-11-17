@@ -1,5 +1,5 @@
 - name:                 Collect physical or virtual sensor Suricata version
-  command:              corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
+  shell:                corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
   register:             suricata_status
   delegate_to:          localhost
   become:               false

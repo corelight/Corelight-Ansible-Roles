@@ -80,11 +80,11 @@
     - suricata_update_enable == 'disabled'
 
 - name:             "software_sensor_common: Refresh Script Index"
-  command:          zkg refresh
+  shell:            zkg refresh
   changed_when:     false
 
 - name:             "software_sensor_common: Collect list of installed scripts"
-  command:          zkg list
+  shell:            zkg list
   register:         installed_scripts
   changed_when:     false
 
@@ -92,10 +92,8 @@
     var:            installed_scripts.stdout_lines
 
 - name:             "software_sensor_common: Install Scripts"
-  expect:
-    command:        zkg install --skiptests "{{ item.path }}"
-    responses:
-      Proceed(.*):  "y"
+  shell: |
+    yes | zkg install --skiptests "{{ item.path }}"
   with_items:       "{{ zeek_packages }}"
   when:
     - 'zeek_packages != None'
@@ -132,7 +130,7 @@
   include_tasks:    remove-packages.yml
 
 - name:             "software_sensor_common: Upgrade Scripts"
-  command:          zkg upgrade {{ item.name }} --force
+  shell:            zkg upgrade {{ item.name }} --force
   with_items:       "{{ zeek_packages }}"
   when:
     - 'item.auto_upgrade is true'

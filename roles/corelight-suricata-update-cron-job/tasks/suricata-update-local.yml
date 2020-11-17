@@ -1,6 +1,6 @@
 ---
 - name:             "suricata-update-local: Run Suricata-update"
-  command:          suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" 
+  shell:            suricata-update --no-reload --no-test -c "{{ suricata_update_path }}/update.yaml" 
   become:           no
   register:         results1
   environment:

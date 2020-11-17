@@ -1,13 +1,13 @@
 ---
 - name:             "create-bundle: Refresh Script Index"
-  command:          zkg refresh
+  shell:            zkg refresh
   changed_when:     false
   environment:
     http_proxy:     "{{ http_proxy_env | default() }}"
     https_proxy:    "{{ https_proxy_env | default() }}"
 
 - name:             "create-bundle: Collect list of installed scripts"
-  command:          zkg list --nodesc
+  shell:            zkg list --nodesc
   register:         installed_scripts
   changed_when:     false
 
@@ -23,7 +23,7 @@
   include_tasks:    remove-packages.yml
 
 - name:             "create-bundle: Upgrade Scripts"
-  command:          zkg upgrade {{ item.name }} --force
+  shell:            zkg upgrade {{ item.name }} --force
   with_items:       "{{ zeek_packages }}"
   when:
     - 'item.auto_upgrade is true'

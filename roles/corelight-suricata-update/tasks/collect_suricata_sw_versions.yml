@@ -1,5 +1,5 @@
 - name:         Collect software sensor Suricata version
-  command:      corelight-suricata -V
+  shell:        corelight-suricata -V
   become:       true
   register:     suricata_status
 
