@@ -1,5 +1,6 @@
 # Ignore customer files in the common files folder.
 common/**
+**/files/*
 !common/files
 !common/files/input-files
 !**/default-input-files
@@ -15,7 +16,7 @@ common/**
 !fragments
 !host_facts
 
-**/files/*
+
 suricata.rules
 suricata-version-facts.yaml
 remove-packages.json
@@ -27,3 +28,5 @@ remove-rule-file-list.json
 !.keep
 !default*
 !example*
+
+devscript-*
