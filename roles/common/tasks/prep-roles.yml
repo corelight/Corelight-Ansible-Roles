@@ -1,0 +1,60 @@
+---
+# Create role /vars/main.yml fragments
+- name: "[cm-20] create {{ outer_item }}/vars/fragments/1main.yml comment"
+  lineinfile:
+    path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
+    line: "# Assembled from ./fragments/*.yml files"
+    regex: "^# Assembled from \\./fragments/\\*\\.yml files"
+    insertbefore: BOF
+    create: yes
+    mode: '0644'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: "[cm-21] define suricata_update_host var in {{ outer_item }} vars/fragments/1main.yml"
+  lineinfile:
+    path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
+    line: "suricata_update_host: {{ suricata_update_host }}"
+    regex: "^suricata_update_host:: {{ suricata_update_host }}"
+    insertafter: "^# Assembled from \\./fragments/\\*\\.yml files"
+
+- name: "[cm-22] define cron_job_host var in {{ outer_item }} vars/fragments/1main.yml"
+  lineinfile:
+    path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
+    line: "cron_job_host: {{ cron_job_host }}"
+    regex: "^cron_job_host:: {{ cron_job_host }}"
+    insertafter: "^# Assembled from \\./fragments/\\*\\.yml files"
+
+- name: "[cm-23] define controller is cron false"
+  set_fact:
+    controller_is_cron: false
+  changed_when: false
+  when:
+    - "hostvars[cron_job_host].ansible_connection|d('ssh') != 'local'"
+
+- name: "[cm-24] define controller is cron true"
+  set_fact:
+    controller_is_cron: true
+  changed_when: false
+  when:
+    - "hostvars[cron_job_host].ansible_connection|d('ssh')  == 'local'"
+
+- name: "[cm-25] define controller_is_cron var in {{ outer_item }} vars/fragments/1main.yml"
+  lineinfile:
+    path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
+    line: "controller_is_cron: {{ controller_is_cron }}"
+    regex: "^controller_is_cron:: {{ controller_is_cron }}"
+    insertafter: "^# Assembled from \\./fragments/\\*\\.yml files"
+
+- name: "[cm-26] create {{ outer_item }}/vars/fragments/1main.yml dictionary"
+  lineinfile:
+    path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
+    line: "{{ outer_item }}_hosts_history:"
+    regexp: "^{{ outer_item }}_hosts_history:"
+    insertafter: EOF
+
+- name: "[cm-27] Re-assemble {{ outer_item }}/vars/main.yml"
+  assemble:
+    src: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/"
+    dest: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/main.yml"
+    mode: '0644'

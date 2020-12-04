@@ -1,6 +1,6 @@
 galaxy_info:
   author: "Corelight, Inc."
-  description: Role for Zeek Package Manager
+  description: Copy Ansible config to cron job host
   company: "Corelight, Inc."
 
   # If the issue tracker for your role is not on github, uncomment the

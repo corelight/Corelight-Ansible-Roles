@@ -1,0 +1,31 @@
+# suricata-update - disable.conf
+
+# Example of disabling a rule by signature ID (gid is optional).
+# 1:2019401
+# 2019401
+
+# Example of disabling a rule by regular expression.
+# - All regular expression matches are case insensitive.
+# re:heartbleed
+# re:MS(0[7-9]|10)-\d+
+
+# Examples of disabling a group of rules.
+# group:emerging-icmp.rules
+# group:emerging-dos
+# group:emerging*
+
+{% if 'software_sensors' not in group_names %}
+# Disable rules with protocols disabled in Corelight-suricata
+re: ^alert\s+rdp
+re: ^alert\s+modbus
+re: ^alert\s+dnp3
+re: ^alert\s+enip
+re: ^alert\s+sip
+re: \sja3
+{% endif %}
+
+{% if disable_rules is defined %}
+{% for rule in disable_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}

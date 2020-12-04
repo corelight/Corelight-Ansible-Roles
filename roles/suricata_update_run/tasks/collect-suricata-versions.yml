@@ -1,0 +1,50 @@
+---
+- name: "[sur-15] Collect Fleet managed physical sensor Suricata version"
+  include_tasks: collect-suricata-fl-versions.yml
+  when:
+    - "'physical_sensors' in group_names"
+    - fleet_managed == 'enabled'
+
+- name: "[sur-16] Collect non-Fleet managed physical sensor Suricata version"
+  include_tasks: collect-suricata-ph-versions.yml
+  when:
+    - "'physical_sensors' in group_names"
+    - fleet_managed != 'enabled'
+
+- name: "[sur-17] Collect software sensor Suricata version"
+  include_tasks: collect-suricata-sw-versions.yml
+  when:
+    - "'software_sensors' in group_names"
+
+- name: "[sur-18] Add relevant sensors to suricata_vers_remote group"
+  group_by:
+    key: suricata_vers_remote
+
+- name: "[sur-19] Set Version Facts"
+  set_fact:
+    suricata_version: "{{ suricata_status.stdout_lines | select('match', '^(.)*?version') | list | regex_replace('[^0-9]*([0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2})(.+)$', '\\1') }}"
+    cacheable: yes
+
+- name: "[sur-20] Write Suricata Versions to file"
+  template:
+    src: suricata-versions.yaml.j2
+    dest: "{{ role_path }}/vars/suricata-version-facts.yaml"
+    mode: 0644
+  delegate_to: localhost
+  run_once: true
+
+- name: "[sur-21] include vars"
+  include_vars:
+    file: suricata-version-facts.yaml
+
+- name: "[sur-22] Remove duplicate versions"
+  set_fact:
+    suricata_versions: "{{ hostvars[inventory_hostname]['suricata_versions'] | unique }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: "[sur-23] Suricata versions"
+  debug:
+    msg: "{{ suricata_versions }}"
+  run_once: true
+  tags: [never, debug]

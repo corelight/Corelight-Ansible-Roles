@@ -1,0 +1,11 @@
+depend_packages:
+{% if installed_depends.results is defined %}
+{% for item in installed_depends.results %}
+{% if item.stdout_lines is defined %}
+{% if item.stdout_lines is search("dependencies") %}
+  - name: '{{ item.stdout_lines | regex_replace('\[\'The following packages will be INSTALLED:\', \'\s+([^\s]+) \(.*?\)\', \'\', \'The following dependencies will be INSTALLED:\', \'\s+([^\s]+).*', '\\1') | regex_replace('.+?([^/]+)$', '\\1')}}'
+    dependency: '{{ item.stdout_lines | regex_replace('\[\'The following packages will be INSTALLED:\', \'\s+([^\s]+) \(.*?\)\', \'\', \'The following dependencies will be INSTALLED:\', \'\s+([^\s]+).*', '\\2') | regex_replace('.+?([^/]+)$', '\\1')}}'
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}

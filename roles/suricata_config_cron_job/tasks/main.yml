@@ -1,0 +1,108 @@
+---
+- block:
+    - name: "[sccj-1] Load vars"
+      include_vars:
+        dir: "{{ playbook_dir }}/common"
+        ignore_files:
+          - "example-secrets.yml"
+          - "example-main-vars.yml"
+        ignore_unknown_extensions: yes
+        extensions:
+          - ""
+          - "yaml"
+          - "yml"
+          - "json"
+
+    - name: Gather Facts
+      setup:
+      when: "'physical_sensors' not in group_names"
+
+    - block:
+        - name: Copy Ansible config to remote if needed
+          copy:
+            src: /etc/ansible/ansible.cfg
+            dest: /etc/ansible/ansible.cfg
+            mode: '0644'
+
+        - name: Create /etc/ansible/corelight-ansible-roles for remote if needed
+          file:
+            path: /etc/ansible/corelight-ansible-roles
+            state: directory
+            mode: "0755"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+
+        - name: Clone Corelight Suricata-update Role Repo on remote
+          git:
+            repo: https://github.com/corelight/Corelight-Ansible-Roles.git
+            dest: /etc/ansible/corelight-ansible-roles
+            force: yes
+            version: "2.0alpha"
+          become: no
+          environment:
+            http_proxy: "{{ http_proxy_env |d() }}"
+            https_proxy: "{{ https_proxy_env |d() }}"
+
+        - name: Copy Role vars to remote
+          copy:
+            src: "{{ item }}"
+            dest: /etc/ansible/corelight-ansible-roles/common/
+            mode: "0755"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            decrypt: no
+          with_fileglob:
+            - "{{ playbook_dir }}/common/*"
+
+        - name: Copy Inventory file to remote
+          copy:
+            src: "{{ item }}"
+            dest: /etc/ansible/corelight-ansible-roles/common/inventory/
+            mode: "0755"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+          with_fileglob:
+            - "{{ playbook_dir }}/common/inventory/*.yml"
+
+        - name: Copy Secrets Password file to  remote
+          copy:
+            src: "{{ secrets_pswd_file }}"
+            dest: "{{ secrets_pswd_file }}"
+            mode: "0700"
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+          no_log: true
+
+      when:
+        - controller_is_cron is false
+        - inventory_hostname == cron_job_host
+
+    - name: Include update cron job tasks
+      include_tasks: update-cron-job.yml
+
+  always:
+    - name: "[sc-26] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: suricata_update_cron_job
+        fact_option: config
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[sc-27] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: suricata_update_cron_job
+        fact_option: config
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[sc-28] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

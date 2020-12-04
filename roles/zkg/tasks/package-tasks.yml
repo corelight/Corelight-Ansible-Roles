@@ -1,0 +1,100 @@
+---
+- name: Install Scripts
+  shell: |
+    source /etc/corelight-env/bin/activate
+    yes | zkg install --skiptests "{{ item.path }}"
+  args:
+    executable: /bin/bash
+  with_items: "{{ zeek_packages }}"
+  changed_when: false
+  when:
+    - "zeek_packages != None"
+    - "item.name not in installed_scripts.stdout"
+  notify: restart software sensor
+  register: installed_depends
+  become: "{{ zkg_become|d('no') }}"
+
+- name: Write depends to file
+  template:
+    src: "zkg-depends.yaml.j2"
+    dest: "{{ role_path }}/vars/depends-packages.yaml"
+    mode: '0644'
+  changed_when: false
+  delegate_to: localhost
+
+- name: include depends
+  include_vars:
+    file: depends-packages.yaml
+
+- name: Modify main-vars
+  lineinfile:
+    path: "common/vars/main-vars.yml"
+    line: "    dependency: {{ item.dependency }}"
+    insertafter: "{{ item.name }}"
+  with_items: "{{ depend_packages }}"
+  when:
+    - "depend_packages != None"
+    - installed_depends.changed
+  delegate_to: localhost
+
+- name: Remove zeek_packages from list
+  lineinfile:
+    path: "{{ role_path }}/vars/remove-packages.json"
+    regexp: "{{ item.name }}"
+    state: absent
+  with_items: "{{ zeek_packages }}"
+  changed_when: false
+  when:
+    - "zeek_packages != None"
+  delegate_to: localhost
+
+- name: Remove dependencies from list
+  lineinfile:
+    path: "{{ role_path }}/vars/remove-packages.json"
+    regexp: "{{ item.dependency }}"
+    state: absent
+  with_items: "{{ zeek_packages }}"
+  changed_when: false
+  when:
+    - "zeek_packages != None"
+    - item.dependency is defined
+  delegate_to: localhost
+
+- name: Include remove-packages vars
+  include_vars:
+    file: remove-packages.json
+
+- name: list packages to be removed
+  debug:
+    msg: "{{ remove_packages }}"
+
+- name: Remove Scripts
+  shell: |
+    source /etc/corelight-env/bin/activate
+    zkg remove {{ item }} --force
+  args:
+    executable: /bin/bash
+  with_items: "{{ remove_packages }}"
+  when:
+    - "remove_packages != None"
+  register: remove_pkgs
+  become: "{{ zkg_become|d('no') }}"
+
+- name: Upgrade Scripts
+  shell: |
+    source /etc/corelight-env/bin/activate
+    zkg upgrade {{ item.name }} --force
+  args:
+    executable: /bin/bash
+  with_items: "{{ zeek_packages }}"
+  when:
+    - "item.auto_upgrade is true"
+    - "item.name in installed_scripts.stdout"
+  register: upgrade_pkgs
+  changed_when:
+    - upgrade_pkgs.stdout != 'All packages already up-to-date.'
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+  notify: restart software sensor
+  become: "{{ zkg_become|d('no') }}"

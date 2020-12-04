@@ -1,6 +1,6 @@
 galaxy_info:
   author: "Corelight, Inc."
-  description: Role for Zeek Package Manager
+  description: Create '/etc/corelight-env' python virtual environment and installs/upgrade basic python3 packages
   company: "Corelight, Inc."
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -47,8 +47,5 @@ galaxy_info:
     # NOTE: A tag is limited to a single word comprised of alphanumeric characters.
     #       Maximum 20 tags per role.
 
-    # The corelight-fact-check dependencies is to ensure roles cannot be ran out of order.
-    # For example, you cannot run suricata-update before it is installed and configured.
-    # All of the roles in this repository leave facts in /etc/ansible/facts.d/ with the
-    # date, time and status if the run was successful.
-  dependencies: []
+allow_duplicates: no
+dependencies: []

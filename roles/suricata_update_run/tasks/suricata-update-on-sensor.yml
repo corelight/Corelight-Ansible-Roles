@@ -1,0 +1,16 @@
+---
+- name: "[sur-10] Run Suricata-update on a sensor"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update
+  args:
+    executable: /bin/bash
+  become: no
+  register: results
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[sur-11] suricata-update results"
+  debug:
+    var: results.stdout_lines

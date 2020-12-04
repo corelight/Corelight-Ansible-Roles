@@ -1,5 +1,0 @@
----
-- name:           restart software sensor
-  service:
-    name:         corelight
-    state:        restarted

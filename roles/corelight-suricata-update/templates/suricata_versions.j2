@@ -1,4 +1,0 @@
-suricata_versions:
-{% for host in groups['suricata_remote'] %}
-    - {{ hostvars[host]['suricata_version']|to_json|safe }} 
-{% endfor %}

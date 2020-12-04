@@ -1,0 +1,63 @@
+---
+- block:
+    - name: "[sur-1] Load vars"
+      include_vars:
+        dir: "{{ playbook_dir }}/common"
+        ignore_files:
+          - "example-secrets.yml"
+          - "example-main-vars.yml"
+        ignore_unknown_extensions: yes
+        extensions:
+          - ""
+          - "yaml"
+          - "yml"
+          - "json"
+
+    - name: "[sur-2] Include Suricata-update Tasks on a sensor"
+      include_tasks: suricata-update-on-sensor.yml
+      when:
+        - suricata_update_enable|d('disabled') == 'local'
+        - "'software_sensors' in group_names"
+
+    - name: "[sur-3] Include collect suricata version tasks"
+      include_tasks: collect-suricata-versions.yml
+      when:
+        - suricata_update_enable|d('disabled') == 'remote'
+
+    - name: "[sur-4] Include Suricata-update Tasks"
+      include_tasks: suricata-update.yml
+      when:
+        - inventory_hostname == suricata_update_host
+        - "'software_sensors' not in group_names"
+
+    - name: "[sur-5] Include Suricata Rules Clients Tasks"
+      include_tasks: suricata-rules-clients.yml
+      when:
+        - "suricata_update_enable|d('disabled') == 'remote'"
+
+  always:
+    - name: "[sur-6] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: suricata_update
+        fact_option: run
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[sur-7] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: suricata_update
+        fact_option: run
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[sur-8] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

@@ -1,0 +1,44 @@
+---
+- name: Gather Facts for software sensors
+  setup:
+    filter: ansible_local
+    gather_subset: "!all"
+  when:
+    - "'software_sensors' in group_names"
+
+- name: Create group install_needed
+  group_by:
+    key: install_needed
+  changed_when: false
+  when:
+    - "'software_sensors' in group_names"
+    - "ansible_local.corelight_ansible_roles.softsensor.install|d('failed') == 'failed'"
+
+- name: pause note
+  pause:
+    seconds: 5
+    prompt: |
+      #########################################################
+      The Software Sensor has not been installed on this host!
+        Run the 'software-sensor-select-install.yml' first.
+      #########################################################
+      "{{ groups.install_needed | to_nice_json }}"
+      #########################################################
+  run_once: true
+  when:
+    - "groups.install_needed is defined"
+
+- name: "[cm-] Cannot configure sensor"
+  debug:
+    msg: "The Software Sensor has not been installed on {{ inventory_hostname }}"
+  when:
+    - "ansible_local.corelight_ansible_roles.softsensor.install|d('failed') == 'failed'"
+  failed_when: true
+
+- name: "[cm-] "
+  pause:
+    seconds: 5
+    prompt: |
+      The following host are a GO!
+        unless they are stopped now
+      "{{ ansible_play_batch | to_nice_json }}"

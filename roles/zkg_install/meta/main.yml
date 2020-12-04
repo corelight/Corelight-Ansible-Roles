@@ -1,6 +1,6 @@
 galaxy_info:
   author: "Corelight, Inc."
-  description: Role for Zeek Package Manager
+  description: Install/Upgrade ZKG
   company: "Corelight, Inc."
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -51,4 +51,5 @@ galaxy_info:
     # For example, you cannot run suricata-update before it is installed and configured.
     # All of the roles in this repository leave facts in /etc/ansible/facts.d/ with the
     # date, time and status if the run was successful.
+
   dependencies: []

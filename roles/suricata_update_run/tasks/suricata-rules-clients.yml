@@ -1,0 +1,50 @@
+---
+- name: "[sur-50] Copy Suricata-update Rules to software sensors"
+  copy:
+    src: "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
+    dest: "{{ suricata_rules_dir }}/suricata.rules"
+    mode: 0644
+  when: "'software_sensors' in group_names"
+  register: results
+  become: yes
+  notify:
+    - Reload Suricata rules Debian
+    - Reload Suricata rules RHEL
+
+- name: "[sur-51] results"
+  debug:
+    msg: results
+
+- name: "[sur-52] Push Suricata-update Rules to non-Fleet managed Physical sensors"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file {{ suricata_update_dir }}/rules/{{ suricata_version }}/suricata.rules
+  args:
+    executable: /bin/bash
+  become: no
+  delegate_to: localhost
+  register: results
+  when:
+    - "'software_sensors' not in group_names"
+    - fleet_managed == 'disable'
+
+- name: "[sur-53] results"
+  debug:
+    msg: results
+
+- name: "[sur-54] Push Suricata-update Rules to Fleet Managed Physical sensors"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ suricata_update_dir }}/rules/{{ suricata_version }}/suricata.rules"
+  args:
+    executable: /bin/bash
+  become: no
+  delegate_to: localhost
+  register: results
+  when:
+    - "'software_sensors' not in group_names"
+    - fleet_managed == 'enable'
+
+- name: "[sur-55] results"
+  debug:
+    msg: results

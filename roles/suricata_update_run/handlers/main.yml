@@ -1,0 +1,23 @@
+# updated 23 Nov 2020
+---
+- name:           Reload Suricata rules Debian
+  shell:          kill -USR2 $(pidof corelight-suricata)
+  args:
+    executable:   /bin/bash
+  become:         yes
+  when:           ansible_distribution == 'Debian'
+
+# - name:           Reload Suricata rules RHEL
+#   service:
+#     name:         corelight
+#     state:        restarted
+#   become:         yes
+#   when:           ansible_distribution == 'RedHat'
+
+##### This needs to be tested for CentOS/RHEL 7 & 8
+- name:           Reload Suricata rules RHEL
+  shell:          kill -USR2 $(pidof corelight-suricata)
+  args:
+    executable:   /bin/bash
+  become:         yes
+  when:           ansible_distribution == 'RedHat'

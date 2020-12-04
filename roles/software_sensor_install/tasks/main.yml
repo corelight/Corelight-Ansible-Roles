@@ -1,0 +1,36 @@
+---
+- block:
+    - name: "[ssi-2] Include Debian Tasks"
+      include_tasks: debian.yml
+      when: "ansible_os_family == 'Debian'"
+
+    - name: "[ssi-3] Include RHEL Tasks"
+      include_tasks: redhat.yml
+      when: "ansible_os_family == 'RedHat'"
+
+  always:
+    - name: "[cc-4] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: softsensor
+        fact_option: install
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[cc-5] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: softsensor
+        fact_option: install
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[cc-6] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

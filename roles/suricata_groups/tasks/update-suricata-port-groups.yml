@@ -1,0 +1,37 @@
+# updated 23 Nov 2020
+---
+# - name:             Update Suricata port-groups on software sensors
+#   lineinfile:
+#     path:           /var/corelight/suricata/.suricata.yaml
+#     regexp:        '^(\s+{{item.name | upper}}:).*'
+#     line:          '\1 "{{ item.group }}"'
+#     backrefs:       yes
+#   with_items:      "{{ suricata_port_groups }}"
+#   when:            "'software_sensors' in group_names"
+#   notify:           Reload Suricata rules
+
+- name:               Update Suricata port-groups on Physical or Virtual sensors
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate configuration update --suricata.port_groups."{{ item.name | lower }}" "{{ item.group }}"
+  args:
+    executable: /bin/bash
+  delegate_to:        localhost
+  with_items:        "{{ suricata_port_groups }}"
+  become:           no
+  when:
+    - ('physical_sensors' in group_names or 'virtual_sensor' in group_names)
+    - fleet_managed == 'disabled'
+
+- name:               Update Suricata port-groups on Fleet Managed Physical or Virtual sensors
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate configuration update --suricata.port_groups."{{ item.name | lower }}" "{{ item.group }}"
+  args:
+    executable: /bin/bash
+  delegate_to:        localhost
+  with_items:        "{{ suricata_port_groups }}"
+  become:           no
+  when:
+    - ('physical_sensors' in group_names or 'virtual_sensor' in group_names)
+    - fleet_managed == 'enabled'

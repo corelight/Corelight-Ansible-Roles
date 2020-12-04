@@ -1,0 +1,79 @@
+---
+- block:
+    - name: Install and or Upgrade ansible in the virtual environment
+      pip:
+        name: ansible
+        virtualenv: "{{ virtual_env_dir }}"
+        extra_args: --upgrade --upgrade-strategy eager
+        virtualenv_command: python3 -m venv
+      become: no
+      register: results
+      environment:
+        http_proxy: "{{ http_proxy_env |d() }}"
+        https_proxy: "{{ https_proxy_env |d() }}"
+
+    - name: Ansible installation results
+      debug:
+        msg: "{{ results.stdout_lines }}"
+
+    - name: Create /etc/ansible directory
+      file:
+        path: /etc/ansible
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Create default Ansible config for remote if needed
+      copy:
+        src: files/default-ansible.cfg
+        dest: /etc/ansible/ansible.cfg
+        force: no
+        mode: '0644'
+
+    - name: Copy Ansible requirements to remote
+      copy:
+        src: "{{ role_path }}/files/requirements.yml"
+        dest: /etc/ansible/requirements.yml
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Install Ansible community modules
+      shell: |
+        source /etc/corelight-env/bin/activate
+        ansible-galaxy install -r /etc/ansible/requirements.yml
+      args:
+        executable: /bin/bash
+      changed_when: false
+      become: no
+      environment:
+        http_proxy: "{{ http_proxy_env |d() }}"
+        https_proxy: "{{ https_proxy_env |d() }}"
+
+  always:
+    - name: "[zkgi-4] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: ansible
+        fact_option: install
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[zkgi-5] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: ansible
+        fact_option: install
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[zkgi-6] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

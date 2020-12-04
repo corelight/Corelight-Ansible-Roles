@@ -1,49 +1,89 @@
 ---
-- name:             Load vars
+- name: set fact to enable become for sensor configs
+  set_fact:
+      zkg_become: yes
+  when: "zkg_included_by|d() == 'softsensor'"
+
+- name: "[zkg-] Load vars"
   include_vars:
-    file:           '{{ item }}'
-  with_items:
-    - "{{ secrets_path }}"
-    - "{{ main_vars_path }}"
+    dir: "{{ playbook_dir }}/common"
+    ignore_files:
+      - 'example-secrets.yml'
+      - 'example-main-vars.yml'
+    ignore_unknown_extensions: yes
+    extensions:
+      - ''
+      - 'yaml'
+      - 'yml'
+      - 'json'
 
-- name:             "main: Include zkg-prep Tasks"
-  include_tasks:    zkg-prep.yml
+- block:
+    - name: Refresh Script Index
+      shell: |
+        source /etc/corelight-env/bin/activate
+        zkg refresh
+      args:
+        executable: /bin/bash
+      changed_when: false
+      environment:
+        http_proxy: "{{ http_proxy_env |d() }}"
+        https_proxy: "{{ https_proxy_env |d() }}"
+      become: "{{ zkg_become|d('no') }}"
 
-- name:             "main: Refresh Script Index"
-  shell:            zkg refresh
-  changed_when:     false
-  delegate_to:      localhost
-  run_once:         true
-  environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+    - name: Collect list of installed scripts
+      shell: |
+        source /etc/corelight-env/bin/activate
+        zkg list --nodesc
+      args:
+        executable: /bin/bash
+      changed_when: false
+      register: installed_scripts
+      become: "{{ zkg_become|d('no') }}"
 
-- name:             "main: Collect list of installed scripts"
-  shell:            zkg list --nodesc
-  register:         installed_scripts
-  changed_when:     false
-  delegate_to:      localhost
-  run_once:         true
+    - name: Write installed_scripts to file
+      template:
+        src: "zkg-remove.yaml.j2"
+        dest: "{{ role_path }}/vars/remove-packages.json"
+        mode: '0644'
+      changed_when: false
+      delegate_to: localhost
 
-- debug:
-    var:            installed_scripts.stdout_lines
-  run_once:             true
+    - debug:
+        var: installed_scripts.stdout_lines
 
-- name:             "main: Include install-pkg Tasks"
-  include_tasks:    install-pkg.yml
-  when:
-    - 'zeek_packages != None'
+    - name: Import package tasks
+      import_tasks: package-tasks.yml
 
-- name:             "main: Include remove_packages tasks"
-  include_tasks:    remove-packages.yml
+    - name: Include bundle Tasks
+      include_tasks: bundle-tasks.yml
+      when:
+        - zkg_included_by is not defined
+  become: no
 
-- name:             "main: Include upgrade_packages tasks"
-  include_tasks:    upgrade-packages.yml
+  always:
+    - name: Include set role facts tasks
+      import_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: zkg
+        fact_option: run
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+      become: yes
 
-- name:             "main: Include create-bundle Tasks"
-  include_tasks:    create-bundle.yml
+  rescue:
+    - name: Include set role failed facts tasks
+      import_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: zkg
+        fact_option: run
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      become: yes
 
-- name:             upload bundle
-  include_tasks:    upload-bundle.yml
-  when:
-    - (create_bundle.changed or empty_bundle.changed)
+    - name: "[] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

@@ -1,0 +1,155 @@
+---
+- name: "[ssc-1] Load vars"
+  include_vars:
+    dir: "{{ playbook_dir }}/common"
+    ignore_files:
+      - 'example-secrets.yml'
+      - 'example-main-vars.yml'
+    ignore_unknown_extensions: yes
+    extensions:
+      - ''
+      - 'yaml'
+      - 'yml'
+      - 'json'
+
+- block:
+    - name: Create corelight.cfg for pre-GA release
+      template:
+        src: corelight-softsensor.conf.j2
+        dest: /etc/corelight.cfg
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart software sensor
+
+    - name: Create corelight-softsensor.conf
+      template:
+        src: corelight-softsensor.conf.j2
+        dest: /etc/corelight-softsensor.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart software sensor
+
+    - name: Create local.zeek
+      template:
+        src: local.zeek.j2
+        dest: /etc/corelight/local.zeek
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart software sensor
+
+    - name: Create /root/.zkg if it does not exist
+      file:
+        path: /root/.zkg
+        mode: "0775"
+        state: directory
+      become: yes
+
+    - name: Copy zkg config to the software sensor
+      template:
+        src: swsensor-zkg.conf.j2
+        dest: /root/.zkg/config
+        mode: '0644'
+      become: yes
+
+    - name: License the sensor
+      template:
+        src: corelight-license.txt.j2
+        dest: /etc/corelight-license.txt
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart software sensor
+
+    - name: Copy default Input Framework files to sensor
+      copy:
+        src: "{{ item }}"
+        dest: /etc/corelight/input_files/
+        mode: '0644'
+      with_fileglob: "{{ playbook_dir }}/common/files/input-files/default-input-files/*.*"
+
+    - name: Copy Input Framework files to sensor
+      copy:
+        src: "{{ item }}"
+        dest: /etc/corelight/input_files/
+        mode: '0644'
+      with_fileglob: "{{ playbook_dir }}/common/files/input-files/*.*"
+
+    - name: Copy Suricata Rule files to sensor
+      copy:
+        src: "{{ playbook_dir }}/common/files/suricata_custom_rules/"
+        # dest: "{{ suricata_custom_rules_dir }}"
+        dest: /etc/corelight/rules/
+        mode: '0644'
+      with_fileglob: "{{ playbook_dir }}/common/files/suricata-custom-rules/*.rules"
+      when: "suricata_update_enable|d() == 'disabled'"
+
+      # when:
+      #   - suricata_enable  is true
+      #   - suricata_update_enable|d() == 'disabled'
+    - name: Write current zeek_packages list to file
+      template:
+        src: previous-os-packages.yaml.j2
+        dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
+        mode: '0644'
+      register: previous_os_packages
+      delegate_to: localhost
+
+    # Loop through zkg role for Zeek package management
+    - name: Include zkg role
+      include_role:
+        name: zkg
+      vars:
+        zkg_included_by: softsensor
+      when:
+        - "previous_os_packages.changed or zkg_last_run.inventory_hostname.last_run_results|d('failed') == 'failed'"
+
+    - name: Create /var/lib/suricata if it does not exist
+      file:
+        path: /var/lib/suricata
+        mode: "0755"
+        state: directory
+      become: yes
+
+    - name: "Create {{ suricata_rules_dir }} if it does not exist"
+      file:
+        path: "{{ suricata_rules_dir }}"
+        mode: "0755"
+        state: directory
+      become: yes
+
+    - name: Start and Enable Corelight Software Sensor
+      service:
+        name: corelight
+        state: started
+        enabled: yes
+        daemon-reload: yes
+
+  always:
+    - name: "[cc-4] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: softsensor
+        fact_option: config
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[cc-5] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: softsensor
+        fact_option: config
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[cc-6] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

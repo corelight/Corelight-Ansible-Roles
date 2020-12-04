@@ -1,0 +1,16 @@
+# updated 25 Nov 2020
+---
+- name:             Collect list of existing custom rules
+  find:
+    paths:          "{{ suricata_custom_rules_dir }}"
+    file_type:      file
+    patterns:       '*.rules'
+  register:         existing_rule_file_list
+
+- name:             Write rule file list to a file
+  template:
+    src:            "remove-rule-file-list.yaml.j2"
+    dest:           "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
+    mode:           0644
+  delegate_to:      localhost
+  changed_when:     false

@@ -1,0 +1,21 @@
+# updated 23 Nov 2020
+---
+- name:           Check if enabled source file exists
+  stat:
+    path:         "{{ suricata_update_dir }}/update/sources/{{ item | regex_replace('^([a-z]*)/(.*)$', '\\1-\\2') }}.yaml"
+  register:       enabled_source_file
+
+- name:           Check if disabled source file exists"
+  stat:
+    path:         "{{ suricata_update_dir }}/update/sources/{{ item | regex_replace('^([a-z]*)/(.*)$', '\\1-\\2') }}.yaml.disabled"
+  register:       disabled_source_file
+
+- name:           Remove remote sources
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update remove-source "{{ item }}"
+  args:
+    executable: /bin/bash
+  changed_when:     false
+  become:           no
+  when:           enabled_source_file.stat.exists or disabled_source_file.stat.exists

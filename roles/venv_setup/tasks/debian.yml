@@ -1,0 +1,43 @@
+---
+- name: "[venv-10] Enable multiarch for Raspberry Pi"
+  lineinfile:
+    dest: /var/lib/dpkg/arch
+    line: "arm64"
+    create: true
+    mode: '0644'
+  when: ansible_facts['machine'] == 'aarch64'
+  register: add_arm64
+
+- name: "[venv-11] Update facts after arm64 added"
+  setup:
+    gather_subset: 'all'
+  when: add_arm64.changed
+
+- name: "[venv-12] Install pip3 on Debian"
+  apt:
+    name: python3-pip
+    state: latest
+    install_recommends: yes
+    update_cache: yes
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-13] Install pip3 on Debian"
+  apt:
+    name: python3-venv
+    state: latest
+    install_recommends: yes
+    update_cache: yes
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-14] Install git on Debian"
+  apt:
+    name: git
+    state: latest
+    install_recommends: yes
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"

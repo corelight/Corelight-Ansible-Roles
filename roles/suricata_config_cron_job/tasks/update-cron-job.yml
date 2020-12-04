@@ -1,0 +1,48 @@
+---
+- name: Set Cron Job Facts Block
+  block:
+    - name: set disable_cron_job fact
+      set_fact:
+        disable_cron_job: yes
+      when:
+        - enable_cron is false
+    - name: set disable_cron_job fact
+      set_fact:
+        disable_cron_job: no
+      when:
+        - enable_cron is true
+
+- name: Make sure Cron Job log path exists
+  file:
+    path: "{{ cron_job_log_path }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Make sure Cron Job file path exists
+  file:
+    path: "etc/ansible"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Create Suricata-update cron file
+  template:
+    src: cron-job.sh.j2
+    dest: "/etc/ansible/corelight-suricata-update-cron-job.sh"
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Ensure Suricata-update runs daily on Suricata-update host
+  cron:
+    name: suricata-update-all
+    hour: "{{ cron_job_hour }}"
+    minute: "{{ cron_job_minute }}"
+    cron_file: suricata-update-cron-job
+    job: "/etc/ansible/corelight-suricata-update-cron-job.sh"
+    user: "{{ ansible_user }}"
+    disabled: "{{ disable_cron_job }}"
+    state: present
