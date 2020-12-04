@@ -1,6 +1,19 @@
+##############################################################################
+## BY DEFAULT, ANSIBLE IGNORES THE FOLLOWING EXTENSIONS AS INVENTORY FILES  ##
+## .pyc, .pyo, .swp, .bak, ~, .rpm, .md, .txt, ~, .orig, .ini, .cfg, .retry ##
+##     DELETE THIS NOTE AND RENAME THIS FILE WITH A '.yml' EXTENSION        ##
+##############################################################################
+##############################################################################
+##                               CAUTION:                                   ##
+##        Variables defined in a vars file in './common/vars/' have         ##
+##          precedence over variables define in an inventory file           ##
+##############################################################################
+
+
+
 all:
   children:
-    suricata_update_host:
+    suricata_update_hosts:
       hosts:
         host1:
             ansible_host: ipaddress

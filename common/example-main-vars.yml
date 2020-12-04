@@ -1,18 +1,29 @@
----
-### This file should be renamed to 'main-vars.yml' ###
-# Only changes from the default variables need to be listed here
+##################################################################################################
+######   ALL PROPERLY FORMATTED VARIABLE FILES IN   './common/*-vars.yml'   WILL BE LOADED  ######
+##################################################################################################
+# Each section of this file can be separated into different files in the ./common/ directory as  #
+# long as each file ends with '-vars.yml'                                                        #
+##################################################################################################
+######                      WARNING: KEEP IN MIND VARIABLE PRECEDENCE!                      ######
+##################################################################################################
+
+##############################
+#### Main Variables File #####
+##############################
+
+### NOTE:  This file should be renamed to 'main-Vars.yml'
+### Only changes from the default variables need to be listed here
 
 
-secrets_path:                           "../../../common/secrets.yml"
-inventory_path:                         "../../../common/inventory.yml"
-main_vars_path:                         "../../../common/main-vars.yml"
+
+
 # path to secrets file password file should be in the secrets file
 secrets_pswd_file:                    "/secret file name in a secret location"
 
 
-####################################
-#### Software Sensor Role Vars #####
-####################################
+#########################################
+#### Software Sensor Role Variables #####
+#########################################
 
 num_workers:                              2
 sniff_interfaces:                         eth0 # should be defined in the inventory file for each software sensor
@@ -45,9 +56,9 @@ included_packages:
   - ja3
 
 
-############################################
-#### ZKG and Software Sensor Role Vars #####
-############################################
+#################################################
+#### ZKG and Software Sensor Role Variables #####
+#################################################
 
 zeek_packages:
   - name:                   icannTLD
@@ -58,23 +69,43 @@ zeek_packages:
     auto_upgrade:           true
 
 
-###################################
-#### Suricata-Update Role Vars ####
-###################################
+########################################
+#### Suricata-Update Role Variables ####
+########################################
 
 # The default setting for process port_groups or address_groups is false
 process_suricata_port_groups:           true      # true or false, if set to false, port_group tasks will be skipped
 process_suricata_address_groups:        true      # true or false, if set to false, address_group tasks will be skipped
 
-# Suricata-update Cron Job Variables
-only_perform_cron_job_tasks:            false     # true or false, if set to true only tasks to create/update the cron job will run
-enable_cron:                            true      # true or false, to enable the cron job on the cron_job_host
+# NOTE: This only needs to be set if you are running Ansible and the Cron Job on separate hosts.
+# The secrets_pswd_file will be copied to the cron_job_host and placed in the same directory.
+# Path to secrets file password file should be in the secrets file.
+secrets_pswd_file:                    "/secret file name in a secret location"
+
+##########################
+### Cron Job Variables ###
+##########################
+
+### cron_job_tasks is an administrative setting
+# cron_job_tasks options are:
+# enabled = cron_job_tasks will be executed
+# disabled = cron_job_tasks will be skipped
+# only = all non-cron_job_tasks will be skipped.  Use if you just want to update the cron_job date/time
+cron_job_tasks:                         disabled
+
+enable_cron_job:                            true      # true or false, to enable the cron job on the cron_job_host
 cron_job_target:                        all       # name of the group or host sensor for Suricata-update to update the rules on
 cron_job_host:                          host1     # name of the group or name of a host to run the cron job on
 
-# Suricata-update Variables
+
+###################################
+#### Suricata-Update Variables ####
+###################################
+
 suricata_update_host: host1
 
+
+# NOTE: If no rule sources are enabled, Suricata-update will use ET/Open by default.
 enable_suricata_remote_sources:
   - 'sslbl/ssl-fp-blacklist'
 
@@ -89,11 +120,6 @@ enable_rules:
 modify_rules:
   - 2019401 "seconds \d+" "seconds 3600"
 
-
-############################################
-#### Suricata-Update Cron Job Role Vars ####
-############################################
-
-# NOTE: This only needs to be set if you are running Ansible and the Cron Job on separate hosts.
-# path to secrets file password file should be in the secrets file
-secrets_pswd_file:                    "/secret file name in a secret location"
+disable_rules:
+  - 2019401
+  - re:heartbleed
