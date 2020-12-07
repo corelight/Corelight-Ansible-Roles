@@ -91,7 +91,7 @@ if ! [ -d /etc/corelight-env/ ] > /dev/null; then
         sudo chown $USER.$USER /etc/corelight-env
 fi
 
-if ! [ -d /etc/corelight-env/ ] > /dev/null; then
+if ! [ -d /etc/ansible/ ] > /dev/null; then
         echo "Creating /etc/ansible directory"
         sudo mkdir /etc/ansible
         sudo chown $USER.$USER /etc/ansible
