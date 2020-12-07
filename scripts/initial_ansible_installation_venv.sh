@@ -70,6 +70,7 @@ if [ "$DistroBasedOn" = "redhat" ]; then
                 echo "Installing Python3-pip and other dependencies"
                 sudo yum install -y epel-release libselinux-python dnf
                 sudo dnf install -y -q python3-pip git
+                sudo dnf install -y -q libselinux-python3
         else
                 echo "Installing Python3-pip and other dependencies"
                 sudo yum install -y dnf

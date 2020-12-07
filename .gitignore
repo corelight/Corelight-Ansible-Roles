@@ -9,12 +9,13 @@ common/**
 !.keep.rules
 !common/files/zkg_bundles
 !common/inventory
-
+!requirements.yml
 
 # Ignore customer files in all vars folders.
 **/vars/**
 !fragments
 !host_facts
+
 
 
 suricata.rules
@@ -31,4 +32,4 @@ remove-rule-file-list.json
 
 
 cleanup.sh
-ansible*
+ansible-*

@@ -53,7 +53,7 @@
 
     - name: "[venv-7] Copy virtual environment activation script"
       copy:
-        src: activate_corelight_venv.sh
+        src: "{{ playbook_dir }}/scripts/activate_venv.sh"
         dest: "~/"
         mode: "0755"
         owner: "{{ ansible_user }}"

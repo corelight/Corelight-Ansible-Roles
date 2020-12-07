@@ -58,3 +58,17 @@
   environment:
     http_proxy: "{{ http_proxy_env |d() }}"
     https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-18] DNF install/upgrade RHEL7 / CentOS7"
+  dnf:
+    name:
+      - libselinux-python3
+    state: latest
+    update_cache: yes
+    validate_certs: "{{ validate_certs |d(yes) }}"
+  when:
+    # - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
