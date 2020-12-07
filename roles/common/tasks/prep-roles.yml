@@ -8,21 +8,19 @@
     insertbefore: BOF
     create: yes
     mode: '0644'
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
 
 - name: "[cm-21] define suricata_update_host var in {{ outer_item }} vars/fragments/1main.yml"
   lineinfile:
     path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
     line: "suricata_update_host: {{ suricata_update_host }}"
-    regex: "^suricata_update_host:: {{ suricata_update_host }}"
+    regex: "^suricata_update_host:"
     insertafter: "^# Assembled from \\./fragments/\\*\\.yml files"
 
 - name: "[cm-22] define cron_job_host var in {{ outer_item }} vars/fragments/1main.yml"
   lineinfile:
     path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
     line: "cron_job_host: {{ cron_job_host }}"
-    regex: "^cron_job_host:: {{ cron_job_host }}"
+    regex: "^cron_job_host:"
     insertafter: "^# Assembled from \\./fragments/\\*\\.yml files"
 
 - name: "[cm-23] define controller is cron false"
@@ -43,7 +41,7 @@
   lineinfile:
     path: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/1main.yml"
     line: "controller_is_cron: {{ controller_is_cron }}"
-    regex: "^controller_is_cron:: {{ controller_is_cron }}"
+    regex: "^controller_is_cron:"
     insertafter: "^# Assembled from \\./fragments/\\*\\.yml files"
 
 - name: "[cm-26] create {{ outer_item }}/vars/fragments/1main.yml dictionary"

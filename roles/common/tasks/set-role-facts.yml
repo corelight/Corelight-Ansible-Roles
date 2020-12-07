@@ -125,8 +125,6 @@
         regexp: "^  {{ inventory_hostname }}:"
         insertbefore: BOF
         mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
         create: yes
       become: yes
       delegate_to: localhost

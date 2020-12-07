@@ -29,4 +29,6 @@ remove-rule-file-list.json
 !default*
 !example*
 
-devscript-*
+
+cleanup.sh
+ansible*
