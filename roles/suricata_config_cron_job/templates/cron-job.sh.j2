@@ -1,6 +1,6 @@
-{% if ansible_facts['ansible_os_family'] == 'Debian' %}
+{% if [ansible_os_family] == 'Debian' %}
 #! /bin/sh
-{% elif ansible_facts['ansible_os_family'] == 'RedHat' %}
+{% elif [ansible_os_family] == 'RedHat' %}
 #! /usr/bin/sh
 {% endif %}
 
