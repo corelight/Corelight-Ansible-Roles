@@ -108,4 +108,4 @@ python3 -m pip install --upgrade --upgrade-strategy eager ansible
 ansible-galaxy collection install community.general
 
 echo "Coping Ansible default config to /etc/ansible/ansible/cfg"
-cp ../roles/ansible-install/files/default-ansible.cfg /etc/ansible/ansible.cfg
+cp ../roles/ansible_install/files/default-ansible.cfg /etc/ansible/ansible.cfg
