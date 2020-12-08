@@ -17,10 +17,6 @@
 
 
 
-# path to secrets file password file should be in the secrets file
-secrets_pswd_file:                    "/secret file name in a secret location"
-
-
 #########################################
 #### Software Sensor Role Variables #####
 #########################################
