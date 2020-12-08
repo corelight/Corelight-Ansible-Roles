@@ -62,64 +62,6 @@
       become: yes
       changed_when: false
 
-    # do we need the host facts in common/vars section ??
-    # Create/Set facts in local common role vars in yaml format
-    # - name: "[cm-36] Set common/vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
-    #   lineinfile:
-    #     path: "{{ common_role_path }}/vars/fragments/host_facts/{{ inventory_hostname }}.yml"
-    #     line: "  {{ inventory_hostname }}:"
-    #     regexp: "^  {{ inventory_hostname }}:"
-    #     insertbefore: "BOF"
-    #     mode: '0644'
-    #     owner: "{{ ansible_user }}"
-    #     group: "{{ ansible_user }}"
-    #     create: yes
-    #   become: yes
-    #   delegate_to: localhost
-    #
-    # - name: "[cm-37] Set common/vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
-    #   lineinfile:
-    #     path: "{{ common_role_path }}/vars/fragments/host_facts/{{ inventory_hostname }}.yml"
-    #     line: "    {{ fact_section }}_{{ fact_option }}: {{ fact_value }}"
-    #     regexp: "^    {{ fact_section }}_{{ fact_option }}:"
-    #     insertafter: "^  {{ inventory_hostname }}:"
-    #   become: yes
-    #   delegate_to: localhost
-    #
-    # - name: "[cm-39] Set common/vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
-    #   lineinfile:
-    #     path: "{{ common_role_path }}/vars/fragments/host_facts/{{ inventory_hostname }}.yml"
-    #     line: "    {{ fact_section }}_{{ fact_option }}_failed_task: '{{ failed_task }}'"
-    #     regexp: "^    {{ fact_section }}_{{ fact_option }}_failed_task:"
-    #     insertafter: "^    {{ fact_section }}_{{ fact_option }}:"
-    #   become: yes
-    #   delegate_to: localhost
-    #
-    # - name: "[cm-40] Set common/vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
-    #   lineinfile:
-    #     path: "{{ common_role_path }}/vars/fragments/host_facts/{{ inventory_hostname }}.yml"
-    #     line: "    {{ fact_section }}_{{ fact_option }}_last_run: {{ now() }}"
-    #     regexp: "^    {{ fact_section }}_{{ fact_option }}_last_run"
-    #     insertafter: "^    {{ fact_section }}_{{ fact_option }}_failed_task:"
-    #   become: yes
-    #   delegate_to: localhost
-    #
-    # # Re-assemble common/vars/host_facts.yml
-    # - name: "[cm-41] Re-assemble common/vars/main.yml"
-    #   assemble:
-    #     src: "{{ common_role_path }}/vars/fragments/host_facts"
-    #     dest: "{{ common_role_path }}/vars/fragments/host_facts.yml"
-    #   delegate_to: localhost
-    #   run_once: yes
-    #
-    # # Re-assemble common/vars/main.yml
-    # - name: "[cm-41] Re-assemble common/vars/main.yml"
-    #   assemble:
-    #     src: "{{ common_role_path }}/vars/fragments"
-    #     dest: "{{ common_role_path }}/vars/main.yml"
-    #   delegate_to: localhost
-    #   run_once: yes
-
     # Create/Set facts in local role vars
     - name: "[cm-46] Set role /vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
       lineinfile:
@@ -142,15 +84,6 @@
         insertafter: "^  {{ inventory_hostname }}:"
       become: yes
       delegate_to: localhost
-
-    # - name: "[cm-48] Set role /vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
-    #   lineinfile:
-    #     path: "{{ role_path }}/vars/fragments/{{ inventory_hostname }}.yml"
-    #     line: "    {{ fact_section }}_{{ fact_option }}_failed_task: '{{ failed_task }}'"
-    #     regexp: "^    {{ fact_section }}_{{ fact_option }}_failed_task:"
-    #     insertafter: "^    {{ fact_section }}_{{ fact_option }}:"
-    #   become: yes
-    #   delegate_to: localhost
 
     - name: "[cm-49] Set role /vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
       lineinfile:
