@@ -18,7 +18,6 @@ all:
         host1:
           ansible_host: ipaddress
           ansible_user: username
-          suricata_update_enable: local
           ansible_connection: local       # Required if Ansible, Suricata-update and the cron job all run on the same host
     sensors:
       children:

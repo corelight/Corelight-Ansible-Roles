@@ -73,14 +73,15 @@ zeek_packages:
 process_suricata_port_groups:           true      # true or false, if set to false, port_group tasks will be skipped
 process_suricata_address_groups:        true      # true or false, if set to false, address_group tasks will be skipped
 
-# NOTE: This only needs to be set if you are running Ansible and the Cron Job on separate hosts.
-# The secrets_pswd_file will be copied to the cron_job_host and placed in the same directory.
-# Path to secrets file password file should be in the secrets file.
-secrets_pswd_file:                    "/secret file name in a secret location"
-
 ##########################
 ### Cron Job Variables ###
 ##########################
+
+# NOTE: The 'secrets_pswd_file' only needs to be set if you are running Ansible and the Cron Job on separate hosts.
+# The secrets_pswd_file will be copied to the cron_job_host and placed in the same directory.
+# Path to secrets file password file should be in the secrets file and in your ansible.cfg.
+
+#secrets_pswd_file:                    "/secret file name in a secret location"
 
 ### cron_job_tasks is an administrative setting
 # cron_job_tasks options are:
