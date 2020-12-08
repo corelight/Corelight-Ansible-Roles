@@ -8,6 +8,8 @@
     insertbefore: BOF
     create: yes
     mode: '0644'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
 
 - name: "[cm-21] define suricata_update_host var in {{ outer_item }} vars/fragments/1main.yml"
   lineinfile:
@@ -56,3 +58,5 @@
     src: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/fragments/"
     dest: "{{ playbook_dir }}/roles/{{ outer_item }}/vars/main.yml"
     mode: '0644'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"

@@ -12,25 +12,6 @@
       - "yml"
       - "json"
 
-#
-# # Prep common role vars/main for host history facts
-# - name: "[cm-10] List vars files in common to be copied"
-#   find:
-#     paths:
-#       - "{{ playbook_dir }}/common"
-#     use_regex: yes
-#     patterns: "^(?!(secrets.*|example.*)).*-vars.yml"
-#   register: copy_var_files
-#
-# # Copy external playbook_dir/common/vars/ to common/vars/fragments/
-# - name: "[cm-11] Copy any vars files in external common/vars to role"
-#   copy:
-#     src: "{{ item }}"
-#     dest: "{{ role_path }}/vars/fragments/"
-#     mode: '0644'
-#   with_items: "{{ copy_var_files.files | json_query('[*].path') }}"
-#
-# Create common/vars/main.yml fragments
 - name: "[cm-12] create common/vars/fragments/1main.yml comment"
   lineinfile:
     path: "{{ role_path }}/vars/fragments/1main.yml"
@@ -67,12 +48,17 @@
 #   assemble:
 #     src: "{{ role_path }}/vars/fragments/host_facts"
 #     dest: "{{ role_path }}/vars/fragments/host_facts.yml"
+#     mode: '0644'
+#     owner: "{{ ansible_user }}"
+#     group: "{{ ansible_user }}"
 
 - name: "[cm-16] Re-assemble common/vars/main.yml"
   assemble:
     src: "{{ role_path }}/vars/fragments/"
     dest: "{{ role_path }}/vars/main.yml"
     mode: '0644'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
 
 - name: "[cm-17] Include prep-role tasks"
   include_tasks: prep-roles.yml

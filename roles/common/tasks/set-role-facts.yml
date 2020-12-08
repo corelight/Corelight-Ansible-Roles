@@ -43,15 +43,18 @@
 
     - name: "[cm-44] Create Corelight-Ansible-Role failed_task facts {{ role_name }}"
       community.general.ini_file:
-        path: "/etc/ansible/facts.d/corelight_ansible_roles.fact"
+        path: "/etc/ansible/facts.d/corelight_ansible_roles_failed_tasks.ini"
         section: "{{ fact_section }}"
         option: "{{ fact_option }}_failed_task"
         value: "{{ failed_task }}"
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       become: yes
 
     - name: "[cm-45] Create failed_task stdout {{ role_name }}"
       community.general.ini_file:
-        path: "/etc/ansible/facts.d/corelight_ansible_roles.fact"
+        path: "/etc/ansible/facts.d/corelight_ansible_roles_failed_tasks.ini"
         section: "{{ fact_section }}_failed_task_details"
         option: failed_task_result
         value: "{{ ansible_failed_result.stderr_lines|d() | to_nice_yaml }}"
@@ -126,6 +129,8 @@
         insertbefore: BOF
         mode: '0644'
         create: yes
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       become: yes
       delegate_to: localhost
 
@@ -138,21 +143,21 @@
       become: yes
       delegate_to: localhost
 
-    - name: "[cm-48] Set role /vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
-      lineinfile:
-        path: "{{ role_path }}/vars/fragments/{{ inventory_hostname }}.yml"
-        line: "    {{ fact_section }}_{{ fact_option }}_failed_task: '{{ failed_task }}'"
-        regexp: "^    {{ fact_section }}_{{ fact_option }}_failed_task:"
-        insertafter: "^    {{ fact_section }}_{{ fact_option }}:"
-      become: yes
-      delegate_to: localhost
+    # - name: "[cm-48] Set role /vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
+    #   lineinfile:
+    #     path: "{{ role_path }}/vars/fragments/{{ inventory_hostname }}.yml"
+    #     line: "    {{ fact_section }}_{{ fact_option }}_failed_task: '{{ failed_task }}'"
+    #     regexp: "^    {{ fact_section }}_{{ fact_option }}_failed_task:"
+    #     insertafter: "^    {{ fact_section }}_{{ fact_option }}:"
+    #   become: yes
+    #   delegate_to: localhost
 
     - name: "[cm-49] Set role /vars/fragments {{ inventory_hostname }} history facts for {{ role_name }}"
       lineinfile:
         path: "{{ role_path }}/vars/fragments/{{ inventory_hostname }}.yml"
         line: "    {{ fact_section }}_{{ fact_option }}_last_run: {{ now() }}"
         regexp: "^    {{ fact_section }}_{{ fact_option }}_last_run"
-        insertafter: "^    {{ fact_section }}_{{ fact_option }}_failed_task:"
+        insertafter: "^    {{ fact_section }}_{{ fact_option }}:"
       become: yes
       delegate_to: localhost
 
