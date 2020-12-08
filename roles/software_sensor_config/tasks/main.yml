@@ -17,33 +17,35 @@
       template:
         src: corelight-softsensor.conf.j2
         dest: /etc/corelight.cfg
-        owner: root
-        group: root
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       notify: restart software sensor
 
     - name: Create corelight-softsensor.conf
       template:
         src: corelight-softsensor.conf.j2
         dest: /etc/corelight-softsensor.conf
-        owner: root
-        group: root
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       notify: restart software sensor
 
     - name: Create local.zeek
       template:
         src: local.zeek.j2
         dest: /etc/corelight/local.zeek
-        owner: root
-        group: root
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       notify: restart software sensor
 
     - name: Create /root/.zkg if it does not exist
       file:
         path: /root/.zkg
         mode: "0775"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
         state: directory
       become: yes
 
@@ -52,15 +54,17 @@
         src: swsensor-zkg.conf.j2
         dest: /root/.zkg/config
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       become: yes
 
     - name: License the sensor
       template:
         src: corelight-license.txt.j2
         dest: /etc/corelight-license.txt
-        owner: root
-        group: root
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       notify: restart software sensor
 
     - name: Copy default Input Framework files to sensor
@@ -68,6 +72,8 @@
         src: "{{ item }}"
         dest: /etc/corelight/input_files/
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       with_fileglob: "{{ playbook_dir }}/common/files/input-files/default-input-files/*.*"
 
     - name: Copy Input Framework files to sensor
@@ -75,6 +81,8 @@
         src: "{{ item }}"
         dest: /etc/corelight/input_files/
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       with_fileglob: "{{ playbook_dir }}/common/files/input-files/*.*"
 
     - name: Copy Suricata Rule files to sensor
@@ -83,6 +91,8 @@
         # dest: "{{ suricata_custom_rules_dir }}"
         dest: /etc/corelight/rules/
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       with_fileglob: "{{ playbook_dir }}/common/files/suricata-custom-rules/*.rules"
       when: "suricata_update_enable|d() == 'disabled'"
 
@@ -94,6 +104,8 @@
         src: previous-os-packages.yaml.j2
         dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       register: previous_os_packages
       delegate_to: localhost
 
@@ -111,6 +123,8 @@
         path: /var/lib/suricata
         mode: "0755"
         state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       become: yes
 
     - name: "Create {{ suricata_rules_dir }} if it does not exist"
@@ -118,6 +132,8 @@
         path: "{{ suricata_rules_dir }}"
         mode: "0755"
         state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
       become: yes
 
     - name: Start and Enable Corelight Software Sensor

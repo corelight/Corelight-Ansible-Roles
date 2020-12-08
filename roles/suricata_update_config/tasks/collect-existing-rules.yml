@@ -12,5 +12,7 @@
     src:            "remove-rule-file-list.yaml.j2"
     dest:           "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
     mode:           0644
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
   delegate_to:      localhost
   changed_when:     false

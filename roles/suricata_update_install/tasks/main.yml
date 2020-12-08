@@ -50,6 +50,8 @@
         path: /var/corelight/suricata
         state: directory
         mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
 
     - name: Include Suricata-update on a Software Sensor Install Tasks
       include_tasks: sensor-install.yml

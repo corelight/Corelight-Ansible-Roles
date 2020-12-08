@@ -30,6 +30,8 @@
         dest: /etc/ansible/ansible.cfg
         force: no
         mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
 
     - name: Copy Ansible requirements to remote
       copy:
