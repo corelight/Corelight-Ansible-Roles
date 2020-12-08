@@ -5,7 +5,7 @@
   args:
     executable:   /bin/bash
   become:         yes
-  when:           ansible_distribution == 'Debian'
+  when:           ansible_os_family == 'Debian'
 
 - name:           restart software sensor
   service:
@@ -20,4 +20,4 @@
   args:
     executable:   /bin/bash
   become:         yes
-  when:           ansible_distribution == 'RedHat'
+  when:           ansible_os_family == 'RedHat'

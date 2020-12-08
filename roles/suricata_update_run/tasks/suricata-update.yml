@@ -16,6 +16,5 @@
     src: "{{ suricata_update_output_dir }}/{{ item }}/suricata.rules"
     dest: "{{ role_path }}/files/{{ item }}/"
     mode: '0644'
-    flat: yes
   with_items: "{{ suricata_versions }}"
   when: "ansible_connection == 'local'"
