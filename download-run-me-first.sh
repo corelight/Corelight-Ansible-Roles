@@ -28,4 +28,6 @@ cd scripts/
 # Note: Run the next commands after Ansible has been configured as noted above.
 # source /etc/corelight-env/bin/activate
 # cd /etc/corelight-env/Corelight-Ansible-Roles/scripts/
+# ssh-keygen
+# ansible-playbook -i ../common/inventory/ ./ssh-copy-id-to-all.yml  --extra-vars '@../common/secrets.yml'
 # ansible-playbook -i ../common/inventory/ ../install-config-all-main-host.yml  --extra-vars '@../common/secrets.yml'
