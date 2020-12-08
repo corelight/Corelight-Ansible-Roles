@@ -5,12 +5,12 @@
       set_fact:
         disable_cron_job: yes
       when:
-        - enable_cron is false
+        - enable_cron_job is false
     - name: set disable_cron_job fact
       set_fact:
         disable_cron_job: no
       when:
-        - enable_cron is true
+        - enable_cron_job is true
 
 - name: Make sure Cron Job log path exists
   file:

@@ -18,13 +18,13 @@
   pause:
     seconds: 5
     prompt: |
-      #########################################################
+      ##############################################################
       The Suricata-update has not been install on the
-      following, EXIT NOW and run 'install-all-main-host.yml'
+      following, EXIT NOW and run 'install-config-all-main-host.yml'
       or ' suricata-update-select-host-install.yml'
-      #########################################################
+      ##############################################################
       "{{ groups.suricata_install_needed | to_nice_json }}"
-      #########################################################
+      ##############################################################
   run_once: true
   when:
     - "groups.suricata_install_needed is defined"

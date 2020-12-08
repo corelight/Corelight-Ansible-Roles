@@ -31,9 +31,9 @@ suricata_custom_rules_dir: /etc/suricata/rules # The directory where suricata-up
 # enabled = cron_job_tasks will be executed
 # disabled = cron_job_tasks will be skipped
 # only = all non-cron_job_tasks will be skipped.  Use if you just want to update the cron_job date/time
-cron_job_tasks: disabled
+cron_job_tasks: enabled
 
-enable_cron_job: false # true or false, enables or disables the cron job
+enable_cron_job: true # true or false, enables or disables the cron job
 cron_job_hour: "0" # 0-23
 cron_job_minute: "0" # 0-59
 cron_job_target: all # name of the group or host sensor for Suricata-update
