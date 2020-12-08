@@ -11,7 +11,7 @@ Table of Contents
   - [Variable Changes](#variable-changes)
   - [File Structure Changes](#file-structure-changes)
 
-**NOTE:** Ansible Collections cannot have '-' in the role names.  All names have been renamed to replace '-' with '_'.  In addition to renaming, install, config, and run have been split on all roles.
+**NOTE:** Ansible Collections cannot have '-' in the role names.  All role names have been renamed to replace '-' with '_'.  In addition to renaming, install, config, and run have been split on all roles.
 
 ## Role Changes
 
