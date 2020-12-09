@@ -2,7 +2,7 @@
 - name: "[sur-10] Run Suricata-update on a sensor"
   shell: |
     source /etc/corelight-env/bin/activate
-    suricata-update
+    suricata-update --no-check-certificate
   args:
     executable: /bin/bash
   become: no

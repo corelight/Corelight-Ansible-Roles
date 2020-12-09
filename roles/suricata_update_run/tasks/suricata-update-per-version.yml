@@ -2,7 +2,7 @@
 - name: "[sur-40] Run Suricata-update for each version"
   shell: |
     source /etc/corelight-env/bin/activate
-    suricata-update  --no-reload --no-test  -o "{{ suricata_update_output_dir }}/{{ item }}" --suricata-version "{{ item }}"
+    suricata-update  --no-reload --no-test  -o "{{ suricata_update_output_dir }}/{{ item }}" --suricata-version "{{ item }}" --no-check-certificate
   args:
     executable: /bin/bash
   become: no
