@@ -39,7 +39,7 @@
             repo: https://github.com/corelight/Corelight-Ansible-Roles.git
             dest: /etc/ansible/corelight-ansible-roles
             force: yes
-            version: "2.0alpha"
+            version: "2.0beta"
           become: no
           environment:
             http_proxy: "{{ http_proxy_env |d() }}"
