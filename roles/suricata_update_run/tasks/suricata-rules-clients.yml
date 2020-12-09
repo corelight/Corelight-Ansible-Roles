@@ -7,7 +7,7 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
   when: "'software_sensors' in group_names"
-  register: results
+  register: results_50
   become: yes
   notify:
     - Reload Suricata rules Debian
@@ -15,7 +15,7 @@
 
 - name: "[sur-51] results"
   debug:
-    msg: results
+    var: results_50
 
 - name: "[sur-52] Push Suricata-update Rules to non-Fleet managed Physical sensors"
   shell: |
@@ -25,14 +25,14 @@
     executable: /bin/bash
   become: no
   delegate_to: localhost
-  register: results
+  register: results_52
   when:
     - "'software_sensors' not in group_names"
     - fleet_managed is false
 
 - name: "[sur-53] results"
   debug:
-    msg: results
+    var: results_52
 
 - name: "[sur-54] Push Suricata-update Rules to Fleet Managed Physical sensors"
   shell: |
@@ -42,11 +42,11 @@
     executable: /bin/bash
   become: no
   delegate_to: localhost
-  register: results
+  register: results_54
   when:
     - "'software_sensors' not in group_names"
     - fleet_managed is true
 
 - name: "[sur-55] results"
   debug:
-    msg: results
+    var: results_54
