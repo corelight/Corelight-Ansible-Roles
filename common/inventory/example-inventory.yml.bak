@@ -15,7 +15,7 @@ all:
   hosts:
     localhost:
       ansible_connection: local
-      # ansible_user:
+      ansible_user:
       # ansible_become_pass:
   children:
     suricata_update_hosts:
