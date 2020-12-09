@@ -9,7 +9,7 @@
         name: common
       vars:
         role_name_fact:
-          - suricata_config_cron_job
+          - suricata_update_config
 
     - name: "[plbk-2] add suricata_update_host to dynamically_created_hosts group"
       add_host:
