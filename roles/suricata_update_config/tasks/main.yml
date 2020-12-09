@@ -146,7 +146,7 @@
     - name: "[sc-18] Enable remote sources with secret-codes"
       shell: |
         source /etc/corelight-env/bin/activate
-        suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}"
+        suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" --no-check-certificate
       args:
         executable: /bin/bash
       become: no
@@ -162,7 +162,7 @@
     - name: "[sc-20] Enable remote sources without secret-codes"
       shell: |
         source /etc/corelight-env/bin/activate
-        suricata-update enable-source "{{ item }}"
+        suricata-update enable-source "{{ item }}" --no-check-certificate
       args:
         executable: /bin/bash
       become: no
@@ -177,7 +177,7 @@
     - name: "[sc-22] Enable remote sources not in the index"
       shell: |
         source /etc/corelight-env/bin/activate
-        suricata-update add-source "{{ item.name }}" "{{ item.url }}"
+        suricata-update add-source "{{ item.name }}" "{{ item.url }}" --no-check-certificate
       args:
         executable: /bin/bash
       become: no
