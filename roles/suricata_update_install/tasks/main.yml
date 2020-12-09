@@ -53,6 +53,20 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 
+    - name: Touch files change permissions
+      file:
+        path: "{{ suricata_dir }}/{{ item.fl }}"
+        state: touch
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      loop:
+        - { fl: suricata.yaml }
+        - { fl: classification.config }
+        - { fl: reference.config }
+        - { fl: threshold.config }
+        - { fl: suricata.socket }
+
     - name: Include Suricata-update on a Software Sensor Install Tasks
       include_tasks: sensor-install.yml
       when: "'software_sensors' in group_names"
