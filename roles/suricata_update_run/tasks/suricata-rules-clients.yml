@@ -16,6 +16,8 @@
 - name: "[sur-51] results"
   debug:
     var: results_50
+  when:
+    - results_50.changed is true
 
 - name: "[sur-52] Push Suricata-update Rules to non-Fleet managed Physical sensors"
   shell: |
@@ -33,6 +35,8 @@
 - name: "[sur-53] results"
   debug:
     var: results_52
+  when:
+    - results_52.changed is true
 
 - name: "[sur-54] Push Suricata-update Rules to Fleet Managed Physical sensors"
   shell: |
@@ -50,3 +54,5 @@
 - name: "[sur-55] results"
   debug:
     var: results_54
+  when:
+    - results_54.changed is true
