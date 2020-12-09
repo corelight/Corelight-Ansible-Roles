@@ -31,4 +31,7 @@ cd scripts-initial-setup/
 # ssh-keygen
 # ansible-playbook -i ../common/inventory/ ./ssh-copy-id-to-all.yml  --extra-vars '@../common/secrets.yml'
 # cd /etc/corelight-env/Corelight-Ansible-Roles/scripts/
+
+# ./example-ansible-install-config-all.sh
+# or
 # ansible-playbook -i ../common/inventory/ ../install-config-all-main-host.yml  --extra-vars '@../common/secrets.yml'
