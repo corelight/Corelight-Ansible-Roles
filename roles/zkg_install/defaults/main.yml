@@ -2,7 +2,7 @@
 virtual_env_dir: /etc/corelight-env
 validate_certs: yes
 
-fleet_managed: disable
+fleet_managed: false
 fleet_ip:
 UID:
 

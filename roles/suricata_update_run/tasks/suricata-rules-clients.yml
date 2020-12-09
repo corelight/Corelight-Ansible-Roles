@@ -28,7 +28,7 @@
   register: results
   when:
     - "'software_sensors' not in group_names"
-    - fleet_managed == 'disable'
+    - fleet_managed is false
 
 - name: "[sur-53] results"
   debug:
@@ -45,7 +45,7 @@
   register: results
   when:
     - "'software_sensors' not in group_names"
-    - fleet_managed == 'enable'
+    - fleet_managed is true
 
 - name: "[sur-55] results"
   debug:
