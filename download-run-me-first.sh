@@ -7,7 +7,7 @@ cd /etc/corelight-env
 git clone https://github.com/corelight/Corelight-Ansible-Roles.git
 cd Corelight-Ansible-Roles/
 git checkout 2.0beta
-cd scripts/
+cd scripts-initial-setup/
 ./initial_ansible_installation_venv.sh
 
 # copy or create the following files and put them in '/etc/corelight/Corelight-Ansible-Roles/common/'
@@ -27,7 +27,8 @@ cd scripts/
 
 # Note: Run the next commands after Ansible has been configured as noted above.
 # source /etc/corelight-env/bin/activate
-# cd /etc/corelight-env/Corelight-Ansible-Roles/scripts/
+# cd /etc/corelight-env/Corelight-Ansible-Roles/scripts-initial-setup/
 # ssh-keygen
 # ansible-playbook -i ../common/inventory/ ./ssh-copy-id-to-all.yml  --extra-vars '@../common/secrets.yml'
+# cd /etc/corelight-env/Corelight-Ansible-Roles/scripts/
 # ansible-playbook -i ../common/inventory/ ../install-config-all-main-host.yml  --extra-vars '@../common/secrets.yml'
