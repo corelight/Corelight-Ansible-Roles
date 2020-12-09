@@ -13,30 +13,35 @@
           - "yml"
           - "json"
 
-    - name: "[sur-2] Include Suricata-update Tasks on a sensor"
+    - name: "[sur-2] Gather facts"
+      setup:
+      when:
+        - "'physical_sensors' not in group_names"
+
+    - name: "[sur-3] Include Suricata-update Tasks on a sensor"
       include_tasks: suricata-update-on-sensor.yml
       when:
         - suricata_update_enable|d('disabled') == 'local'
         - "'software_sensors' in group_names"
 
-    - name: "[sur-3] Include collect suricata version tasks"
+    - name: "[sur-4] Include collect suricata version tasks"
       include_tasks: collect-suricata-versions.yml
       when:
         - suricata_update_enable|d('disabled') == 'remote'
 
-    - name: "[sur-4] Include Suricata-update Tasks"
+    - name: "[sur-5] Include Suricata-update Tasks"
       include_tasks: suricata-update.yml
       when:
         - inventory_hostname == suricata_update_host
         - "'software_sensors' not in group_names"
 
-    - name: "[sur-5] Include Suricata Rules Clients Tasks"
+    - name: "[sur-6] Include Suricata Rules Clients Tasks"
       include_tasks: suricata-rules-clients.yml
       when:
         - "suricata_update_enable|d('disabled') == 'remote'"
 
   always:
-    - name: "[sur-6] Include set role facts tasks"
+    - name: "[sur-7] Include set role facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -47,7 +52,7 @@
       when: ansible_failed_task is not defined
 
   rescue:
-    - name: "[sur-7] Include set role failed facts tasks"
+    - name: "[sur-8] Include set role failed facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -57,7 +62,7 @@
         failed_state: present
       when: ansible_failed_task is defined
 
-    - name: "[sur-8] Failed task"
+    - name: "[sur-9] Failed task"
       fail:
         msg: |
           "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

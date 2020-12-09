@@ -12,6 +12,11 @@
       - 'yml'
       - 'json'
 
+- name: "[ssc-2] Gather facts"
+  setup:
+  when:
+    - "'physical_sensors' not in group_names"
+
 - block:
     - name: Create corelight.cfg for pre-GA release
       template:
