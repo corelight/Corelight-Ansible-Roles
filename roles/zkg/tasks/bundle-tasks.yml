@@ -88,8 +88,8 @@
     src: "{{ role_path }}/files/ansible_role.bundle"
     dest: "{{ playbook_dir }}/common/files/zkg_bundles/ansible_role.bundle"
     mode: '0644'
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
   delegate_to: localhost
   run_once: true
   when:

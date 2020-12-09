@@ -30,8 +30,8 @@
     src: suricata-versions.yaml.j2
     dest: "{{ role_path }}/vars/suricata-version-facts.yaml"
     mode: 0644
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
   delegate_to: localhost
   run_once: true
 

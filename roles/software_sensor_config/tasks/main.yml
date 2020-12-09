@@ -104,8 +104,8 @@
         src: previous-os-packages.yaml.j2
         dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
         mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
+        owner: "{{ hostvars['localhost'].ansible_user }}"
+        group: "{{ hostvars['localhost'].ansible_user }}"
       register: previous_os_packages
       delegate_to: localhost
 
