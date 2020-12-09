@@ -5,7 +5,7 @@
       file:
         path: /etc/ansible
         state: directory
-        mode: "0755"
+        mode: '0755'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       become: yes
@@ -16,7 +16,7 @@
       file:
         path: /etc/ansible/facts.d
         state: directory
-        mode: "0755"
+        mode: '0755'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       become: yes
@@ -100,6 +100,8 @@
         src: "{{ role_path }}/vars/fragments"
         dest: "{{ role_path }}/vars/main.yml"
         mode: '0644'
+        owner: "{{ hostvars['localhost'].ansible_user }}"
+        group: "{{ hostvars['localhost'].ansible_user }}"
       delegate_to: localhost
       run_once: yes
   when:

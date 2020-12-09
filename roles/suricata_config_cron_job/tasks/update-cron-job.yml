@@ -16,7 +16,7 @@
   file:
     path: "{{ cron_job_log_path }}"
     state: directory
-    mode: "0755"
+    mode: '0755'
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
@@ -24,7 +24,7 @@
   file:
     path: "etc/ansible"
     state: directory
-    mode: "0755"
+    mode: '0755'
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
@@ -32,7 +32,7 @@
   template:
     src: cron-job.sh.j2
     dest: "/etc/ansible/corelight-suricata-update-cron-job.sh"
-    mode: "0755"
+    mode: '0755'
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 

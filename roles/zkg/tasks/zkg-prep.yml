@@ -1,15 +1,15 @@
 ---
-- name:           "zkg-prep: Install zkg"
+- name: "zkg-prep: Install zkg"
   pip:
-    name:           zkg
-    state:          latest
-    executable:     pip3
-    extra_args:     --upgrade --upgrade-strategy only-if-needed
-  delegate_to:      localhost
-  run_once:         true
+    name: zkg
+    state: latest
+    executable: pip3
+    extra_args: --upgrade --upgrade-strategy only-if-needed
+  delegate_to: localhost
+  run_once: true
   environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+    http_proxy: "{{ http_proxy_env | default() }}"
+    https_proxy: "{{ https_proxy_env | default() }}"
 
 # pexpect is used to run commands are respond to prompts
 # - name:             "zkg-prep: Install pexpect"
@@ -35,14 +35,14 @@
 #     http_proxy:     "{{ http_proxy_env | default() }}"
 #     https_proxy:    "{{ https_proxy_env | default() }}"
 
-- name:             "zkg-prep: Install Corelight-client"
+- name: "zkg-prep: Install Corelight-client"
   pip:
-    name:           corelight-client
-    state:          latest
-    executable:     pip3
-    extra_args:     --upgrade --upgrade-strategy only-if-needed
-  delegate_to:      localhost
-  run_once:         true
+    name: corelight-client
+    state: latest
+    executable: pip3
+    extra_args: --upgrade --upgrade-strategy only-if-needed
+  delegate_to: localhost
+  run_once: true
   environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+    http_proxy: "{{ http_proxy_env | default() }}"
+    https_proxy: "{{ https_proxy_env | default() }}"

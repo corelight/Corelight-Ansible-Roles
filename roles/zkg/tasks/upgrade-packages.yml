@@ -1,15 +1,15 @@
 ---
-- name:             "create-bundle: Upgrade Scripts"
-  shell:            zkg upgrade {{ item.name }} --force
-  with_items:       "{{ zeek_packages }}"
+- name: "create-bundle: Upgrade Scripts"
+  shell: zkg upgrade {{ item.name }} --force
+  with_items: "{{ zeek_packages }}"
   when:
-    - 'item.auto_upgrade is true'
-    - 'item.name in installed_scripts.stdout'
-  register:         upgrade_pkgs
+    - "item.auto_upgrade is true"
+    - "item.name in installed_scripts.stdout"
+  register: upgrade_pkgs
   changed_when:
     - upgrade_pkgs.stdout != 'All packages already up-to-date.'
-  delegate_to:      localhost
-  run_once:         true
+  delegate_to: localhost
+  run_once: true
   environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+    http_proxy: "{{ http_proxy_env | default() }}"
+    https_proxy: "{{ https_proxy_env | default() }}"

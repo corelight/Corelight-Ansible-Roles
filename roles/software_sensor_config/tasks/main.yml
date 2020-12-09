@@ -43,7 +43,7 @@
     - name: Create /root/.zkg if it does not exist
       file:
         path: /root/.zkg
-        mode: "0775"
+        mode: '0775'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         state: directory
@@ -121,7 +121,7 @@
     - name: Create /var/lib/suricata if it does not exist
       file:
         path: /var/lib/suricata
-        mode: "0755"
+        mode: '0755'
         state: directory
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
@@ -130,7 +130,7 @@
     - name: "Create {{ suricata_rules_dir }} if it does not exist"
       file:
         path: "{{ suricata_rules_dir }}"
-        mode: "0755"
+        mode: '0755'
         state: directory
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"

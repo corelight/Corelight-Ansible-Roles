@@ -3,7 +3,9 @@
   copy:
     src: "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
     dest: "{{ suricata_rules_dir }}/suricata.rules"
-    mode: 0644
+    mode: '0644'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
   when: "'software_sensors' in group_names"
   register: results
   become: yes

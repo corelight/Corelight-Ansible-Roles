@@ -12,7 +12,7 @@
       file:
         path: "{{ virtual_env_dir }}"
         state: directory
-        mode: "0755"
+        mode: '0755'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 
@@ -55,7 +55,7 @@
       copy:
         src: "{{ playbook_dir }}/scripts/activate_venv.sh"
         dest: "~/"
-        mode: "0755"
+        mode: '0755'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       become: no

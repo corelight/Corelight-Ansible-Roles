@@ -19,7 +19,7 @@
         dest: "{{ suricata_dir }}/suricata.yaml"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-        mode: "0755"
+        mode: '0755'
       when: "'software_sensors' in group_names"
 
     - name: "[sc-3] Create Suricata-update config"
@@ -28,7 +28,7 @@
         dest: "{{ suricata_update_dir }}/update.yaml"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-        mode: "0755"
+        mode: '0755'
 
     - name: "[sc-4] Create Suricata-update disable config"
       template:
@@ -36,7 +36,7 @@
         dest: "{{ suricata_update_dir }}/disable.conf"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-        mode: "0755"
+        mode: '0755'
 
     - name: "[sc-5] Create Suricata-update enable config"
       template:
@@ -44,7 +44,7 @@
         dest: "{{ suricata_update_dir }}/enable.conf"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-        mode: "0755"
+        mode: '0755'
 
     - name: "[sc-6] Create Suricata-update modify config"
       template:
@@ -52,7 +52,7 @@
         dest: "{{ suricata_update_dir }}/modify.conf"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
-        mode: "0755"
+        mode: '0755'
 
     # find new custom rule files
     - name: "[sc-7] Collect list of custom rules"
@@ -67,7 +67,7 @@
       template:
         src: "custom-rule-file-list.yaml.j2"
         dest: "{{ role_path }}/vars/custom-rule-file-list.json"
-        mode: 0644
+        mode: '0644'
         owner: "{{ hostvars['localhost'].ansible_user }}"
         group: "{{ hostvars['localhost'].ansible_user }}"
       delegate_to: localhost
@@ -107,7 +107,7 @@
       copy:
         src: "{{ playbook_dir }}/common/files/suricata_custom_rules/{{ item.name }}"
         dest: "{{ suricata_custom_rules_dir }}"
-        mode: 0644
+        mode: '0644'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       with_items: "{{ custom_rule_files }}"

@@ -35,7 +35,7 @@
       file:
         path: "{{ item.dir }}"
         state: directory
-        mode: "0775"
+        mode: '0775'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       loop:
@@ -49,7 +49,7 @@
       file:
         path: /var/corelight/suricata
         state: directory
-        mode: "0755"
+        mode: '0755'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 

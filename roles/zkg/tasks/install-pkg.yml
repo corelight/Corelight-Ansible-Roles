@@ -1,41 +1,41 @@
 ---
-- name:             "install-pkg: Install Scripts"
+- name: "install-pkg: Install Scripts"
   shell: |
     yes | zkg install --skiptests "{{ item.path }}"
-  with_items:       "{{ zeek_packages }}"
+  with_items: "{{ zeek_packages }}"
   when:
-    - 'zeek_packages != None'
-    - 'item.name not in installed_scripts.stdout'
-  register:         install_depends
-  delegate_to:      localhost
-  run_once:         true
+    - "zeek_packages != None"
+    - "item.name not in installed_scripts.stdout"
+  register: install_depends
+  delegate_to: localhost
+  run_once: true
   environment:
-    http_proxy:     "{{ http_proxy_env | default() }}"
-    https_proxy:    "{{ https_proxy_env | default() }}"
+    http_proxy: "{{ http_proxy_env | default() }}"
+    https_proxy: "{{ https_proxy_env | default() }}"
 
-- name:             "install-pkg: Write depends to file"
+- name: "install-pkg: Write depends to file"
   template:
-    src:            "zkg_depends.j2"
-    dest:           "{{ role_path }}/vars/depends_packages.json"
-    mode:           0644
-    owner: "{{ ansible_user }}"
-    group: "{{ ansible_user }}"
-  changed_when:     false
-  delegate_to:      localhost
-  run_once:         true
+    src: "zkg_depends.j2"
+    dest: "{{ role_path }}/vars/depends_packages.json"
+    mode: '0644'
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
+  changed_when: false
+  delegate_to: localhost
+  run_once: true
 
-- name:             "install-pkg: include depends"
+- name: "install-pkg: include depends"
   include_vars:
-    file:           depends_packages.json
+    file: depends_packages.json
 
-- name:             "install-pkg: Modify main-vars"
+- name: "install-pkg: Modify main-vars"
   lineinfile:
-    path:           "common/main-vars.yml"
-    line:           "    dependency:                           {{ item.dependency }}"
-    insertafter:    "{{ item.name }}"
-  with_items:       "{{ depend_packages }}"
+    path: "common/main-vars.yml"
+    line: "    dependency:                           {{ item.dependency }}"
+    insertafter: "{{ item.name }}"
+  with_items: "{{ depend_packages }}"
   when:
-    - 'depend_packages != None'
+    - "depend_packages != None"
     - install_depends.changed
-  delegate_to:      localhost
-  run_once:         true
+  delegate_to: localhost
+  run_once: true

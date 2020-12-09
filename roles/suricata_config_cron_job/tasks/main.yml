@@ -30,7 +30,7 @@
           file:
             path: /etc/ansible/corelight-ansible-roles
             state: directory
-            mode: "0755"
+            mode: '0755'
             owner: "{{ ansible_user }}"
             group: "{{ ansible_user }}"
 
@@ -49,7 +49,7 @@
           copy:
             src: "{{ item }}"
             dest: /etc/ansible/corelight-ansible-roles/common/
-            mode: "0755"
+            mode: '0755'
             owner: "{{ ansible_user }}"
             group: "{{ ansible_user }}"
             decrypt: no
@@ -60,7 +60,7 @@
           copy:
             src: "{{ item }}"
             dest: /etc/ansible/corelight-ansible-roles/common/inventory/
-            mode: "0755"
+            mode: '0755'
             owner: "{{ ansible_user }}"
             group: "{{ ansible_user }}"
           with_fileglob:
@@ -70,7 +70,7 @@
           copy:
             src: "{{ secrets_pswd_file }}"
             dest: "{{ secrets_pswd_file }}"
-            mode: "0700"
+            mode: '0700'
             owner: "{{ ansible_user }}"
             group: "{{ ansible_user }}"
           no_log: true
