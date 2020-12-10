@@ -16,6 +16,7 @@ echo "  [ ] create a Python3 virtual environment at /etc/corelight-env/"
 echo "  [ ] Install Ansible in the /etc/corelight-env/ virtual environment"
 echo "  "
 read -p "Press any key to continue or CTRL-C to cancel ..."
+echo -e "\033[0m";
 
 sudo mkdir /etc/corelight-env
 cd /etc/corelight-env
