@@ -25,6 +25,7 @@ echo "  (((        )))               ";
 echo "     (((())))                  ";
 echo ""
 echo " Step 1 Complete"
+echo ""
 read -p "Press any key to continue ..."
 clear
 echo "                               ";
@@ -43,23 +44,24 @@ echo " The following steps must be completed:"
 echo " [ ] copy or create a secrets.yml file"
 echo " [ ] copy or create one or more variable files"
 echo "      - variable files (including secrets files will automatically be loaded from"
-echo "        /etc/corelight-env/Corelight-Ansible-Roles/common/"
+echo -e "\033[0;32m        /etc/corelight-env/Corelight-Ansible-Roles/common/"
 echo " [ ] copy or create one or more yaml inventory files"
 echo "      - inventory files will automatically be loaded from"
-echo "        /etc/corelight-env/Corelight-Ansible-Roles/common/inventory/"
+echo -e "\033[0;32m        /etc/corelight-env/Corelight-Ansible-Roles/common/inventory/"
 echo " [ ] If you are using ansible-vault to encrypt your secrets file, copy or create a"
 echo "       vault password file.  Edit /etc/ansible/ansible.cfg and edit the following line:"
-echo "    #  vault_password_file = /path/to/vault_password_file"
+echo -e "\033[0;32m    #  vault_password_file = /path/to/vault_password_file"
 echo ""
 echo ""
 echo " The following steps are optional:"
 echo " [ ] generate ssh keys with the following command: 'ssh-keygen'"
-echo " [ ] copy the ssh public key to all the remote hosts in the inventory with the following playbook:"
+echo " [ ] copy the ssh public key to all the remote hosts in the inventory with the following commands:"
+echo ""
 echo -e "\033[1;32m     source /etc/corelight-env/bin/activate"
 echo -e "\033[1;32m     cd /etc/corelight-env/Corelight-Ansible-Roles/scripts-initial-setup/"
 echo -e "\033[1;32m     ansible-playbook -i ../common/inventory/ ./ssh-copy-id-to-all.yml  --extra-vars '@../common/secrets.yml'"
 echo ""
-read -p "Press any key to continue ..."
+read -p "Press any key for more options ..."
 clear
 echo "                               ";
 echo "    ((((                       ";
