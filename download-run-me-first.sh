@@ -1,4 +1,6 @@
-#!
+#!/bin/bash
+# to download and run this script in one command, execute the following:
+# source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/2.0beta/download-run-me-first.sh)
 
 sudo mkdir /etc/corelight-env
 cd /etc/corelight-env
