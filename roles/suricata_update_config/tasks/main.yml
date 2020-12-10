@@ -115,7 +115,7 @@
         path: "{{ item }}"
         state: absent
       with_items: "{{ remove_rule_files }}"
-      when: remove_rule_files|d() is not none
+      when: remove_rule_files is not none
 
     # copy custom rules to suricata host
     - name: "[sc-16] Copy Suricata Custom Rule files to suricata host"
