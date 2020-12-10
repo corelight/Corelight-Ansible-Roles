@@ -10,3 +10,4 @@
     when:
       - "'physical_sensors' not in group_names"
       - "'virtual_sensors' not in group_names"
+      - "inventory_hostname != 'localhost'"
