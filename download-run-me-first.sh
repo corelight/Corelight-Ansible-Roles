@@ -2,6 +2,21 @@
 # to download and run this script in one command, execute the following:
 # source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/2.0beta/download-run-me-first.sh)
 
+echo -e "\033[0;33m";
+echo "The script you are about to run will do the following:"
+echo ""
+echo "  Install or upgrade the following packages depending on the OS"
+echo "  [ ] Python3-pip"
+echo "  [ ] Python3-venv"
+echo "  [ ] epel-release, libselinux-python dnf (RHEL7/CentOS7)"
+echo "  [ ] Python3-pip, git"
+echo "  [ ] libselinux-python3 (RHEL7/CentOS7)"
+echo "  [ ] Upgrade pip3 to version 20.x or later"
+echo "  [ ] create a Python3 virtual environment at /etc/corelight-env/"
+echo "  [ ] Install Ansible in the /etc/corelight-env/ virtual environment"
+echo "  "
+read -p "Press any key to continue or CTRL-C to cancel ..."
+
 sudo mkdir /etc/corelight-env
 cd /etc/corelight-env
 sudo chown $USER.$USER /etc/corelight-env
