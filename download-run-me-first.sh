@@ -12,28 +12,97 @@ git checkout 2.0beta
 cd scripts-initial-setup/
 ./initial_ansible_installation_venv.sh
 
-# copy or create the following files and put them in '/etc/corelight-env/Corelight-Ansible-Roles/common/'
-# secrets.yml
-# variable files ( .yml)  You can have multiple
 
-# copy or create the following files and put them in '/etc/corelight-env/Corelight-Ansible-Roles/common/inventory/'
-# inventory files ( .yml)  You can have multiple
+echo -e "\033[1;32m"
+clear
+echo "                               ";
+echo "    ((((                       ";
+echo "  ((                           ";
+echo " ((       |                    ";
+echo " ((       |    ))              ";
+echo " ((            ))              ";
+echo "  (((        )))               ";
+echo "     (((())))                  ";
+echo ""
+echo " Step 1 Complete"
+read -p "Press any key to continue ..."
+clear
+echo "                               ";
+echo "    ((((                       ";
+echo "  ((     _                     ";
+echo " ((      _|                    ";
+echo " ((     |_     ))              ";
+echo " ((            ))              ";
+echo "  (((        )))               ";
+echo "     (((())))                  ";
+echo ""
+echo " Step 2 is manual"
+echo -e "\033[0;33m"
+echo ""
+echo " The following steps must be completed:"
+echo " [ ] copy or create a secrets.yml file"
+echo " [ ] copy or create one or more variable files"
+echo "      - variable files (including secrets files will automatically be loaded from"
+echo "        /etc/corelight-env/Corelight-Ansible-Roles/common/"
+echo " [ ] copy or create one or more yaml inventory files"
+echo "      - inventory files will automatically be loaded from"
+echo "        /etc/corelight-env/Corelight-Ansible-Roles/common/inventory/"
+echo " [ ] If you are using ansible-vault to encrypt your secrets file, copy or create a"
+echo "       vault password file.  Edit /etc/ansible/ansible.cfg and edit the following line:"
+echo "    #  vault_password_file = /path/to/vault_password_file"
+echo ""
+echo ""
+echo " The following steps are optional:"
+echo " [ ] generate ssh keys with the following command: 'ssh-keygen'"
+echo " [ ] copy the ssh public key to all the remote hosts in the inventory with the following playbook:"
+echo -e "\033[1;32m     source /etc/corelight-env/bin/activate"
+echo -e "\033[1;32m     cd /etc/corelight-env/Corelight-Ansible-Roles/scripts-initial-setup/"
+echo -e "\033[1;32m     ansible-playbook -i ../common/inventory/ ./ssh-copy-id-to-all.yml  --extra-vars '@../common/secrets.yml'"
+echo ""
+read -p "Press any key to continue ..."
+clear
+echo "                               ";
+echo "    ((((                       ";
+echo "  ((     _                     ";
+echo " ((      _|                    ";
+echo " ((      _|    ))              ";
+echo " ((            ))              ";
+echo "  (((        )))               ";
+echo "     (((())))                  ";
+echo ""
 
-# copy or create vault password file
-# edit /etc/ansible/ansible.cfg and uncomment the following line and point to your vault password file.
-#vault_password_file = /path/to/vault_password_file
+echo -e "\033[0;32m Step 3"
+echo " Install, Configure or Run something"
+echo ""
+echo -e "\033[0;33m    NOTE: Make sure you activate the python environment first:"
+echo -e "\033[1;32m      source /etc/corelight-env/bin/activate"
+echo ""
+echo -e "\033[0;33m    From the /etc/corelight-env/Corelight-Ansible-Roles/scripts directory"
+echo ""
+echo -e "\033[0m [ ]  Install and configure Suricata-update on the main host with:"
+echo -e "\033[1;32m        ./example-ansible-install-config-all-host.sh"
+echo -e "\033[0m         or"
+echo -e "\033[1;32m        ansible-playbook -i ../common/inventory/ ../install-config-all-main-host.yml  --extra-vars '@../common/secrets.yml'"
+echo ""
+echo -e "\033[0m [ ]  Reconfigure Suricata-update on the main host with:"
+echo -e "\033[1;32m        ./example-ansible-suricata-update-reconfig-host.sh"
+echo -e "\033[0m         or"
+echo -e "\033[1;32m        ansible-playbook -i ../common/inventory/ ../install-config-all-main-host.yml  --extra-vars '@../common/secrets.yml'"
+echo ""
+echo -e "\033[0m [ ]  Run Suricata-update on the main host with:"
+echo -e "\033[1;32m        ./example-ansible-suricata-update-run-host.sh"
+echo -e "\033[0m         or"
+echo -e "\033[1;32m        ansible-playbook -i ../common/inventory/ ../suricata-update-run-host.yml  --extra-vars '@../common/secrets.yml'"
+echo ""
+echo -e "\033[0m [ ]  Install and configure ALL Software Sensors in inventory with:"
+echo -e "\033[1;32m        ./example-ansible-sw-sensor-install-all.sh"
+echo -e "\033[0m         or"
+echo -e "\033[1;32m        ansible-playbook -i ../common/inventory/ ../install-config-all-software-sensor.yml  --extra-vars '@../common/secrets.yml'"
+echo "";
+echo -e "\033[0m";
+
+
 
 # Note: If you need a password for sudo, add 'ansible_become_pass: '{{centos7_sudo}}' to the inventory file.
 # In this example,  add a variable called 'centos7_sudo' to your secrets.yml with the real password.
 # If you need if for localhost, make sure you also add it to the 'default-localhost.yml' inventory file or create an entry for localhost in your inventory file.
-
-# Note: Run the next commands after Ansible has been configured as noted above.
-# source /etc/corelight-env/bin/activate
-# cd /etc/corelight-env/Corelight-Ansible-Roles/scripts-initial-setup/
-# ssh-keygen
-# ansible-playbook -i ../common/inventory/ ./ssh-copy-id-to-all.yml  --extra-vars '@../common/secrets.yml'
-# cd /etc/corelight-env/Corelight-Ansible-Roles/scripts/
-
-# ./example-ansible-install-config-all.sh
-# or
-# ansible-playbook -i ../common/inventory/ ../install-config-all-main-host.yml  --extra-vars '@../common/secrets.yml'
