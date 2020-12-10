@@ -54,16 +54,7 @@
         group: "{{ ansible_user }}"
         mode: '0755'
 
-    # find new custom rule files
-    - name: "[sc-7] Collect list of custom rules"
-      find:
-        paths: "{{ playbook_dir }}/common/files/suricata-custom-rules/"
-        file_type: file
-        patterns: "*.rules"
-      register: custom_rule_file_list
-      delegate_to: localhost
-
-    - name: "[sc-8] Write custom rule file list to a file"
+    - name: "[sc-7] Collect list of custom rules and write to a file"
       template:
         src: "custom-rule-file-list.yaml.j2"
         dest: "{{ role_path }}/vars/custom-rule-file-list.json"
@@ -72,16 +63,24 @@
         group: "{{ hostvars['localhost'].ansible_user }}"
       delegate_to: localhost
 
-    - name: "[sc-9] Include custom rule file vars"
+    - name: "[sc-8] Include custom rule file vars"
       include_vars:
         file: "{{ role_path }}/vars/custom-rule-file-list.json"
 
     # find existing custom rule files
-    - name: "[sc-10] Include Collect list of existing custom rules tasks"
-      include_tasks: collect-existing-rules.yml
+    - name: "[sc-9] Collect list of existing custom rules and write to a file"
+      template:
+        src: "remove-rule-file-list.yaml.j2"
+        dest: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
+        mode: '0644'
+        owner: "{{ hostvars['localhost'].ansible_user }}"
+        group: "{{ hostvars['localhost'].ansible_user }}"
+      delegate_to: localhost
+      changed_when: false
+      throttle: 1
 
     # remove unused custom rules
-    - name: "[sc-11] Clean up remove list"
+    - name: "[sc-10] Remove {{ suricata_custom_rules_dir }}/*.rules that are not in common/files/suricata-custom-rules/"
       lineinfile:
         path: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
         regexp: "^(.*){{ item.name }}$"
@@ -89,34 +88,34 @@
       with_items: "{{ custom_rule_files }}"
       changed_when: false
       delegate_to: localhost
-      when: custom_rule_files is defined
+      when: custom_rule_files is not none
 
-    - name: "[sc-12] Include remove unused custom rules vars"
+    - name: "[sc-11] Include remove unused custom rules vars"
       include_vars:
         file: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
 
-    - name: "[sc-13] Remove unused custom rules files"
+    - name: "[sc-12] Remove unused custom rules files"
       file:
         path: "{{ item }}"
         state: absent
       with_items: "{{ remove_rule_files }}"
-      when: remove_rule_files is defined
+      when: remove_rule_files is not none
 
     # copy custom rules to suricata host
-    - name: "[sc-14] Copy Suricata Custom Rule files to suricata host"
+    - name: "[sc-13] Copy Suricata Custom Rule files to suricata host"
       copy:
-        src: "{{ playbook_dir }}/common/files/suricata_custom_rules/{{ item.name }}"
+        src: "{{ item.a_path }}"
         dest: "{{ suricata_custom_rules_dir }}"
         mode: '0644'
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       with_items: "{{ custom_rule_files }}"
       register: results
-      when: custom_rule_files is defined
+      when: custom_rule_files is not none
 
     ################## cannot update sources until the suricata is running on the sensor
 
-    - name: "[sc-15] Update Suricata-update Sources"
+    - name: "[sc-14] Update Suricata-update Sources"
       shell: |
         source /etc/corelight-env/bin/activate
         suricata-update update-sources --no-check-certificate
@@ -129,7 +128,7 @@
         https_proxy: "{{ https_proxy_env |d() }}"
 
     # enable new sources
-    - name: "[sc-16] Collect list of enabled sources"
+    - name: "[sc-15] Collect list of enabled sources"
       shell: |
         source /etc/corelight-env/bin/activate
         suricata-update list-enabled-sources
@@ -139,11 +138,11 @@
       become: no
       register: enabled_sources
 
-    - name: "[sc-17] List of enabled sources"
+    - name: "[sc-16] List of enabled sources"
       debug:
         var: enabled_sources.stdout_lines
 
-    - name: "[sc-18] Enable remote sources with secret-codes"
+    - name: "[sc-17] Enable remote sources with secret-codes"
       shell: |
         source /etc/corelight-env/bin/activate
         suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" --no-check-certificate
@@ -155,11 +154,11 @@
       no_log: true
       register: results
 
-    - name: "[sc-19] enable remote sources with secret-codes results"
+    - name: "[sc-18] enable remote sources with secret-codes results"
       debug:
         var: results.stdout_lines
 
-    - name: "[sc-20] Enable remote sources without secret-codes"
+    - name: "[sc-19] Enable remote sources without secret-codes"
       shell: |
         source /etc/corelight-env/bin/activate
         suricata-update enable-source "{{ item }}" --no-check-certificate
@@ -170,11 +169,11 @@
       when: "item not in enabled_sources.stdout"
       register: results
 
-    - name: "[sc-21] enable remote sources without secret-codes results"
+    - name: "[sc-20] enable remote sources without secret-codes results"
       debug:
         var: results.stdout_lines
 
-    - name: "[sc-22] Enable remote sources not in the index"
+    - name: "[sc-21] Enable remote sources not in the index"
       shell: |
         source /etc/corelight-env/bin/activate
         suricata-update add-source "{{ item.name }}" "{{ item.url }}" --no-check-certificate
@@ -185,12 +184,12 @@
       when: "item.name not in enabled_sources.stdout"
       register: results
 
-    - name: "[sc-23] enable remote sources not in the index results"
+    - name: "[sc-22] enable remote sources not in the index results"
       debug:
         var: results.stdout_lines
 
     # remove unused sources
-    - name: "[sc-24] Remove Suricata-update remote sources tasks"
+    - name: "[sc-23] Remove Suricata-update remote sources tasks"
       include_tasks: remove-sources.yml
       loop: "{{ enabled_sources.stdout_lines | select('match', '^  - [a-z]') | list | regex_replace('  - ') }}"
       when:
@@ -199,13 +198,13 @@
         - "item not in (suricata_custom_url_sources|default([])|string)"
       register: results
 
-    - name: "[sc-25] remove suricata-update sources results"
+    - name: "[sc-24] remove suricata-update sources results"
       debug:
         var: results.stdout_lines
 
 
   always:
-    - name: "[sc-26] Include set role facts tasks"
+    - name: "[sc-25] Include set role facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -216,7 +215,7 @@
       when: ansible_failed_task is not defined
 
   rescue:
-    - name: "[sc-27] Include set role failed facts tasks"
+    - name: "[sc-26] Include set role failed facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -226,7 +225,7 @@
         failed_state: present
       when: ansible_failed_task is defined
 
-    - name: "[sc-28] Failed task"
+    - name: "[sc-27] Failed task"
       fail:
         msg: |
           "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

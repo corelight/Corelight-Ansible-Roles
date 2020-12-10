@@ -1,7 +1,5 @@
 ---
-{% if existing_rule_file_list.files | length > 0 %}
 remove_rule_files:
-{% for files in existing_rule_file_list.files%}
-  {{ files.path }}
+{% for filename in lookup('fileglob', '{{ suricata_custom_rules_dir }}/*.rules', wantlist=true) %}
+  {{ filename }}
 {% endfor %}
-{% endif %}
