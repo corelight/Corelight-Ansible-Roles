@@ -9,6 +9,9 @@ UID:
 ###################################
 #### Suricata-update Variables ####
 ###################################
+lawmaker_enabled: false
+lawmaker_url: "https://api.lawmaker.cloud"
+
 # DO NOT USE 'localhost' AS THE suricata_update_host, instead list the host name in the
 # inventory file and add 'ansible_connection: local'
 suricata_update_enable: disabled

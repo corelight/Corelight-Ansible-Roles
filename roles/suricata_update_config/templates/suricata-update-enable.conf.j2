@@ -1,21 +1,9 @@
 # suricata-update - enable.conf
 
-# Example of enabling a rule by signature ID (gid is optional).
-# 1:2019401
-# 2019401
-
-# Example of enabling a rule by regular expression.
-# - All regular expression matches are case insensitive.
-# re:heartbleed
-# re:MS(0[7-9]|10)-\d+
-
-# Examples of enabling a group of rules.
-# group:emerging-icmp.rules
-# group:emerging-dos
-# group:emerging*
-
 {% if enable_rules is defined %}
 {% for rule in enable_rules %}
 {{ rule }}
 {% endfor %}
 {% endif %}
+
+{% include 'files/enable.conf' ignore missing %}

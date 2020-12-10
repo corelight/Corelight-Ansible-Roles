@@ -1,0 +1,87 @@
+---
+- name: "[sc-30] Update Suricata-update Sources"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update update-sources --no-check-certificate
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: no
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+# enable new sources
+- name: "[sc-31] Collect list of enabled sources"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update list-enabled-sources
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: no
+  register: enabled_sources
+
+- name: "[sc-32] List of enabled sources"
+  debug:
+    var: enabled_sources.stdout_lines
+
+- name: "[sc-33] Enable remote sources with secret-codes"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update enable-source "{{ item.name }}" secret-code="{{ item.secret_code }}" --no-check-certificate
+  args:
+    executable: /bin/bash
+  become: no
+  with_items: "{{ suricata_secret_code_sources|default([]) }}"
+  when: "item.name not in enabled_sources.stdout"
+  no_log: true
+  register: results
+
+- name: "[sc-34] enable remote sources with secret-codes results"
+  debug:
+    var: results.stdout_lines
+
+- name: "[sc-35] Enable remote sources without secret-codes"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update enable-source "{{ item }}" --no-check-certificate
+  args:
+    executable: /bin/bash
+  become: no
+  with_items: "{{ suricata_remote_sources|default([]) }}"
+  when: "item not in enabled_sources.stdout"
+  register: results
+
+- name: "[sc-36] enable remote sources without secret-codes results"
+  debug:
+    var: results.stdout_lines
+
+- name: "[sc-37] Enable remote sources not in the index"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update add-source "{{ item.name }}" "{{ item.url }}" --no-check-certificate
+  args:
+    executable: /bin/bash
+  become: no
+  with_items: "{{ suricata_custom_url_sources|default([]) }}"
+  when: "item.name not in enabled_sources.stdout"
+  register: results
+
+- name: "[sc-38] enable remote sources not in the index results"
+  debug:
+    var: results.stdout_lines
+
+# remove unused sources
+- name: "[sc-39] Remove Suricata-update remote sources tasks"
+  include_tasks: remove-sources.yml
+  loop: "{{ enabled_sources.stdout_lines | select('match', '^  - [a-z]') | list | regex_replace('  - ') }}"
+  when:
+    - "item not in (suricata_remote_sources|default([])|string)"
+    - "item not in (suricata_secret_code_sources|default([])|string)"
+    - "item not in (suricata_custom_url_sources|default([])|string)"
+  register: results
+
+- name: "[sc-40] remove suricata-update sources results"
+  debug:
+    var: results.stdout_lines

@@ -33,6 +33,9 @@ test-command: /usr/bin/corelight-suricata -T -S {{ suricata_update_output_dir }}
 reload-command: sudo kill -USR2 $(pidof corelight-suricata)
 {% endif %}
 
+{% include 'files/update.yaml' ignore missing %}
+
+
 # A list of local rule sources.
 local:
   - {{ suricata_custom_rules_dir }}/*.rules

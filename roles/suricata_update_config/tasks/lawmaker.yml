@@ -1,0 +1,27 @@
+---
+- name: "[sc-45] Create Lawmaker Download Script"
+  template:
+    src: corelight-lawmaker-agent.sh.j2
+    dest: "{{ role_path }}/files/corelight-lawmaker-agent.sh"
+    mode: "0755"
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
+  delegate_to: localhost
+
+- name: "[sc-46] Run Lawmaker Download Script"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    {{ role_path }}/files/corelight-lawmaker-agent.sh
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: no
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+  delegate_to: localhost
+  register: lawmaker
+
+- name: "[sc-47] Lawmaker results"
+  debug:
+    var: lawmaker.stdout_lines
