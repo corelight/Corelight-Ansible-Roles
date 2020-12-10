@@ -9,7 +9,7 @@
 - name: Write rule file list to a file
   template:
     src: "remove-rule-file-list.yaml.j2"
-    dest: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
+    dest: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
     mode: '0644'
     owner: "{{ hostvars['localhost'].ansible_user }}"
     group: "{{ hostvars['localhost'].ansible_user }}"

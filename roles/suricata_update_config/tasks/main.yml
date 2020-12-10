@@ -81,7 +81,7 @@
     - name: "[sc-10] Collect list of custom rules and write to a file"
       template:
         src: "custom-rule-file-list.yaml.j2"
-        dest: "{{ role_path }}/vars/custom-rule-file-list.json"
+        dest: "{{ role_path }}/vars/custom-rule-file-list.yaml"
         mode: "0644"
         owner: "{{ hostvars['localhost'].ansible_user }}"
         group: "{{ hostvars['localhost'].ansible_user }}"
@@ -89,7 +89,7 @@
 
     - name: "[sc-11] Include custom rule file vars"
       include_vars:
-        file: custom-rule-file-list.json
+        file: custom-rule-file-list.yaml
 
     # find existing custom rule files
     - name: "[sc-12] Include Collect list of existing custom rules on the host"
@@ -98,7 +98,7 @@
     # remove unused custom rules
     - name: "[sc-13] Remove {{ suricata_custom_rules_dir }}/*.rules that are not in common/files/suricata-custom-rules/"
       lineinfile:
-        path: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
+        path: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
         regexp: "^(.*){{ item.name }}$"
         state: absent
       with_items: "{{ custom_rule_files }}"
@@ -108,14 +108,14 @@
 
     - name: "[sc-14] Include remove unused custom rules vars"
       include_vars:
-        file: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.json"
+        file: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
 
     - name: "[sc-15] Remove unused custom rules files"
       file:
         path: "{{ item }}"
         state: absent
       with_items: "{{ remove_rule_files }}"
-      when: remove_rule_files is not none
+      when: remove_rule_files|d() is not none
 
     # copy custom rules to suricata host
     - name: "[sc-16] Copy Suricata Custom Rule files to suricata host"
