@@ -10,11 +10,11 @@ git checkout 2.0beta
 cd scripts-initial-setup/
 ./initial_ansible_installation_venv.sh
 
-# copy or create the following files and put them in '/etc/corelight/Corelight-Ansible-Roles/common/'
+# copy or create the following files and put them in '/etc/corelight-env/Corelight-Ansible-Roles/common/'
 # secrets.yml
 # variable files ( .yml)  You can have multiple
 
-# copy or create the following files and put them in '/etc/corelight/Corelight-Ansible-Roles/common/inventory/'
+# copy or create the following files and put them in '/etc/corelight-env/Corelight-Ansible-Roles/common/inventory/'
 # inventory files ( .yml)  You can have multiple
 
 # copy or create vault password file
