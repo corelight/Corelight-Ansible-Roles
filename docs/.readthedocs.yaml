@@ -1,0 +1,20 @@
+version: 2
+formats:
+  - epub
+  - pdf
+python:
+  version: 3
+  install:
+    - requirements: docs/requirements.txt
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
+  system_packages: true
+sphinx:
+  builder: html
+  configuration: conf.py
+  fail_on_warning: true
+mkdocs:
+  configuration: mkdocs.yml
+  fail_on_warning: false
