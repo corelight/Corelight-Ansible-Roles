@@ -1,8 +1,5 @@
-{% if [ansible_os_family] == 'Debian' %}
-#! /bin/sh
-{% elif [ansible_os_family] == 'RedHat' %}
-#! /usr/bin/sh
-{% endif %}
+#!/usr/bin/bash
+
 
 source /etc/corelight-env/bin/activate
 cd "{{ playbook_dir }}"
@@ -10,7 +7,7 @@ echo "Run Date:" > "{{ cron_job_log_path }}/ansible-suricata-update.log"
 date >> "{{ cron_job_log_path }}/ansible-suricata-update.log"
 echo "If the cron job is not running correctly, you may find additional logs in /var/mail/"
 echo "By default, cron will try to send an email if a job has output"
-ansible-playbook -i ./common/inventory suricata-update-run-host.yml --extra-vars '{"target":"{{ cron_job_target }}"}' --extra-vars '@"./common/vars/secrets.yml"' >> "{{ cron_job_log_path }}/ansible-suricata-update.log"
+ansible-playbook -i ./common/inventory suricata-update-run-host.yml --extra-vars '@"./common/secrets.yml"' >> "{{ cron_job_log_path }}/ansible-suricata-update.log"
 rm {{ cron_job_log_path }}/ansible-suricata-update-14.log 2>/dev/null
 mv {{ cron_job_log_path }}/ansible-suricata-update-13.log {{ cron_job_log_path }}/ansible-suricata-update-14.log 2>/dev/null
 mv {{ cron_job_log_path }}/ansible-suricata-update-12.log {{ cron_job_log_path }}/ansible-suricata-update-13.log 2>/dev/null

@@ -1,18 +1,11 @@
 ---
-- block:
-    - name: "[sccj-1] Load vars"
-      include_vars:
-        dir: "{{ playbook_dir }}/common"
-        ignore_files:
-          - "example-secrets.yml"
-          - "example-main-vars.yml"
-        ignore_unknown_extensions: yes
-        extensions:
-          - ""
-          - "yaml"
-          - "yml"
-          - "json"
+- name: "[scrj-1] Include common role to CHECK FACTS"
+  include_role:
+    name: common
+  vars:
+    sending_role: suricata_config_cron_job
 
+- block:
     - name: Gather Facts
       setup:
       when: "'physical_sensors' not in group_names"
