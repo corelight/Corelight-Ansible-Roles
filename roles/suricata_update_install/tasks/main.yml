@@ -1,6 +1,6 @@
 ---
 - block:
-    - name: Install Suricata-update
+    - name: "[sui-1] Install Suricata-update"
       pip:
         name: suricata-update
         virtualenv: "{{ virtual_env_dir }}"
@@ -12,7 +12,7 @@
         http_proxy: "{{ http_proxy_env |d() }}"
         https_proxy: "{{ https_proxy_env |d() }}"
 
-    - name: Suricata-update installation without a proxy results
+    - name: "[sui-2] Suricata-update installation without a proxy results"
       debug:
         msg: "{{ results.stdout_lines }}"
 
@@ -31,7 +31,7 @@
     #     msg:                "{{ results.stdout_lines }}"
     #   when:                 results is not skipped
 
-    - name: Create directories
+    - name: "[sui-3] Create directories"
       file:
         path: "{{ item.dir }}"
         state: directory
@@ -45,7 +45,7 @@
         - { dir: "{{ suricata_update_output_dir }}" }
         - { dir: "{{ suricata_custom_rules_dir }}" }
 
-    - name: Create /var/corelight/suricata directory
+    - name: "[sui-4] Create /var/corelight/suricata directory"
       file:
         path: /var/corelight/suricata
         state: directory
@@ -53,7 +53,7 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 
-    - name: Touch files change permissions
+    - name: "[sui-5] Touch files change permissions"
       file:
         path: "{{ suricata_dir }}/{{ item.fl }}"
         state: touch
@@ -66,13 +66,14 @@
         - { fl: reference.config }
         - { fl: threshold.config }
         - { fl: suricata.socket }
+      when: "'software_sensors' not in group_names"
 
-    - name: Include Suricata-update on a Software Sensor Install Tasks
+    - name: "[sui-6] Include Suricata-update on a Software Sensor Install Tasks"
       include_tasks: sensor-install.yml
       when: "'software_sensors' in group_names"
 
   always:
-    - name: "[zkgi-4] Include set role facts tasks"
+    - name: "[sui-7] Include set role facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -83,7 +84,7 @@
       when: ansible_failed_task is not defined
 
   rescue:
-    - name: "[zkgi-5] Include set role failed facts tasks"
+    - name: "[sui-8] Include set role failed facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -93,7 +94,7 @@
         failed_state: present
       when: ansible_failed_task is defined
 
-    - name: "[zkgi-6] Failed task"
+    - name: "[sui-9] Failed task"
       fail:
         msg: |
           "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

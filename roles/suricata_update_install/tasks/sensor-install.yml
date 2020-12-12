@@ -1,5 +1,5 @@
 ---
-- name: Touch files for symbolic links to corelight-suricata
+- name: "[sui-10] Touch files for symbolic links to corelight-suricata"
   file:
     path: "/var/corelight/suricata/{{ item.fl }}"
     state: touch
@@ -12,7 +12,7 @@
     - { fl: threshold.config }
     - { fl: suricata.socket }
 
-- name: Create symbolic links to corelight-suricata
+- name: "[sui-11] Create symbolic links to corelight-suricata"
   file:
     src: "/var/corelight/suricata/{{ item.fl }}"
     dest: "{{ suricata_dir }}/{{ item.fl }}"
