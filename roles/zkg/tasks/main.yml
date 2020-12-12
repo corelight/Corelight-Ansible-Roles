@@ -2,7 +2,8 @@
 - name: set fact to enable become for sensor configs
   set_fact:
       zkg_become: yes
-  when: "zkg_included_by|d() == 'softsensor'"
+  when:
+    - "starting_role|d() == 'software_sensor_config'"
 
 - name: "[zkg-] Load vars"
   include_vars:
@@ -16,6 +17,16 @@
       - 'yaml'
       - 'yml'
       - 'json'
+
+# - name: "[ssc-7] Write current zeek_packages list to file"
+#   template:
+#     src: previous-os-packages.yaml.j2
+#     dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
+#     mode: "0644"
+#     owner: "{{ hostvars['localhost'].ansible_user }}"
+#     group: "{{ hostvars['localhost'].ansible_user }}"
+#   register: previous_os_packages
+#   delegate_to: localhost
 
 - block:
     - name: Refresh Script Index
@@ -59,7 +70,7 @@
     - name: Include bundle Tasks
       include_tasks: bundle-tasks.yml
       when:
-        - zkg_included_by is not defined
+        - starting_role is not defined
   become: no
 
   always:

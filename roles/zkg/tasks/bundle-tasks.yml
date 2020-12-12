@@ -6,7 +6,7 @@
     state: absent
   when:
     - "zeek_packages == None"
-    - "zkg_included_by|d() == 'softsensor'"
+    - "starting_role|d() == 'software_sensor_config'"
   register: empty_bundle
   delegate_to: localhost
   run_once: true

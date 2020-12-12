@@ -17,7 +17,7 @@ lawmaker_url: "https://api.lawmaker.cloud"
 suricata_update_enable: disabled
 suricata_update_host: # The host name to run Suricata-update on
 
-suricata_dir: /usr/local/etc/suricata # The default directory for corelight-suricata config files
+suricata_dir: /usr/local/etc/suricata # The default directory for suricata config files
 suricata_update_dir: /etc/suricata # The default directory where suricata-update looks for config files
 suricata_update_output_dir: /var/lib/suricata/rules # The default directory where suricata-update puts suricata.rules
 suricata_rules_dir: /var/lib/suricata/rules # The directory where corelight-suricata looks for rulesets
