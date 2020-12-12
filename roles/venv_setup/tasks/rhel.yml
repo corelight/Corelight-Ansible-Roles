@@ -6,6 +6,13 @@
 # # RHEL7 with cert subs
 # subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
 
+# # If epel-release is not available for RHEL7, the following commands:
+# cd /tmp
+# wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+# ls *.rpm
+# sudo yum install epel-release-latest-7.noarch.rpm
+
+
 - name: "[venv-15] Upgrade/Enable dnf - RHEL7 / CentOS7 only"
   yum:
     name:
