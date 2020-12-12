@@ -24,12 +24,6 @@
   gather_facts: no
 
   tasks:
-    - name: "[plbk-3] Include common role to CHECK FACTS"
-      import_role:
-        name: common
-      vars:
-        starting_role: suricata_config_cron_job
-
-    - name: "[plbk-7] "
+    - name: "[plbk-3] "
       include_role:
         name: suricata_config_cron_job

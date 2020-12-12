@@ -31,12 +31,6 @@
   gather_facts: no
 
   tasks:
-    - name: "[plbk-4] Include common role to CHECK FACTS"
-      import_role:
-        name: common
-      vars:
-        starting_role: suricata_update_run
-
-    - name: "[plbk-5] "
+    - name: "[plbk-4] "
       include_role:
         name: suricata_update_run

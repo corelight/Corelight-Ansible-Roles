@@ -24,12 +24,12 @@
   gather_facts: no
 
   tasks:
-    - name: "[plbk-3] Include common role to CHECK FACTS"
-      import_role:
-        name: common
-      vars:
-        starting_role: software_sensor_config
+    # - name: "[plbk-3] Include common role to CHECK FACTS"
+    #   import_role:
+    #     name: common
+    #   vars:
+    #     sending_role: software_sensor_config
 
-    - name: "[plbk-4] "
+    - name: "[plbk-3] "
       include_role:
         name: software_sensor_config

@@ -36,11 +36,11 @@
       when:
         - "'software_sensors' in group_names"
 
-    - name: "[plbk-3] Include common role to CHECK FACTS"
+    - name: "[plbk-3] Include common role to create groups"
       import_role:
         name: common
       vars:
-        starting_role: none
+        sending_role: none
 
     - name: Include Python3 virtual environment setup role
       include_role:
@@ -60,12 +60,6 @@
       when:
         - "ansible_local.corelight_ansible_roles.softsensor.install|d('failed') == 'failed'"
 
-    - name: Include Software Sensor Config role
-      include_role:
-        name: software_sensor_config
-      when:
-        - "ansible_local.corelight_ansible_roles.softsensor.config|d('failed') == 'failed'"
-
     - name: Include Suricata-update install role
       include_role:
         name: suricata_update_install
@@ -74,11 +68,43 @@
         - "suricata_update_enable|d('disabled') == 'local'"
         - "suricata_enable|d(false) is true"
 
+    - name: Include Software Sensor Config role
+      include_role:
+        name: software_sensor_config
+      when:
+        - "ansible_local.corelight_ansible_roles.softsensor.config|d('failed') == 'failed'"
+
+    - name: "[ ] Include zkg role"
+      include_role:
+        name: zkg
+      vars:
+        starting_role: software_sensor_config
+      when:
+        - "zkg_last_run.inventory_hostname.last_run_results|d('failed') == 'failed'"
+
     - name: Include Suricata-update config role
       include_role:
         name: suricata_update_config
       when:
         - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') == 'failed'"
+        - "suricata_update_enable|d('disabled') == 'local'"
+        - "suricata_enable|d(false) is true"
+
+    - name: "[ ] Gather Facts for suricata-update run"
+      setup:
+        filter: ansible_local
+        gather_subset: "!all"
+      when:
+        - "inventory_hostname == suricata_update_host or
+          'suricata_local' in group_names or
+          'suricata_remote' in group_names"
+        - "'physical_sensors' not in group_names"
+
+    - name: Include Suricata-update run role
+      include_role:
+        name: suricata_update_run
+      when:
+        - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') == 'success'"
         - "suricata_update_enable|d('disabled') == 'local'"
         - "suricata_enable|d(false) is true"
 
