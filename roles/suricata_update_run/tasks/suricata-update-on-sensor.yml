@@ -10,6 +10,9 @@
   environment:
     http_proxy: "{{ http_proxy_env |d() }}"
     https_proxy: "{{ https_proxy_env |d() }}"
+  notify:
+    - Reload Suricata rules Debian
+    - Reload Suricata rules RHEL
 
 - name: "[sur-11] suricata-update results"
   debug:

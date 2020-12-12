@@ -2,6 +2,8 @@
 - name: "[sur-35] Run Suricata-update for each version"
   include_tasks: suricata-update-per-version.yml
   loop: "{{ suricata_versions }}"
+  when:
+    - suricata_versions is defined
 
 - name: "[sur-36] Fetch new suricata.rules file - remote"
   fetch:
@@ -12,7 +14,9 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
   with_items: "{{ suricata_versions }}"
-  when: "ansible_connection != 'local'"
+  when:
+    - "ansible_connection != 'local'"
+    - suricata_versions is defined
 
 - name: "[sur-37] Copy new suricata.rules file - local"
   copy:
@@ -22,4 +26,6 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
   with_items: "{{ suricata_versions }}"
-  when: "ansible_connection == 'local'"
+  when:
+    - "ansible_connection == 'local'"
+    - suricata_versions is defined

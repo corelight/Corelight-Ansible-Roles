@@ -5,7 +5,10 @@
     filter: ansible_local
     gather_subset: "!all"
   when:
-    - "inventory_hostname == suricata_update_host or 'suricata_local' in group_names"
+    - "inventory_hostname == suricata_update_host or
+      'suricata_local' in group_names or
+      'suricata_remote' in group_names"
+    - "'physical_sensors' not in group_names"
 
 - name: "[cm-61] "
   pause:
@@ -27,6 +30,15 @@
   when:
     - "'suricata_remote' in group_names or inventory_hostname == suricata_update_host"
     - "hostvars[suricata_update_host]['ansible_local']['corelight_ansible_roles'].suricata_update.config|d('failed') != 'success'"
+  failed_when: true
+
+- name: "[cm-] Software Sensor not ready"
+  debug:
+    msg: "Software Sensor with Suricata not configured on {{ inventory_hostname }}"
+  when:
+    - "'suricata_remote' in group_names"
+    - "'software_sensors' in group_names"
+    - "ansible_local['corelight_ansible_roles'].softsensor.config|d('failed') != 'success'"
   failed_when: true
 
 - name: "[cm-63] Include tests for suricata-update on a sensor"

@@ -1,16 +1,9 @@
 ---
-- name: "[ssc-1] Load vars"
-  include_vars:
-    dir: "{{ playbook_dir }}/common"
-    ignore_files:
-      - 'example-secrets.yml'
-      - 'example-main-vars.yml'
-    ignore_unknown_extensions: yes
-    extensions:
-      - ''
-      - 'yaml'
-      - 'yml'
-      - 'json'
+- name: "[ssc-1] Include common role to CHECK FACTS"
+  include_role:
+    name: common
+  vars:
+    sending_role: software_sensor_config
 
 - name: "[ssc-2] Gather facts"
   setup:
@@ -18,65 +11,56 @@
     - "'physical_sensors' not in group_names"
 
 - block:
-    - name: Create corelight.cfg for pre-GA release
-      template:
-        src: corelight-softsensor.conf.j2
-        dest: /etc/corelight.cfg
-        mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      notify: restart software sensor
-
-    - name: Create corelight-softsensor.conf
-      template:
-        src: corelight-softsensor.conf.j2
-        dest: /etc/corelight-softsensor.conf
-        mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      notify: restart software sensor
-
-    - name: Create local.zeek
-      template:
-        src: local.zeek.j2
-        dest: /etc/corelight/local.zeek
-        mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      notify: restart software sensor
-
-    - name: Create /root/.zkg if it does not exist
+    - name: "[ssc-3] Create required folders if they do not exist"
       file:
-        path: /root/.zkg
-        mode: '0775'
+        path: "{{ item }}"
+        mode: "0775"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         state: directory
       become: yes
+      loop:
+        - /root/.zkg
+        - /var/lib/suricata
+        - "{{ suricata_rules_dir }}"
 
-    - name: Copy zkg config to the software sensor
+    - name: "[ssc-4] Create sensor files"
       template:
-        src: swsensor-zkg.conf.j2
-        dest: /root/.zkg/config
-        mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      become: yes
-
-    - name: License the sensor
-      template:
-        src: corelight-license.txt.j2
-        dest: /etc/corelight-license.txt
-        mode: '0644'
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "0644"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       notify: restart software sensor
+      loop:
+        - {
+            src: "corelight-license.txt.j2",
+            dest: "/etc/corelight-license.txt",
+          }
+        - {
+            src: "swsensor-zkg.conf.j2",
+            dest: "/root/.zkg/config"
+          }
+        - {
+            src: "local.zeek.j2",
+            dest: "/etc/corelight/local.zeek"
+          }
+        - {
+            src: "corelight-softsensor.conf.j2",
+            dest: "/etc/corelight-softsensor.conf",
+          }
+        - {
+            src: "corelight-softsensor.conf.j2",
+            dest: "/etc/corelight.cfg"
+          }
 
-    - name: Copy default Input Framework files to sensor
+    # Input Framework
+    - name: Copy default Input Framework files to sensor if file does not exist
       copy:
         src: "{{ item }}"
         dest: /etc/corelight/input_files/
-        mode: '0644'
+        force: no
+        mode: "0644"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       with_fileglob: "{{ playbook_dir }}/common/files/input-files/default-input-files/*.*"
@@ -85,63 +69,22 @@
       copy:
         src: "{{ item }}"
         dest: /etc/corelight/input_files/
-        mode: '0644'
+        mode: "0644"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       with_fileglob: "{{ playbook_dir }}/common/files/input-files/*.*"
 
-    - name: Copy Suricata Rule files to sensor
-      copy:
-        src: "{{ playbook_dir }}/common/files/suricata_custom_rules/"
-        # dest: "{{ suricata_custom_rules_dir }}"
-        dest: /etc/corelight/rules/
-        mode: '0644'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      with_fileglob: "{{ playbook_dir }}/common/files/suricata-custom-rules/*.rules"
-      when: "suricata_update_enable|d() == 'disabled'"
-
-      # when:
-      #   - suricata_enable  is true
-      #   - suricata_update_enable|d() == 'disabled'
-    - name: Write current zeek_packages list to file
-      template:
-        src: previous-os-packages.yaml.j2
-        dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
-        mode: '0644'
-        owner: "{{ hostvars['localhost'].ansible_user }}"
-        group: "{{ hostvars['localhost'].ansible_user }}"
-      register: previous_os_packages
-      delegate_to: localhost
-
-    # Loop through zkg role for Zeek package management
-    - name: Include zkg role
+    # suricata rules
+    - name: "[ssc-6] Include suricata_update_config role for sensors without updates"
       include_role:
-        name: zkg
+        name: suricata_update_config
       vars:
-        zkg_included_by: softsensor
+        starting_role: software_sensor_config
       when:
-        - "previous_os_packages.changed or zkg_last_run.inventory_hostname.last_run_results|d('failed') == 'failed'"
+        - suricata_enable is true
+        - "suricata_update_enable|d('disabled') == 'disabled'"
 
-    - name: Create /var/lib/suricata if it does not exist
-      file:
-        path: /var/lib/suricata
-        mode: '0755'
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      become: yes
-
-    - name: "Create {{ suricata_rules_dir }} if it does not exist"
-      file:
-        path: "{{ suricata_rules_dir }}"
-        mode: '0755'
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      become: yes
-
-    - name: Start and Enable Corelight Software Sensor
+    - name: "[ssc-7] Start and Enable Corelight Software Sensor"
       service:
         name: corelight
         state: started
@@ -149,7 +92,7 @@
         daemon-reload: yes
 
   always:
-    - name: "[cc-4] Include set role facts tasks"
+    - name: "[ssc-8] Include set role facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: softsensor
@@ -160,7 +103,7 @@
       when: ansible_failed_task is not defined
 
   rescue:
-    - name: "[cc-5] Include set role failed facts tasks"
+    - name: "[ssc-9 Include set role failed facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: softsensor
@@ -170,7 +113,7 @@
         failed_state: present
       when: ansible_failed_task is defined
 
-    - name: "[cc-6] Failed task"
+    - name: "[ssc-10] Failed task"
       fail:
         msg: |
           "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

@@ -7,7 +7,7 @@ suricata: /usr/bin/corelight-suricata
 
 data-directory: {{ suricata_update_dir }}
 
-output_dir: {{ suricata_update_output_dir }}
+output: {{ suricata_update_output_dir }}
 
 disable-conf: {{ suricata_update_dir }}/disable.conf
 enable-conf: {{ suricata_update_dir }}/enable.conf
@@ -29,9 +29,9 @@ test-command: /usr/bin/corelight-suricata -T -S {{ suricata_update_output_dir }}
 # Provide a command to reload the Suricata rules.
 # May be overrided by the --reload-command command line option.
 #reload-command: sudo systemctl reload suricata
-{% if 'software_sensors' in group_names %}
-reload-command: sudo kill -USR2 $(pidof corelight-suricata)
-{% endif %}
+#{% if 'software_sensors' in group_names %}
+#reload-command: sudo kill -USR2 $($(which pidof) corelight-suricata)
+#{% endif %}
 
 {% include 'files/update.yaml' ignore missing %}
 

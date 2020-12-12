@@ -13,7 +13,6 @@
 #   become:         yes
 #   when:           ansible_os_family == 'RedHat'
 
-##### This needs to be tested for CentOS/RHEL 7 & 8
 - name: Reload Suricata rules RHEL
   shell: kill -USR2 $(pidof corelight-suricata)
   args:
