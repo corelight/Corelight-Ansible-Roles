@@ -39,7 +39,7 @@
       import_role:
         name: common
       vars:
-        starting_role: software_sensor_config
+        sending_role: software_sensor_config
 
     - name: Include Python3 virtual environment setup role
       include_role:

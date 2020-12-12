@@ -44,7 +44,7 @@
       import_role:
         name: common
       vars:
-        starting_role: suricata_update_run
+        sending_role: suricata_update_run
 
     - name: "[plbk-7] "
       include_role:

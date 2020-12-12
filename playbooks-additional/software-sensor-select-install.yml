@@ -39,7 +39,7 @@
       import_role:
         name: common
       vars:
-        starting_role: none
+        sending_role: none
 
     - name: Include Python3 virtual environment setup role
       include_role:

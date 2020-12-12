@@ -30,7 +30,7 @@
       import_role:
         name: common
       vars:
-        starting_role: software_sensor_config
+        sending_role: software_sensor_config
 
     - name: "[plbk-4] "
       include_role:
