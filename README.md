@@ -1,6 +1,12 @@
-# Caution: Before you run this version, if you are upgrading, some variable names and locations have changed
-
 # Corelight-Ansible-Roles
+
+**Caution:** Before you run this version, if you are upgrading, some variable names and locations have changed
+
+To get started, simply run this command:
+
+```source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/2.0beta/download-run-me-first.sh)```
+
+
 
 Corelight-Ansible-Roles are a collection of roles and playbooks to install, configure, run and manage a variety of Corelight ans Zeek solutions.  To include:
 
