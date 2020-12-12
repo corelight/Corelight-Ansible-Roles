@@ -1,0 +1,119 @@
+---
+- name: "[sc-6] Collect list of custom rules and write to a file"
+  template:
+    src: "custom-rule-file-list.yaml.j2"
+    dest: "{{ role_path }}/vars/custom-rule-file-list.yaml"
+    mode: "0644"
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
+  delegate_to: localhost
+  run_once: true
+
+- name: "[sc-7] Include custom rule file vars"
+  include_vars:
+    file: custom-rule-file-list.yaml
+########TEMP#DEBUG######
+- debug:
+    msg: |
+      "{{ inventory_hostname }}"
+      "{{ custom_rule_files | to_nice_yaml }}"
+  tags: [ never, debug ]
+- pause:
+    prompt:
+  tags: [ never, debug ]
+######################
+# find existing custom rule files
+- name: "[sc-8-0] Include Collect list of existing custom rules on the host"
+  include_tasks: existing-suricata-custom-rules-dir.yml
+  when:
+    - "suricata_update_enable|d('disabled') != 'disabled' or
+      inventory_hostname == suricata_update_host"
+
+- name: "[sc-9-0] Include Collect list of existing custom rules on disabled sensors"
+  include_tasks: existing-suricata-rules-dir.yml
+  when:
+    - "suricata_update_enable|d('disabled') == 'disabled'"
+    - suricata_enable is true
+    - inventory_hostname != suricata_update_host
+########TEMP#DEBUG######
+- debug:
+    msg: |
+      "{{ inventory_hostname }}"
+      "{{ existing_rule_file_list | to_nice_yaml }}"
+  tags: [ never, debug ]
+- pause:
+    prompt:
+  tags: [ never, debug ]
+######################
+# remove unused custom rules
+- name: "[sc-10] Build list to remove rules that are not in common/files/suricata-custom-rules/"
+  lineinfile:
+    path: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
+    regexp: "^(.*){{ item.name }}$"
+    state: absent
+  with_items: "{{ custom_rule_files }}"
+  changed_when: false
+  delegate_to: localhost
+  when: custom_rule_files is not none
+########TEMP#DEBUG######
+- debug:
+    msg: |
+      "{{ inventory_hostname }}"
+      "{{ existing_rule_file_list | to_nice_yaml }}"
+  tags: [ never, debug ]
+- pause:
+    prompt:
+  tags: [ never, debug ]
+######################
+- name: "[sc-11] Include remove unused custom rules vars"
+  include_vars:
+    file: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
+  throttle: 1
+
+- name: "[sc-12] Remove unused custom rules files"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ remove_rule_files }}"
+  register: results_12
+  when: remove_rule_files is not none
+  throttle: 1
+########TEMP#DEBUG######
+- debug:
+    msg: |
+      "{{ inventory_hostname }}"
+      "{{ results_12 | to_nice_yaml }}"
+  tags: [ never, debug ]
+- pause:
+    prompt:
+  tags: [ never, debug ]
+######################
+# copy custom rules to suricata host
+- name: "[sc-13] Copy Suricata Custom Rule files to suricata host"
+  copy:
+    src: "{{ item.a_path }}"
+    dest: "{{ suricata_custom_rules_dir }}"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  with_items: "{{ custom_rule_files }}"
+  register: results_12
+  when:
+    - custom_rule_files is not none
+    - "(suricata_update_enable|d('disabled') != 'disabled' or inventory_hostname == suricata_update_host)"
+
+# copy custom rules to sensor without suricata-update
+- name: "[sc-14] Copy Suricata Custom Rule files sensors without suricata-update"
+  copy:
+    src: "{{ item.a_path }}"
+    dest: "{{ suricata_rules_dir }}"
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  with_items: "{{ custom_rule_files }}"
+  register: results_13
+  when:
+    - custom_rule_files is not none
+    - "suricata_update_enable|d('disabled') == 'disabled'"
+    - suricata_enable is true
+    - inventory_hostname != suricata_update_host

@@ -1,142 +1,41 @@
 ---
-- block:
-    - name: "[sc-1] Load vars"
-      include_vars:
-        dir: "{{ playbook_dir }}/common"
-        ignore_files:
-          - "example-secrets.yml"
-          - "example-main-vars.yml"
-        ignore_unknown_extensions: yes
-        extensions:
-          - ""
-          - "yaml"
-          - "yml"
-          - "json"
+- name: "[suc-1] Include common role to CHECK FACTS"
+  include_role:
+    name: common
+  vars:
+    sending_role: suricata_update_config
 
-    - name: "[sc-2] Include Lawmaker tasks"
+- block:
+    - name: "[suc-2] Include Lawmaker tasks"
       include_tasks: lawmaker.yml
       when:
         - lawmaker_enabled|d('false') is true
 
-    - name: "[sc-3] Create Suricata-update disable config"
-      template:
-        src: suricata-update-disable.conf.j2
-        dest: "{{ suricata_update_dir }}/disable.conf"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
-
-    - name: "[sc-4] Create Suricata-update enable config"
-      template:
-        src: suricata-update-enable.conf.j2
-        dest: "{{ suricata_update_dir }}/enable.conf"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
-
-    - name: "[sc-5] Create Suricata-update modify config"
-      template:
-        src: suricata-update-modify.conf.j2
-        dest: "{{ suricata_update_dir }}/modify.conf"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
-      when:
-        - lawmaker_enabled|d('false') is false
-
-    - name: "[sc-6] Create Corelight-Suricata rule test config"
-      template:
-        src: corelight-suricata-testing.conf.j2
-        dest: "{{ suricata_dir }}/suricata.yaml"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
-      when: "'software_sensors' in group_names"
-
-    - name: "[sc-7] Remove local from Lawmaker update.yaml"
+    - name: "[suc-3] Clean up local Lawmaker update.yaml"
       lineinfile:
         path: "{{ role_path }}/files/update.yaml"
+        regexp: "{{ item }}"
         state: absent
-        regexp: "^local"
       delegate_to: localhost
       changed_when: false
-
-    - name: "[sc-8] Remove lm.rules from Lawmaker update.yaml"
-      lineinfile:
-        path: "{{ role_path }}/files/update.yaml"
-        state: absent
-        regexp: '^  - \/var\/lib\/suricata\/rules\/lm\.rules'
-      delegate_to: localhost
-      changed_when: false
-
-    # when lawmaker is enabled, this needs to be merged with the lawmaker update.yaml
-    - name: "[sc-9] Create Suricata-update config"
-      template:
-        src: suricata-update.conf.j2
-        dest: "{{ suricata_update_dir }}/update.yaml"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
-
-    - name: "[sc-10] Collect list of custom rules and write to a file"
-      template:
-        src: "custom-rule-file-list.yaml.j2"
-        dest: "{{ role_path }}/vars/custom-rule-file-list.yaml"
-        mode: "0644"
-        owner: "{{ hostvars['localhost'].ansible_user }}"
-        group: "{{ hostvars['localhost'].ansible_user }}"
-      delegate_to: localhost
-
-    - name: "[sc-11] Include custom rule file vars"
-      include_vars:
-        file: custom-rule-file-list.yaml
-
-    # find existing custom rule files
-    - name: "[sc-12] Include Collect list of existing custom rules on the host"
-      include_tasks: existing-rules.yml
-
-    # remove unused custom rules
-    - name: "[sc-13] Remove {{ suricata_custom_rules_dir }}/*.rules that are not in common/files/suricata-custom-rules/"
-      lineinfile:
-        path: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
-        regexp: "^(.*){{ item.name }}$"
-        state: absent
-      with_items: "{{ custom_rule_files }}"
-      changed_when: false
-      delegate_to: localhost
-      when: custom_rule_files is not none
-
-    - name: "[sc-14] Include remove unused custom rules vars"
-      include_vars:
-        file: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
-
-    - name: "[sc-15] Remove unused custom rules files"
-      file:
-        path: "{{ item }}"
-        state: absent
-      with_items: "{{ remove_rule_files }}"
-      when: remove_rule_files is not none
-
-    # copy custom rules to suricata host
-    - name: "[sc-16] Copy Suricata Custom Rule files to suricata host"
-      copy:
-        src: "{{ item.a_path }}"
-        dest: "{{ suricata_custom_rules_dir }}"
-        mode: "0644"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      with_items: "{{ custom_rule_files }}"
-      register: results
-      when: custom_rule_files is not none
-
-    ################## cannot update sources until the suricata is running on the sensor
-    - name: "[sc-17] Include sources tasks"
-      include_tasks: sources.yml
+      loop:
+        - "^local"
+        - '^  - \/var\/lib\/suricata\/rules\/lm\.rules'
       when:
-        - lawmaker_enabled|d('false') is false
+        - lawmaker_enabled|d('false') is true
+
+    - name: "[suc-4] Include main-host tasks"
+      include_tasks: main-host.yml
+      when:
+        - "starting_role|d('suricata_update_config') == 'suricata_update_config'"
+
+    - name: "[suc-5] Include custom-rules tasks for sensor without suricata-update"
+      include_tasks: custom-rules.yml
+      when:
+        - "starting_role|d('suricata_update_config') == 'software_sensor_config'"
 
   always:
-    - name: "[sc-18] Include set role facts tasks"
+    - name: "[suc-6] Include set role facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -147,7 +46,7 @@
       when: ansible_failed_task is not defined
 
   rescue:
-    - name: "[sc-19] Include set role failed facts tasks"
+    - name: "[suc-7] Include set role failed facts tasks"
       include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
       vars:
         fact_section: suricata_update
@@ -157,7 +56,7 @@
         failed_state: present
       when: ansible_failed_task is defined
 
-    - name: "[sc-20] Failed task"
+    - name: "[suc-8] Failed task"
       fail:
         msg: |
           "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

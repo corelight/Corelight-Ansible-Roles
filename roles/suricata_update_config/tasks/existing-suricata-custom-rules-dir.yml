@@ -1,12 +1,12 @@
 ---
-- name: Collect list of existing custom rules
+- name: "[suc-8-1] Collect list of existing custom rules"
   find:
     paths: "{{ suricata_custom_rules_dir }}"
     file_type: file
     patterns: "*.rules"
   register: existing_rule_file_list
 
-- name: Write rule file list to a file
+- name: "[suc-8-2] Write rule file list to a file"
   template:
     src: "remove-rule-file-list.yaml.j2"
     dest: "{{ role_path }}/vars/{{ inventory_hostname }}-remove-rule-file-list.yaml"
@@ -15,3 +15,15 @@
     group: "{{ hostvars['localhost'].ansible_user }}"
   delegate_to: localhost
   changed_when: false
+
+########TEMP#DEBUG######
+- debug:
+    msg: |
+      host
+      "{{ inventory_hostname }}"
+      "{{ existing_rule_file_list | to_nice_yaml }}"
+  tags: [ never, debug ]
+- pause:
+    prompt:
+  tags: [ never, debug ]
+######################
