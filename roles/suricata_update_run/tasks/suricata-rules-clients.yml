@@ -41,7 +41,7 @@
 - name: "[sur-54] Push Suricata-update Rules to Fleet Managed Physical sensors"
   shell: |
     source /etc/corelight-env/bin/activate
-    corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
+    corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate suricata ruleset upload --filename suricata.rules --file "{{ role_path }}/files/{{ suricata_version }}/suricata.rules"
   args:
     executable: /bin/bash
   become: no

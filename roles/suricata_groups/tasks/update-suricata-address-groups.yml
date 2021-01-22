@@ -10,7 +10,7 @@
   with_items: "{{ suricata_address_groups }}"
   when:
     - ('physical_sensors' in group_names or 'virtual_sensor' in group_names)
-    - fleet_managed == 'disabled'
+    - fleet_managed is false
 
 - name: Update Suricata address-groups on Fleet Managed Physical or Virtual sensors
   shell: |
@@ -23,4 +23,4 @@
   with_items: "{{ suricata_address_groups }}"
   when:
     - ('physical_sensors' in group_names or 'virtual_sensor' in group_names)
-    - fleet_managed == 'enabled'
+    - fleet_managed is true

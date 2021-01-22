@@ -33,8 +33,9 @@ test-command: /usr/bin/corelight-suricata -T -S {{ suricata_update_output_dir }}
 #reload-command: sudo kill -USR2 $($(which pidof) corelight-suricata)
 #{% endif %}
 
+{% if lawmaker_enabled|d('false') is true %}
 {% include 'files/update.yaml' ignore missing %}
-
+{% endif %}
 
 # A list of local rule sources.
 local:

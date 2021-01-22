@@ -3,13 +3,13 @@
   include_tasks: collect-suricata-fl-versions.yml
   when:
     - "'physical_sensors' in group_names"
-    - fleet_managed == 'enabled'
+    - fleet_managed is true
 
 - name: "[sur-16] Collect non-Fleet managed physical sensor Suricata version"
   include_tasks: collect-suricata-ph-versions.yml
   when:
     - "'physical_sensors' in group_names"
-    - fleet_managed != 'enabled'
+    - fleet_managed is false
 
 - name: "[sur-17] Collect software sensor Suricata version"
   include_tasks: collect-suricata-sw-versions.yml

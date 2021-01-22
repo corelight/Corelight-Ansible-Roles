@@ -4,7 +4,7 @@
   delegate_to: localhost
   become: no
   when:
-    - fleet_managed != 'enabled'
+    - fleet_managed is false
     - "zeek_packages != None"
     - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
     - (target == inventory_hostname or target == 'all')
@@ -14,7 +14,7 @@
 #   delegate_to:      localhost
 #   become:           no
 #   when:
-#     - fleet_managed == 'enabled'
+#     - fleet_managed is true
 #     - 'zeek_packages != None'
 #     - (target == inventory_hostname or target == 'all')
 
@@ -23,7 +23,7 @@
   delegate_to: localhost
   become: no
   when:
-    - fleet_managed != 'enabled'
+    - fleet_managed is false
     - "zeek_packages == None"
     - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
     - (target == inventory_hostname or target == 'all')
@@ -33,7 +33,7 @@
 #   delegate_to:      localhost
 #   become:           no
 #   when:
-#     - fleet_managed == 'enabled'
+#     - fleet_managed is true
 #     - 'zeek_packages == None'
 #     - (target == inventory_hostname or target == 'all')
 
