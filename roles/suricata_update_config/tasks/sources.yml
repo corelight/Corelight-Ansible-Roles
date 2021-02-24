@@ -33,7 +33,7 @@
   args:
     executable: /bin/bash
   become: no
-  with_items: "{{ suricata_secret_code_sources|default([]) }}"
+  with_items: "{{ enable_suricata_secret_code_sources|default([]) }}"
   when: "item.name not in enabled_sources.stdout"
   no_log: true
   register: results
@@ -78,7 +78,7 @@
   loop: "{{ enabled_sources.stdout_lines | select('match', '^  - [a-z]') | list | regex_replace('  - ') }}"
   when:
     - "item not in (suricata_remote_sources|default([])|string)"
-    - "item not in (suricata_secret_code_sources|default([])|string)"
+    - "item not in (enable_suricata_secret_code_sources|default([])|string)"
     - "item not in (suricata_custom_url_sources|default([])|string)"
   register: results
 
