@@ -51,42 +51,42 @@
     - name: Include ZKG install role
       include_role:
         name: zkg_install
-      when:
-        - "ansible_local.corelight_ansible_roles.zkg.install|d('failed') == 'failed'"
+      # when:
+      #   - "ansible_local.corelight_ansible_roles.zkg.install|d('failed') == 'failed'"
 
     - name: Include Software Sensor Install role
       include_role:
         name: software_sensor_install
-      when:
-        - "ansible_local.corelight_ansible_roles.softsensor.install|d('failed') == 'failed'"
+      # when:
+      #   - "ansible_local.corelight_ansible_roles.softsensor.install|d('failed') == 'failed'"
 
     - name: Include Suricata-update install role
       include_role:
         name: suricata_update_install
       when:
-        - "ansible_local.corelight_ansible_roles.suricata_update.install|d('failed') == 'failed'"
+        # - "ansible_local.corelight_ansible_roles.suricata_update.install|d('failed') == 'failed'"
         - "suricata_update_enable|d('disabled') == 'local'"
         - "suricata_enable|d(false) is true"
 
     - name: Include Software Sensor Config role
       include_role:
         name: software_sensor_config
-      when:
-        - "ansible_local.corelight_ansible_roles.softsensor.config|d('failed') == 'failed'"
+      # when:
+      #   - "ansible_local.corelight_ansible_roles.softsensor.config|d('failed') == 'failed'"
 
     - name: "[ ] Include zkg role"
       include_role:
         name: zkg
       vars:
         starting_role: software_sensor_config
-      when:
-        - "zkg_last_run.inventory_hostname.last_run_results|d('failed') == 'failed'"
+      # when:
+        # - "zkg_last_run.inventory_hostname.last_run_results|d('failed') == 'failed'"
 
     - name: Include Suricata-update config role
       include_role:
         name: suricata_update_config
       when:
-        - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') == 'failed'"
+        # - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') == 'failed'"
         - "suricata_update_enable|d('disabled') == 'local'"
         - "suricata_enable|d(false) is true"
 
@@ -112,6 +112,6 @@
       include_role:
         name: suricata_config_cron_job
       when:
-        - "ansible_local.corelight_ansible_roles.suricata_update_cron_job.config|d('failed') == 'failed'"
+        # - "ansible_local.corelight_ansible_roles.suricata_update_cron_job.config|d('failed') == 'failed'"
         - "suricata_update_enable|d('disabled') == 'local'"
         - "suricata_enable|d(false) is true"
