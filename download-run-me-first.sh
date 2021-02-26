@@ -142,7 +142,7 @@ cd Corelight-Ansible-Roles/
 git checkout 2.0beta
 
 echo "Coping Ansible default config to /etc/ansible/ansible/cfg"
-cp ../roles/ansible_install/files/default-ansible.cfg /etc/ansible/ansible.cfg
+cp /etc/corelight-env/Corelight-Ansible-Roles/roles/ansible_install/files/default-ansible.cfg /etc/ansible/ansible.cfg
 
 
 echo -e "\033[1;32m";
