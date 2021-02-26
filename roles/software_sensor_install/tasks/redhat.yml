@@ -19,7 +19,7 @@
 
 - name: Remove Corelight Software Sensor if repo changed
   yum:
-    name: corelight
+    name: corelight-softsensor
     state: absent
     autoremove: yes
   when: repo.changed
@@ -32,7 +32,7 @@
 
 - name: Install Corelight Software Sensor
   yum:
-    name: corelight
+    name: corelight-softsensor
     update_cache: yes
     state: latest
   environment:

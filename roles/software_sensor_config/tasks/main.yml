@@ -49,10 +49,6 @@
             src: "corelight-softsensor.conf.j2",
             dest: "/etc/corelight-softsensor.conf",
           }
-        - {
-            src: "corelight-softsensor.conf.j2",
-            dest: "/etc/corelight.cfg"
-          }
 
     # Input Framework
     - name: Copy default Input Framework files to sensor if file does not exist

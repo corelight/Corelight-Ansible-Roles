@@ -19,14 +19,14 @@
 
 - name: Remove Corelight Software Sensor if repo changed
   apt:
-    name: corelight
+    name: corelight-softsensor
     state: absent
     purge: yes
   when: repo.changed
 
 - name: Install Corelight Software Sensor arm64
   apt:
-    name: corelight:arm64
+    name: corelight-softsensor:arm64
     update_cache: yes
     state: latest
   when: ansible_facts['architecture'] == 'aarch64'
@@ -36,7 +36,7 @@
 
 - name: Install Corelight Software Sensor x86_64
   apt:
-    name: corelight
+    name: corelight-softsensor
     update_cache: yes
     state: latest
   when: ansible_facts['architecture'] == 'x86_64'
