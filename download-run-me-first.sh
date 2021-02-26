@@ -89,18 +89,23 @@ echo ""
 
 if [ "$DistroBasedOn" = "redhat" ]; then
         if [ "$MREV" = "7" ]; then
-                echo "Installing Python3-pip and other dependencies"
+                echo "Installing epel-release libselinux-python and dnf"
                 sudo yum install -y epel-release libselinux-python dnf
+                echo "Installing Python3-pip and git"
                 sudo dnf install -y -q python3-pip git
+                echo "Installing libselinux-python3"
                 sudo dnf install -y -q libselinux-python3
         else
-                echo "Installing Python3-pip and other dependencies"
+                echo "Installing dnf"
                 sudo yum install -y dnf
+                echo "Installing Python3-pip and git"
                 sudo dnf install -y -q python3-pip git
         fi
 elif [ "$DistroBasedOn" = "debian" ]; then
         sudo apt-get update -y -q
+        echo "Installing Python3-pip and git"
         sudo apt-get install -y -q --install-suggests python3-pip git
+        echo "Installing Python3-venv"
         sudo apt-get install -y -q --install-suggests python3-venv
 else
         echo "Not RedHat or Debian based"
