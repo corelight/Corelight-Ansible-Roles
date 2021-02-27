@@ -82,7 +82,7 @@
 
     - name: "[ssc-7] Start and Enable Corelight Software Sensor"
       service:
-        name: corelight
+        name: corelight-softsensor
         state: started
         enabled: yes
         daemon-reload: yes

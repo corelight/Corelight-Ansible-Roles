@@ -8,7 +8,7 @@
 
 - name: restart software sensor
   service:
-    name: corelight
+    name: corelight-softsensor
     state: restarted
   become: yes
 #   when:           ansible_os_family == 'RedHat'
