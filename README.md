@@ -4,7 +4,7 @@
 
 To get started, simply run this command:
 
-```source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/2.0beta/download-run-me-first.sh)```
+```source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/v2.0.0/download-run-me-first.sh)```
 
 This product includes GeoLite2 data created by MaxMind, available from <https://www.maxmind.com>.
 You can sign up for free and get a license key from <https://www.maxmind.com/en/geolite2/signup>
