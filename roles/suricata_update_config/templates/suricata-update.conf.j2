@@ -29,9 +29,9 @@ test-command: /usr/bin/corelight-suricata -T -S {{ suricata_update_output_dir }}
 # Provide a command to reload the Suricata rules.
 # May be overrided by the --reload-command command line option.
 #reload-command: sudo systemctl reload suricata
-#{% if 'software_sensors' in group_names %}
-#reload-command: sudo kill -USR2 $($(which pidof) corelight-suricata)
-#{% endif %}
+{% if 'software_sensors' in group_names %}
+reload-command: sudo kill -USR2 $($(which pidof) corelight-suricata)
+{% endif %}
 
 {% if lawmaker_enabled|d('false') is true %}
 {% include 'files/update.yaml' ignore missing %}
