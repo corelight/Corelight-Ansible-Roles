@@ -50,6 +50,11 @@
             dest: "/etc/corelight-softsensor.conf",
           }
 
+    # GeoIPLite Database
+    - name:  Include GeoIPLite tasks
+      include_tasks: GeoIP.yml
+      when: enable_geoip|d(false) is true
+
     # Input Framework
     - name: Copy default Input Framework files to sensor if file does not exist
       copy:

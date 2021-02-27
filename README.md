@@ -6,7 +6,8 @@ To get started, simply run this command:
 
 ```source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/2.0beta/download-run-me-first.sh)```
 
-
+This product includes GeoLite2 data created by MaxMind, available from <https://www.maxmind.com>.
+You can sign up for free and get a license key from <https://www.maxmind.com/en/geolite2/signup>
 
 Corelight-Ansible-Roles are a collection of roles and playbooks to install, configure, run and manage a variety of Corelight ans Zeek solutions.  To include:
 

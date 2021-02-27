@@ -2,6 +2,7 @@
 common/**
 **/files/*
 !common/files
+!common/files/Geo*
 !common/files/input-files
 !**/default-input-files
 !**/default-input-files/*
