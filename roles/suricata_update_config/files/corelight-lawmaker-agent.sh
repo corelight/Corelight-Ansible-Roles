@@ -1,0 +1,244 @@
+#!/bin/bash
+export TERM=xterm-256color
+
+####################################################
+#                                                  #
+#               CLIENT VARIABLES                   #
+# change these to match your Lawmaker environment  #
+#                                                  #
+####################################################
+API_KEY=9a8573fb-1da3-044d-82cc-24112068a4b2
+
+####################################################
+#                                                  #
+#               SYSTEM VARIABLES                   #
+#                                                  #
+####################################################
+API_URL=https://api.lawmaker.3csqa.com
+SURI_REBOOT_RULES="/tmp/SURI_REBOOT_RULES"
+SURI_REBOOT="/tmp/SURI_REBOOT"
+
+
+####################################################
+#        Check for updates on disable.conf         #
+####################################################
+
+FILE_DISABLE="disable.conf"
+# Check if a local file already exists or if this is the first download
+if [ -f "/mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE" ]; then
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_DISABLE exists. Checking if the file is still up to date with Lawmaker ...\033[0m"
+  STATUS_DISABLE=$(curl -s -o /dev/null -w '%{http_code}' -X GET "$API_URL/file?type=disable" --header "Authorization: $API_KEY" --header "Content-Type: application/json" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE)")
+  if [ $STATUS_DISABLE -eq 200 ]; then
+    echo "(Code 200) $FILE_DISABLE in Lawmaker is more recent than the local file. Downloading ..."
+    curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE.temp -X GET "$API_URL/file?type=disable" --header "Authorization: $API_KEY" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE)"
+    if [ -s /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE.temp ]
+    then
+      mv /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE.temp /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE
+      touch $SURI_REBOOT_RULES
+    else
+      echo "File downloaded from Lawmaker has no content. Not replacing local file."
+    fi
+  elif [ $STATUS_DISABLE -eq 304 ]; then
+    echo "(Code 304) $FILE_DISABLE in Lawmaker has not changed. Standing down."
+  else
+    echo ""
+    echo "Got $STATUS_DISABLE return code for $FILE_DISABLE. Please check API key and file name."
+  fi
+else
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_DISABLE does not exist. Downloading ...\033[0m"
+  curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE.temp -X GET "$API_URL/file?type=disable" --header "Authorization: $API_KEY" --header "If-Modified-Since: 1947-09-18T01:01:01Z"
+    if [ -s /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE.temp ]
+    then
+      mv /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE.temp /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_DISABLE
+      touch $SURI_REBOOT_RULES
+    else
+      echo "File downloaded from Lawmaker has no content. Not replacing local file."
+    fi
+fi
+
+####################################################
+#         Check for updates on enable.conf         #
+####################################################
+
+FILE_ENABLE="enable.conf"
+# Check if a local file already exists or if this is the first download
+if [ -f "/mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE" ]; then
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_ENABLE exists. Checking if the file is still up to date with Lawmaker ...\033[0m"
+  STATUS_ENABLE=$(curl -s -o /dev/null -w '%{http_code}' -X GET "$API_URL/file?type=enable" --header "Authorization: $API_KEY" --header "Content-Type: application/json" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE)")
+  if [ $STATUS_ENABLE -eq 200 ]; then
+    echo "(Code 200) $FILE_ENABLE in Lawmaker is more recent than the local file. Downloading ..."
+    curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE.temp -X GET "$API_URL/file?type=enable" --header "Authorization: $API_KEY" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE)"
+    if [ -s /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE.temp ]
+    then
+      mv /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE.temp /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE
+      touch $SURI_REBOOT_RULES
+    else
+      echo "File downloaded from Lawmaker has no content. Not replacing local file."
+    fi
+  elif [ $STATUS_ENABLE -eq 304 ]; then
+    echo "(Code 304) $FILE_ENABLE in Lawmaker has not changed. Standing down."
+  else
+    echo ""
+    echo "Got $STATUS_ENABLE return code for $FILE_ENABLE. Please check API key and file name."
+  fi
+else
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_ENABLE does not exist. Downloading ...\033[0m"
+  curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE.temp -X GET "$API_URL/file?type=enable" --header "Authorization: $API_KEY" --header "If-Modified-Since: 1947-09-18T01:01:01Z"
+  if [ -s /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE.temp ]
+  then
+    mv /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE.temp /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_ENABLE
+    touch $SURI_REBOOT_RULES
+  else
+    echo "File downloaded from Lawmaker has no content. Not replacing local file."
+  fi
+fi
+
+###################################################
+#  Check for updates on lm.rules  (rule creator)  #
+###################################################
+
+FILE_LMRULES="lm.rules"
+
+
+# Check if a local file already exists or if this is the first download
+if [ -f "/mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES" ]; then
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_LMRULES exists. Checking if the file is still up to date with Lawmaker ...\033[0m"
+  STATUS_LM=$(curl -s -o /dev/null -w '%{http_code}' -X GET "$API_URL/file?type=lm" --header "Authorization: $API_KEY" --header "Content-Type: application/json" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES)")
+  if [ $STATUS_LM -eq 200 ]; then
+    echo "(Code 200) $FILE_LMRULES in Lawmaker is more recent than the local file! Downloading ..."
+    curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES.temp -X GET "$API_URL/file?type=lm" --header "Authorization: $API_KEY" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES)"
+    if [ -s /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES.temp ]
+    then
+      mv /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES.temp /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES
+      touch $SURI_REBOOT_RULES
+    else
+      echo "File downloaded from Lawmaker has no content. Not replacing local file."
+    fi
+  elif [ $STATUS_LM -eq 304 ]; then
+    echo "(Code 304) $FILE_LMRULES in Lawmaker has not changed. Standing down."
+  else
+    echo ""
+    echo "Got $STATUS_LM return code for $FILE_LMRULES. Please check API key and file name."
+  fi
+else
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_LMRULES does not exist. Downloading ...\033[0m"
+  curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES.temp -X GET "$API_URL/file?type=lm" --header "Authorization: $API_KEY" --header "If-Modified-Since: 1947-09-18T01:01:01Z"
+  if [ -s /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES.temp ]
+  then
+    mv /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES.temp /mnt/c/corelight_projects/corelight-ansible-roles/common/files/suricata-custom-rules/$FILE_LMRULES
+    touch $SURI_REBOOT_RULES
+  else
+    echo "File downloaded from Lawmaker has no content. Not replacing local file."
+  fi
+fi
+
+###################################################
+#      Check for updates on update.yaml           #
+###################################################
+
+FILE_SURICATAUPDATE="update.yaml"
+# Check if a local file already exists or if this is the first download
+if [ -f "/mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE" ]; then
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_SURICATAUPDATE exists. Checking if the file is still up to date with Lawmaker ...\033[0m"
+  STATUS_SURICATAUPDATE=$(curl -s -o /dev/null -w '%{http_code}' -X GET "$API_URL/file?type=update" --header "Authorization: $API_KEY" --header "Content-Type: application/json" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE)")
+  if [ $STATUS_SURICATAUPDATE -eq 200 ]; then
+    echo "(Code 200) $FILE_SURICATAUPDATE in Lawmaker is more recent than the local file! Downloading ..."
+    curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE.temp -X GET "$API_URL/file?type=update" --header "Authorization: $API_KEY" --header "If-Modified-Since: $(date -u +%Y-%m-%dT%H:%M:%SZ -r /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE)"
+    if [ `cat /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE.temp | wc -l` -ge "2" ]
+    then
+      touch $SURI_REBOOT_RULES
+      mv /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE.temp /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE
+    else
+      echo "File downloaded from Lawmaker has no content. Not replacing local file."
+    fi
+  elif [ $STATUS_SURICATAUPDATE -eq 304 ]; then
+    echo "(Code 304) $FILE_SURICATAUPDATE in Lawmaker has not changed. Standing down."
+  else
+  echo ""
+  echo "Got $STATUS_SURICATAUPDATE return code for $FILE_SURICATAUPDATE. Please check API key and file name."
+  fi
+else
+  echo ""
+  echo -e "\033[1m▶ Local $FILE_SURICATAUPDATE does not exist. Downloading ...\033[0m"
+  curl -s -o /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE.temp -X GET "$API_URL/file?type=update" --header "Authorization: $API_KEY" --header "If-Modified-Since: 1947-09-18T01:01:01Z"
+  if [ `cat /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE.temp | wc -l` -ge "2" ]
+  then
+    touch $SURI_REBOOT_RULES
+    mv /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE.temp /mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE
+  else
+    echo "File downloaded from Lawmaker has no content. Not replacing local file."
+  fi
+fi
+
+
+
+####################################################
+#   If update.yaml exists, create a cron entry     #
+#         for nightly ruleset updates              #
+####################################################
+
+# Define function that will create the suricata-update cron entry
+suricata_update_cron () {
+  echo ""
+  echo -e "\033[1mInstalling cron entry that will retrieve changes to rulesets every night at 3AM ...\033[0m"
+  (crontab -l 2>/dev/null; echo "0 3 * * * $(which suricata-update) >/tmp/suricata-update-log 2>&1 && $(which sleep) 20 && $(which suricatasc) -c ruleset-reload-nonblocking >/tmp/suricata-update-log-reload 2>&1") | crontab -;
+}
+
+# Determine if this is running via cron or interactively
+if [ -t 1 ] ; then
+  # Determine if we install the cron job by checking for the existence of a suricata-update configuration file
+  if [ -f "/mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE" ]; then
+    # Check if crontab is empty
+    if [ $(crontab -l 2> /dev/null | wc -c) -eq 0 ]; then
+      echo -e "\033[1mWould you like me to proceed with the installation of a cron job to perform nightly ruleset updates? These updates will happen by default at 3AM. Configure cron?\033[0m"
+      select yn in "Yes" "No"; do
+        case $yn in
+          Yes) echo ""; echo -e "\033[1m▶ Installing cron job for suricata-update!\033[0m" && suricata_update_cron; break;;
+          No) echo ""; echo -e "\033[1m▶ cron job for suricata-update will not be installed!\033[0m"; break;;
+        esac
+      done
+      else
+        # If crontab exists check for suricata-update cron job
+        if grep -R "suricata-update" /var/spool/cron/crontabs/ > /dev/null
+        then
+          echo "suricata-update entry detected in crontab. Standing down."
+        else
+          echo -e "\033[1mWould you like me to proceed with the installation of a cron job to perform nightly ruleset updates? These updates will happen by default at 3AM. Configure cron?\033[0m"
+        select yn in "Yes" "No"; do
+          case $yn in
+            Yes) echo ""; echo -e "\033[1m▶ Installing cron job for suricata-update!\033[0m" && suricata_update_cron; break;;
+            No) echo ""; echo -e "\033[1m▶ cron job for suricata-update will not be installed!\033[0m"; break;;
+          esac
+        done
+        fi
+    fi
+  else
+    echo "/mnt/c/corelight_projects/corelight-ansible-roles/roles/suricata_update_config/files/$FILE_SURICATAUPDATE does not exist. I will not install a cron entry as suricata-update will update based on Lawmaker changes."
+  fi
+else
+  echo -e "\nlawmaker-agent is running via cron. Will not question about the installation of the suricata-update cron job.\n"
+fi
+
+
+####################################################
+#                                                  #
+#                CLEANUP ACTIONS                   #
+#                                                  #
+####################################################
+
+if [ -f "$SURI_REBOOT_RULES" ]; then
+  rm $SURI_REBOOT_RULES
+fi
+
+if [ -f "$SURI_REBOOT" ]; then
+  rm $SURI_REBOOT
+fi
+
+exit 0
