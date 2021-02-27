@@ -1,0 +1,34 @@
+---
+- name: "[ssc-30] Remove old GeoIP files"
+  file:
+    path: "{{ item }}"
+    state: absent
+  become: yes
+  loop:
+    - /usr/share/GeoIP/GeoIP.dat
+    - /usr/share/GeoIP/GeoIPv6.dat
+
+- name: "[ssc-31] Add new GeoIP database"
+  unarchive:
+    src: "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key={{ geoip_key }}&suffix=tar.gz"
+    dest: /tmp
+    mode: "0644"
+    list_files: yes
+    remote_src: yes
+  become: yes
+  register: geoip_name
+
+- name: "[ssc-32] Move GeoLite2-City.mmdb"
+  copy:
+    src: "/tmp/{{ geoip_name.files[0] }}GeoLite2-City.mmdb"
+    dest: /usr/share/GeoIP/GeoLite2-City.mmdb
+    force: no
+    remote_src: yes
+    mode: "0644"
+  notify: restart software sensor
+
+- name: "[ssc-33] Cleanup GeoLite2-City tar file"
+  file:
+    path: "/tmp/{{ geoip_name.files[0] }}"
+    state: absent
+  become: yes

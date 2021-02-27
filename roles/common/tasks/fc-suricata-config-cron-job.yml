@@ -1,0 +1,46 @@
+---
+- name: Gather Facts for suricata_update_host and suricata_local
+  setup:
+    filter: ansible_local
+    gather_subset: "!all"
+  when:
+    - "inventory_hostname == suricata_update_host or 'suricata_local' in group_names"
+
+- name: Create group suricata_config_needed
+  group_by:
+    key: suricata_config_needed
+  changed_when: false
+  when:
+    - "'suricata_local' in group_names or inventory_hostname == suricata_update_host"
+    - "ansible_local.corelight_ansible_roles.suricata_update.install|d('failed') != 'success'"
+
+- name: pause note
+  pause:
+    seconds: 5
+    prompt: |
+      #########################################################
+      The Suricata-update has not been configured on the
+      following, EXIT NOW
+      Run 'suricata-update-reconfig-host.yml' or
+      'suricata-update-reconfig-select.yml'
+      #########################################################
+      "{{ groups.suricata_config_needed | to_nice_json }}"
+      #########################################################
+  run_once: true
+  when:
+    - "groups.suricata_config_needed is defined"
+
+- name: "[cm-] Cannot configure suricata-update"
+  debug:
+    msg: "suricata-update not installed on or for {{ inventory_hostname }}"
+  when:
+    - "'suricata_install_needed' in group_names"
+  failed_when: true
+
+- name: "[cm-] "
+  pause:
+    seconds: 5
+    prompt: |
+      The following host are a GO!
+        unless they are stopped now
+      "{{ ansible_play_batch | to_nice_json }}"

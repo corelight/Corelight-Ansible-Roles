@@ -1,0 +1,51 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+  vars_prompt:
+    - name: target
+      prompt: Enter the host to run Suricata-update for
+      private: no
+
+  tasks:
+    - name: "[plbk-1] Include common role"
+      include_role:
+        name: common
+      vars:
+        role_name_fact:
+          - suricata_update_run
+
+    - name: "[plbk-2] set fact"
+      set_fact:
+        target: "{{ target }}"
+      changed_when: false
+
+    - name: "[plbk-3] add host if suricata_update_enabled != disabled"
+      add_host:
+        name: "{{ target }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+      when:
+        - "hostvars[target].suricata_update_enable|d('disabled') != 'disabled'"
+
+    - name: "[plbk-4] add suricata_update_host to dynamically_created_hosts group"
+      add_host:
+        name: "{{ suricata_update_host }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+      when:
+        - "hostvars[target].suricata_update_enable|d('disabled') == 'remote'"
+
+- hosts: dynamically_created_hosts
+  gather_facts: no
+
+  tasks:
+    - name: "[plbk-6] Include common role to CHECK FACTS"
+      import_role:
+        name: common
+      vars:
+        sending_role: suricata_update_run
+
+    - name: "[plbk-7] "
+      include_role:
+        name: suricata_update_run

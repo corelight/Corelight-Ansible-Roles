@@ -1,0 +1,19 @@
+# suricata-update - disable.conf
+
+{% if 'software_sensors' not in group_names %}
+# Disable rules with protocols disabled in Corelight-suricata
+re: ^alert\s+rdp
+re: ^alert\s+modbus
+re: ^alert\s+dnp3
+re: ^alert\s+enip
+re: ^alert\s+sip
+re: \sja3
+{% endif %}
+
+{% if disable_rules is defined %}
+{% for rule in disable_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+
+{% include  'files/disable.conf' ignore missing %}

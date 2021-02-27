@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: no
+  become: no
+  serial: 1
+
+  tasks:
+  - local_action: "command ssh-copy-id {{ ansible_user }}@{{ inventory_hostname }}"
+    ignore_errors: true
+    when:
+      - "'physical_sensors' not in group_names"
+      - "'virtual_sensors' not in group_names"
+      - "inventory_hostname != 'localhost'"

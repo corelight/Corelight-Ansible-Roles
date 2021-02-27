@@ -1,0 +1,6 @@
+---
+custom_rule_files:
+{% for filename in lookup('fileglob', '{{ playbook_dir }}/common/files/suricata-custom-rules/*.rules', wantlist=true) %}
+  - name: {{ filename | regex_replace('(.*)\\/(.*)', '\\2') }}
+    a_path: {{ filename }}
+{% endfor %}

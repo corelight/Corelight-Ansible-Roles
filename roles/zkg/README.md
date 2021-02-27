@@ -134,13 +134,13 @@ all:
 ### Command to run the playbook
 
 ```none
-ansible-playbook -i common/inventory.yml zkg.yml
+ansible-playbook -i common/vars/inventory.yml zkg.yml
 ```
 
 The playbook will prompt for the name of the Software Sensor to be configured and if the name you provide is an individual host or a group of hosts.  Alternately, you can provide the sensor name with --extra-vars in the command line
 
 ```none
-ansible-playbook -i common/inventory.yml zkg.yml --extra-vars '{"target":"all"}'
+ansible-playbook -i common/vars/inventory.yml zkg.yml --extra-vars '{"target":"all"}'
 ```
 
 If all of the managed hosts use the same SSH password and sudo password, you can have Ansible prompt for each with the options ```--ask-pass --ask-become-pass```
@@ -148,7 +148,7 @@ If all of the managed hosts use the same SSH password and sudo password, you can
 If you are using the secrets file to supply SSH or sudo passwords, use --extra-vars to load the secrets file at the start of the playbook.
 
 ```none
-ansible-playbook -i common/inventory.yml zkg.yml --extra-vars '{"target":"all"}' --extra-vars '@common/secrets.yml'
+ansible-playbook -i common/vars/inventory.yml zkg.yml --extra-vars '{"target":"all"}' --extra-vars '@common/vars/secrets.yml'
 ```
 
 If the sensor host has been setup with SSH keys, you will not need to provide the 'ask-pass' or 'become password'.

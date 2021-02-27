@@ -1,0 +1,72 @@
+---
+# this playbook is still a work in progress
+- meta: end_play
+
+- hosts: localhost
+  gather_facts: no
+  vars_prompt:
+  - name: target
+    prompt: Please enter the target host name or group name
+    private: no
+
+
+  tasks:
+    - meta: end_play
+    - add_host:
+        name: "{{ target }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+
+
+- hosts: dynamically_created_hosts
+  become: yes
+
+  vars:
+    community_string: me
+
+  tasks:
+    - include_role:
+        name: venv_setup
+
+    - meta: end_play
+    - copy:
+        src: ./corelight-fleetd.pem
+        dest: /etc/corelight-fleetd.pem
+        mode: '0400'
+
+    - name:            Add Corelight repo key
+      apt_key:
+        url:            https://pkgs.corelight.com/signing.pub
+        state:          present
+
+    - name:            Add Corelight repo
+      apt_repository:
+        # repo: "deb https://pkgs.corelight.com/deb/stable {{ansible_distribution_release}} main"
+        # ubuntu20.04 does not have a repo, use 18.04's
+        repo: deb https://pkgs.corelight.com/deb/stable bionic main
+        state: present
+        mode: '0644'
+
+    - name: install fleet
+      apt:
+        name: corelight-fleet
+        state: latest
+        update_cache: yes
+        install_recommends: yes
+
+    - file:
+        path: /etc/corelight-fleetd.pem
+        owner: corelight-fleetd
+        group: corelight-fleetd
+        mode: '0400'
+
+    - name: Set fleet authentication community string
+      lineinfile:
+        path: /etc/corelight-fleetd.conf
+        regexp: '^(\s*\"community-string\").*$'
+        line: '\1: "{{ community_string }}"'
+        backrefs: yes
+
+    - service:
+        name: corelight-fleetd
+        state: stopped

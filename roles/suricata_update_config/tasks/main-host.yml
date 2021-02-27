@@ -1,0 +1,43 @@
+---
+- name: "[ssc-4] Create Suricata-update .conf files"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - {
+        src: "suricata-update-disable.conf.j2",
+        dest: "{{ suricata_update_dir }}/disable.conf",
+      }
+    - {
+        src: "suricata-update-enable.conf.j2",
+        dest: "{{ suricata_update_dir }}/enable.conf",
+      }
+    - {
+        src: "suricata-update-modify.conf.j2",
+        dest: "{{ suricata_update_dir }}/modify.conf",
+      }
+    - {
+        src: "suricata-update.conf.j2",
+        dest: "{{ suricata_update_dir }}/update.yaml",
+      }
+
+- name: "[sc-5] Create Software Sensor Corelight-Suricata rule test config"
+  template:
+    src: corelight-suricata-testing.conf.j2
+    dest: "{{ suricata_dir }}/suricata.yaml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  when: "'software_sensors' in group_names"
+
+- name: "[sc-6] Include custom rules tasks"
+  include_tasks: custom-rules.yml
+
+################## cannot update sources until the suricata is running on the sensor
+- name: "[sc-13] Include sources tasks"
+  include_tasks: sources.yml
+  when:
+    - lawmaker_enabled|d('false') is false

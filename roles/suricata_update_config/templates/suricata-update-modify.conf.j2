@@ -1,0 +1,7 @@
+# suricata-update - modify.conf
+
+{% if modify_rules is defined %}
+{% for rule in modify_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}

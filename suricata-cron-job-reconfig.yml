@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: "[plbk-1] Include common role"
+      include_role:
+        name: common
+      vars:
+        role_name_fact:
+          - suricata_config_cron_job
+
+    - name: "[plbk-2] add cron_job_host to dynamically_created_hosts group"
+      add_host:
+        name: "{{ cron_job_host }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+      when:
+        - cron_job_host is defined
+
+- hosts: dynamically_created_hosts
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: "[plbk-3] "
+      include_role:
+        name: suricata_config_cron_job

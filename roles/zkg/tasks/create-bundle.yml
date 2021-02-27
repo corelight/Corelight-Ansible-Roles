@@ -1,31 +1,11 @@
 ---
-- name:             "create-bundle: Refresh Script Index"
-  command:          zkg refresh
-  changed_when:     false
-
-- name:             "create-bundle: Collect list of installed scripts"
-  command:          zkg list --nodesc
-  register:         installed_scripts
-  changed_when:     false
-
-- debug:
-    var:            installed_scripts.stdout_lines
-
-- name:             "create-bundle: Include install-pkg Tasks"
-  include_tasks:    install-pkg.yml
+- name:           create bundle
+  shell:          zkg bundle ansible_role.bundle --force
+  args:
+    chdir:        "{{ role_path }}/files"
   when:
     - 'zeek_packages != None'
-
-- name:             "create-bundle: Include remove_packages tasks"
-  include_tasks:    remove-packages.yml
-
-- name:             "create-bundle: Upgrade Scripts"
-  command:          zkg upgrade {{ item.name }} --force
-  with_items:       "{{ zeek_packages }}"
-  when:
-    - 'item.auto_upgrade is true'
-    - 'item.name in installed_scripts.stdout'
-  register:         results
-  changed_when:
-    - results.stdout != 'All packages already up-to-date.'
-  notify:           create bundle
+    - ( install_depends.changed or remove_pkgs.changed or upgrade_pkgs.changed )
+  register:       create_bundle
+  delegate_to:    localhost
+  run_once:       true

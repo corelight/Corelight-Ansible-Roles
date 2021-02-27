@@ -3,10 +3,3 @@
   service:
     name:         corelight
     state:        restarted
-
-- name:           create bundle
-  command:        zkg bundle ansible_role.bundle --force
-  args:
-    chdir:        "{{ role_path }}/files"
-  when:
-    - 'zeek_packages != None'

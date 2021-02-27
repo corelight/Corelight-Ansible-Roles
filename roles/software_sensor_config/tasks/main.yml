@@ -1,0 +1,120 @@
+---
+- name: "[ssc-1] Include common role to CHECK FACTS"
+  include_role:
+    name: common
+  vars:
+    sending_role: software_sensor_config
+
+- name: "[ssc-2] Gather facts"
+  setup:
+  when:
+    - "'physical_sensors' not in group_names"
+
+- block:
+    - name: "[ssc-3] Create required folders if they do not exist"
+      file:
+        path: "{{ item }}"
+        mode: "0775"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        state: directory
+      become: yes
+      loop:
+        - /root/.zkg
+        - /var/lib/suricata
+        - "{{ suricata_rules_dir }}"
+
+    - name: "[ssc-4] Create sensor files"
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      notify: restart software sensor
+      loop:
+        - {
+            src: "corelight-license.txt.j2",
+            dest: "/etc/corelight-license.txt",
+          }
+        - {
+            src: "swsensor-zkg.conf.j2",
+            dest: "/root/.zkg/config"
+          }
+        - {
+            src: "local.zeek.j2",
+            dest: "/etc/corelight/local.zeek"
+          }
+        - {
+            src: "corelight-softsensor.conf.j2",
+            dest: "/etc/corelight-softsensor.conf",
+          }
+
+    # GeoIPLite Database
+    - name:  Include GeoIPLite tasks
+      include_tasks: GeoIP.yml
+      when: enable_geoip|d(false) is true
+
+    # Input Framework
+    - name: Copy default Input Framework files to sensor if file does not exist
+      copy:
+        src: "{{ item }}"
+        dest: /etc/corelight/input_files/
+        force: no
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      with_fileglob: "{{ playbook_dir }}/common/files/input-files/default-input-files/*.*"
+
+    - name: Copy Input Framework files to sensor
+      copy:
+        src: "{{ item }}"
+        dest: /etc/corelight/input_files/
+        mode: "0644"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      with_fileglob: "{{ playbook_dir }}/common/files/input-files/*.*"
+
+    # suricata rules
+    - name: "[ssc-6] Include suricata_update_config role for sensors without updates"
+      include_role:
+        name: suricata_update_config
+      vars:
+        starting_role: software_sensor_config
+      when:
+        - suricata_enable is true
+        - "suricata_update_enable|d('disabled') == 'disabled'"
+
+    - name: "[ssc-7] Start and Enable Corelight Software Sensor"
+      service:
+        name: corelight-softsensor
+        state: started
+        enabled: yes
+        daemon-reload: yes
+
+  always:
+    - name: "[ssc-8] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: softsensor
+        fact_option: config
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[ssc-9 Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: softsensor
+        fact_option: config
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[ssc-10] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

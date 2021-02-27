@@ -1,0 +1,96 @@
+---
+# Delete bundle/s
+- name: Delete empty bundle
+  file:
+    path: ansible_role.bundle
+    state: absent
+  when:
+    - "zeek_packages == None"
+    - "starting_role|d() == 'software_sensor_config'"
+  register: empty_bundle
+  delegate_to: localhost
+  run_once: true
+
+# Create bundle/s
+- name: create bundle
+  shell: |
+    source /etc/corelight-env/bin/activate
+    zkg bundle ansible_role.bundle --force
+  args:
+    executable: /bin/bash
+    chdir: "{{ role_path }}/files"
+  when:
+    - "zeek_packages != None"
+    - ( installed_depends.changed or remove_pkgs.changed or upgrade_pkgs.changed )
+  register: create_bundle
+  delegate_to: localhost
+  become: "{{ zkg_become|d('no') }}"
+  run_once: true
+
+# Upload bundle/s
+- name: "Push bundles to physical/virtual sensors"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate bro bundle upload --bundle "{{ role_path }}/files/ansible_role.bundle"
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: no
+  delegate_to: localhost
+  when:
+    - fleet_managed is false
+    - "zeek_packages != None"
+    - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+    - (target == inventory_hostname or target == 'all')
+
+# - name:             "Push bundles to physical/virtual sensors Fleet Managed"
+#   shell: |
+#     source /etc/corelight-env/bin/activate
+#     corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate bro bundle upload --bundle "{{ role_path }}/files/ansible_role.bundle"
+#   args:
+#     executable:     /bin/bash
+#   delegate_to:      localhost
+#   become:           no
+#   when:
+#     - fleet_managed is true
+#     - 'zeek_packages != None'
+#     - (target == inventory_hostname or target == 'all')
+
+- name: "Remove bundles from physical/virtual sensors"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate bro bundle remove
+  args:
+    executable: /bin/bash
+  delegate_to: localhost
+  become: no
+  when:
+    - fleet_managed is false
+    - "zeek_packages == None"
+    - ('physical_sensors' in group_names or 'virtual_sensors' in group_names)
+    - (target == inventory_hostname or target == 'all')
+
+# - name:             "Remove bundles from physical/virtual sensors Fleet Managed"
+#   shell: |
+#     source /etc/corelight-env/bin/activate
+#     corelight-client --fleet "{{ fleet_ip }}" --uid "{{ UID }}" -u "{{ fleet_username }}" -p "{{ fleet_password }}" --no-password-save --ssl-no-verify-certificate bro bundle remove
+#   args:
+#     executable:     /bin/bash
+#   delegate_to:      localhost
+#   become:           no
+#   when:
+#     - fleet_managed is true
+#     - 'zeek_packages == None'
+#     - (target == inventory_hostname or target == 'all')
+
+- name: "Copy bundle to common/files/zkg_bundles"
+  copy:
+    src: "{{ role_path }}/files/ansible_role.bundle"
+    dest: "{{ playbook_dir }}/common/files/zkg_bundles/ansible_role.bundle"
+    mode: '0644'
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
+  delegate_to: localhost
+  run_once: true
+  when:
+    - "zeek_packages != None"

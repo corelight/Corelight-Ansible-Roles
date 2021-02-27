@@ -1,0 +1,18 @@
+---
+    - name: Copy default Input Framework files to sensor
+      copy:
+        src: "{{ item }}"
+        dest: /etc/corelight/input_files/
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      with_fileglob: "{{ playbook_dir }}/common/files/input-files/default-input-files/*.*"
+
+    - name: Copy Input Framework files to sensor
+      copy:
+        src: "{{ item }}"
+        dest: /etc/corelight/input_files/
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      with_fileglob: "{{ playbook_dir }}/common/files/input-files/*.*"

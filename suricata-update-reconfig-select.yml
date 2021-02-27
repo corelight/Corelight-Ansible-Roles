@@ -1,0 +1,24 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+  vars_prompt:
+    - name: target
+      prompt: Enter the hosts name to install suricata-update on
+      private: no
+
+  tasks:
+    - name: "[plbk-1] Add target host to dynamically_created_hosts"
+      add_host:
+        name: "{{ target }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+
+- hosts: dynamically_created_hosts
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: "[plbk-2] Include role suricata_update_config"
+      include_role:
+        name: suricata_update_config

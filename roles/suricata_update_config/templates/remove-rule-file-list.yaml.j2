@@ -1,0 +1,7 @@
+---
+remove_rule_files:
+{% if existing_rule_file_list.files | length > 0 %}
+{% for files in existing_rule_file_list.files%}
+  - {{ files.path }}
+{% endfor %}
+{% endif %}

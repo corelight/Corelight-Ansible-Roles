@@ -1,0 +1,53 @@
+---
+- name: "[cm-1] Load vars"
+  include_vars:
+    dir: "{{ playbook_dir }}/common"
+    ignore_files:
+      - "example-secrets.yml"
+      - "example-main-vars.yml"
+    ignore_unknown_extensions: yes
+    extensions:
+      - ""
+      - "yaml"
+      - "yml"
+      - "json"
+
+- name: "[cm-2] Prep role vars/main for host history facts"
+  include_tasks: prep-common-role.yml
+  when:
+    - "inventory_hostname == 'localhost'"
+    # - starting_role is not defined
+    - sending_role is not defined
+
+- name: "[cm-3] create dynamic groups"
+  include_tasks: create-dynamic-groups.yml
+  when:
+    # - starting_role is not defined
+    # - sending_role is not defined
+
+- name: "[cm-4] Include fact check tasks for running suricata-update on a host or sensor"
+  include_tasks: fc-suricata-update-run.yml
+  when:
+    # - "starting_role|d() == 'suricata_update_run'"
+    - "sending_role|d() == 'suricata_update_run'"
+    - "(hostvars[suricata_update_host]['ansible_local']['corelight_ansible_roles'].suricata_update.config|d('failed') == 'failed'  and  suricata_update_enable|d('disabled') == 'remote') or
+      (hostvars[suricata_update_host]['ansible_local']['corelight_ansible_roles'].suricata_update.config|d('failed') == 'failed'  and  inventory_hostname == suricata_update_host) or
+      (ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') == 'failed'  and  suricata_update_enable|d('disabled') == 'local')"
+
+- name: "[cm-5] Include fact check tasks for configuring suricata-update"
+  include_tasks: fc-suricata-update-config.yml
+  when:
+    # - "starting_role|d() == 'suricata_update_config'"
+    - "sending_role|d() == 'suricata_update_config'"
+
+- name: "[cm-6] Include fact check tasks for configuring suricata-update cron job"
+  include_tasks: fc-suricata-config-cron-job.yml
+  when:
+    # - "starting_role|d() == 'suricata_config_cron_job'"
+    - "sending_role|d() == 'suricata_config_cron_job'"
+
+- name: "[cm-6] Include fact check tasks for configuring software sensor"
+  include_tasks: fc-software-sensor-config.yml
+  when:
+    # - "starting_role|d() == 'software_sensor_config'"
+    - "sending_role|d() == 'software_sensor_config'"

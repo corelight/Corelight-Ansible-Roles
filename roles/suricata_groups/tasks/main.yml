@@ -1,0 +1,13 @@
+# updated 23 Nov 2020
+---
+- name:               Include Update Suricata Address Groups Tasks
+  include_tasks:      update-suricata-address-groups.yml
+  when:
+    - suricata_address_groups is defined
+    - process_suricata_address_groups|d(false) is true
+
+- name:               Include Update Suricata Port Groups Tasks
+  include_tasks:      update-suricata-port-groups.yml
+  when:
+    - suricata_port_groups is defined
+    - process_suricata_port_groups|d(false) is true

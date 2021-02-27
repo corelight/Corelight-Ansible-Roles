@@ -1,0 +1,42 @@
+%YAML 1.1
+---
+{% if 'software_sensors' in group_names %}
+suricata-conf: {{ suricata_dir }}/suricata.yaml
+suricata: /usr/bin/corelight-suricata
+{% endif %}
+
+data-directory: {{ suricata_update_dir }}
+
+output: {{ suricata_update_output_dir }}
+
+disable-conf: {{ suricata_update_dir }}/disable.conf
+enable-conf: {{ suricata_update_dir }}/enable.conf
+modify-conf: {{ suricata_update_dir }}/modify.conf
+
+# List of files to ignore. Overrided by the --ignore command line option.
+ignore:
+  - "*deleted.rules"
+
+# Override the user-agent string.
+#user-agent: "Suricata-Update"
+
+# Provide an alternate command to the default test command.
+#test-command: /usr/bin/corelight-suricata -T -S suricata.rules -l /tmp
+{% if 'software_sensors' in group_names %}
+test-command: /usr/bin/corelight-suricata -T -S {{ suricata_update_output_dir }}/suricata.rules -l /tmp
+{% endif %}
+
+# Provide a command to reload the Suricata rules.
+# May be overrided by the --reload-command command line option.
+#reload-command: sudo systemctl reload suricata
+{% if 'software_sensors' in group_names %}
+reload-command: sudo kill -USR2 $($(which pidof) corelight-suricata)
+{% endif %}
+
+{% if lawmaker_enabled|d('false') is true %}
+{% include 'files/update.yaml' ignore missing %}
+{% endif %}
+
+# A list of local rule sources.
+local:
+  - {{ suricata_custom_rules_dir }}/*.rules

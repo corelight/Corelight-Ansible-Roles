@@ -1,0 +1,40 @@
+# updated 22 Nov 2020
+---
+- name: Add Corelight Package Signing Key
+  rpm_key:
+    key: https://{{ corelight_repo_url }}/signing.pub
+    state: present
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: Create Corelight Repository List
+  template:
+    src: corelight.repo.j2
+    dest: /etc/yum.repos.d/Corelight-Repository.repo
+    owner: root
+    group: root
+    mode: '0644'
+  register: repo
+
+- name: Remove Corelight Software Sensor if repo changed
+  yum:
+    name: corelight-softsensor
+    state: absent
+    autoremove: yes
+  when: repo.changed
+
+- name: yum-clean-metadata
+  command: yum clean metadata
+  args:
+    warn: no
+  when: repo.changed
+
+- name: Install Corelight Software Sensor
+  yum:
+    name: corelight-softsensor
+    update_cache: yes
+    state: latest
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"

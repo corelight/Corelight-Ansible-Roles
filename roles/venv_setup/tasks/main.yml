@@ -1,0 +1,88 @@
+---
+- block:
+    - name: "[venv-2] Include Debian tasks"
+      include_tasks: debian.yml
+      when: "ansible_os_family == 'Debian'"
+
+    - name: "[venv-3] Include RHEL tasks"
+      include_tasks: rhel.yml
+      when: "ansible_os_family == 'RedHat'"
+
+    - name: "[venv-4] Create Python3 virtual environment directory"
+      file:
+        path: "{{ virtual_env_dir }}"
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: "[venv-5] Create {{ virtual_env_dir }} virtual environment"
+      pip:
+        name:
+          - pip
+          - wheel
+          - setuptools
+          - pandas
+        extra_args: --upgrade --upgrade-strategy eager
+        executable: pip3
+      become: yes
+      environment:
+        http_proxy: "{{ http_proxy_env |d() }}"
+        https_proxy: "{{ https_proxy_env |d() }}"
+      when:
+        - "ansible_distribution == 'CentOS'"
+        - "ansible_distribution_major_version == '7'"
+
+    - name: "[venv-6] Create {{ virtual_env_dir }} virtual environment"
+      pip:
+        name:
+          - pip
+          - wheel
+          - setuptools
+          - pandas
+        virtualenv: "{{ virtual_env_dir }}"
+        extra_args: --upgrade --upgrade-strategy eager
+        virtualenv_command: python3 -m venv
+      become: no
+      environment:
+        http_proxy: "{{ http_proxy_env |d() }}"
+        https_proxy: "{{ https_proxy_env |d() }}"
+      when:
+        - "ansible_distribution != 'CentOS'"
+        - "ansible_distribution_major_version != '7'"
+
+    - name: "[venv-7] Copy virtual environment activation script"
+      copy:
+        src: "{{ playbook_dir }}/scripts-initial-setup/activate_venv.sh"
+        dest: "~/"
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: no
+
+  always:
+    - name: "[venv-8] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: venv
+        fact_option: setup
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[venv-9] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: venv
+        fact_option: setup
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[venv-10] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

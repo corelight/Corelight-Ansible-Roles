@@ -1,0 +1,100 @@
+---
+- block:
+    - name: "[sui-1] Install Suricata-update"
+      pip:
+        name: suricata-update
+        virtualenv: "{{ virtual_env_dir }}"
+        extra_args: --upgrade --upgrade-strategy eager
+        virtualenv_command: python3 -m venv
+      become: no
+      register: results
+      environment:
+        http_proxy: "{{ http_proxy_env |d() }}"
+        https_proxy: "{{ https_proxy_env |d() }}"
+
+    - name: "[sui-2] Suricata-update installation without a proxy results"
+      debug:
+        msg: "{{ results.stdout_lines }}"
+
+    ### This needs to be tested to determine if it is still needed ####
+    # # Install Suricata-update behind a proxy
+    # - name:                 Install Suricata-update with sudo -H behind a proxy
+    #   shell: |
+    #     sudo -H pip3 install --upgrade --prefix=/usr/local --upgrade-strategy only-if-needed --proxy {{ https_proxy_env }} suricata-update
+    #   register:             results
+    #   args:
+    #     warn:               no
+    #   when:                 https_proxy_env is defined
+
+    # - name:                 Suricata-update installation with a proxy results
+    #   debug:
+    #     msg:                "{{ results.stdout_lines }}"
+    #   when:                 results is not skipped
+
+    - name: "[sui-3] Create directories"
+      file:
+        path: "{{ item.dir }}"
+        state: directory
+        mode: '0775'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      loop:
+        - { dir: "/var/lib/suricata" }
+        - { dir: "{{ suricata_dir }}" }
+        - { dir: "{{ suricata_update_dir }}" }
+        - { dir: "{{ suricata_update_output_dir }}" }
+        - { dir: "{{ suricata_custom_rules_dir }}" }
+
+    - name: "[sui-4] Create /var/corelight/suricata directory"
+      file:
+        path: /var/corelight/suricata
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: "[sui-5] Touch files change permissions"
+      file:
+        path: "{{ suricata_dir }}/{{ item.fl }}"
+        state: touch
+        mode: '0644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      loop:
+        - { fl: suricata.yaml }
+        - { fl: classification.config }
+        - { fl: reference.config }
+        - { fl: threshold.config }
+        - { fl: suricata.socket }
+      when: "'software_sensors' not in group_names"
+
+    - name: "[sui-6] Include Suricata-update on a Software Sensor Install Tasks"
+      include_tasks: sensor-install.yml
+      when: "'software_sensors' in group_names"
+
+  always:
+    - name: "[sui-7] Include set role facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: suricata_update
+        fact_option: install
+        fact_value: success
+        failed_task: none
+        failed_state: absent
+      when: ansible_failed_task is not defined
+
+  rescue:
+    - name: "[sui-8] Include set role failed facts tasks"
+      include_tasks: "{{ role_path }}/../common/tasks/set-role-facts.yml"
+      vars:
+        fact_section: suricata_update
+        fact_option: install
+        fact_value: failed
+        failed_task: "{{ ansible_failed_task.name }}"
+        failed_state: present
+      when: ansible_failed_task is defined
+
+    - name: "[sui-9] Failed task"
+      fail:
+        msg: |
+          "{{ ansible_failed_result.stderr_lines | to_nice_yaml }}"

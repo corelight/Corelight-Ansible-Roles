@@ -1,0 +1,9 @@
+# suricata-update - enable.conf
+
+{% if enable_rules is defined %}
+{% for rule in enable_rules %}
+{{ rule }}
+{% endfor %}
+{% endif %}
+
+{% include 'files/enable.conf' ignore missing %}

@@ -1,0 +1,76 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+  vars_prompt:
+    - name: target
+      prompt: Enter the hosts name to setup a Python3 virtual environment on
+      private: no
+
+  tasks:
+    - name: Include common role
+      include_role:
+        name: common
+      vars:
+        role_name_fact:
+          - venv_setup
+          - zkg_install
+          - software_sensor_install
+          - software_sensor_config
+          - suricata_update_install
+
+    - name: add host to dynamically_created_hosts group
+      add_host:
+        name: "{{ target }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+
+- hosts: dynamically_created_hosts
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Gather Facts
+      setup:
+      when:
+        - "'physical_sensors' not in group_names"
+
+    - name: "[plbk-3] Include common role to CHECK FACTS"
+      import_role:
+        name: common
+      vars:
+        sending_role: none
+
+    - name: Include Python3 virtual environment setup role
+      include_role:
+        name: venv_setup
+      when:
+        - "ansible_local.corelight_ansible_roles.venv.setup|d('failed') == 'failed'"
+
+    - name: Include ZKG install role
+      include_role:
+        name: zkg_install
+      when:
+        - "ansible_local.corelight_ansible_roles.zkg.install|d('failed') == 'failed'"
+
+    - name: Include Software Sensor Install role
+      include_role:
+        name: software_sensor_install
+      when:
+        - "ansible_local.corelight_ansible_roles.softsensor.install|d('failed') == 'failed'"
+        - "'software_sensors' in group_names"
+
+    - name: Include Software Sensor Config role
+      include_role:
+        name: software_sensor_config
+      when:
+        - "ansible_local.corelight_ansible_roles.softsensor.config|d('failed') == 'failed'"
+        - "'software_sensors' in group_names"
+
+    - name: Include Suricata-update install role
+      include_role:
+        name: suricata_update_install
+      when:
+        - "ansible_local.corelight_ansible_roles.suricata_update.install|d('failed') == 'failed'"
+        - "suricata_update_enable|d('disabled') == 'local'"
+        - "suricata_enable|d(false) is true"

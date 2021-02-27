@@ -1,63 +1,110 @@
-# Corelight-Ansible-Roles Release Notes
+# 2.0 Changes
 
-v1.1.0
+Table of Contents
 
-## zkg Role
+- [2.0 Changes](#20-changes)
+  - [Role Changes](#role-changes)
+  - [Default Settings Changes](#default-settings-changes)
+    - [Changed defaults](#changed-defaults)
+    - [Removed defaults - (no longer needed)](#removed-defaults---no-longer-needed)
+    - [New defaults](#new-defaults)
+  - [Variable Changes](#variable-changes)
+  - [File Structure Changes](#file-structure-changes)
 
-- New role to automate installation, upgrading and/or removing Zeek Packages.
-  - To install a package, add the name and path to 'zeek_packages' in the var file
-  - To automatically upgrade a package (if an upgrade is available when the role is ran), add 'auto_upgrade: yes' to the item in 'zeek_packages' in the var file
-  - To remove a package, simply remove the package from the 'zeek_packages' in the var file
-- Automatically create a new bundle (if a package changed)
-- Automatically upload the bundle to the selected physical or virtual sensors
+**NOTE:** Ansible Collections cannot have '-' in the role names.  All role names have been renamed to replace '-' with '_'.  In addition to renaming, install, config, and run have been split on all roles.
 
-## Software Sensor Role
+## Role Changes
 
-- Simplified Zeek Package management to match the zkg Role
+| Role Names:     ||
+| ---------------------------------: | :-------------------------------------------------- |
+|      ```corelight-software-sensor```     | > ```software_sensor_install```                           |
+|                                    | > ```software_sensor_config```                            |
+|                                    |                                                     |
+|      ```corelight-suricata-update```     | > ```suricata_update_install```                           |
+|                                    | > ```suricata_update_config```                            |
+|                                    | > ```suricata_update_run```                               |
+|                                    |                                                     |
+|                         ```common```     | This role creates some dynamic groups and runs some dependency fact checking before a config or run playbook will execute.                     |
+|                     ```venv_setup```     | This role does basic install of Python3 (and other dependencies) and creates a (/etc/corelight-env by default) virtual environment.           |
+|       ```corelight_client_install```     | Installs Corelight-client in the virtual environment created with venv_setup.                                                                   |
+|                ```ansible_install```     | Installs Ansible in the virtual environment created with venv_setup.                                                                           |
+|                    ```zkg_install```     | Installs ZKG in the virtual environment created with venv_setup.                                                                                |
+|       ```suricata_config_cron_job```     | This role is used to configure or reconfigure a Suricata-update cron job to run on the local controller or a remote Suricata-update host.  |
+|                ```suricata_groups```     | This role manages Suricata address and port groups on physical sensors.                                                                          |
+|                            ```zkg```     | This role manages Zeek packages on all sensors (currently only manages the zkg bundle for Fleet managed sensor).                          |
+|            ```intel``` (coming soon)     | This role manages Intel Framework files for all sensors.  It can automatically merge a directory of files into a single intel file and upload it to any sensor. (currently will not remove files from sensors)                           |
+|            ```input``` (coming soon)     | This role manages Input Framework files for all sensors types.  (currently will not remove files from sensors)                             |
+|                                    |                                                     |
+| ```corelight-suricata-update-cron-job``` | **removed**                                         |
+|                                    |                                                     |
 
-## Scripts
+**NOTE:** Splitting the roles into different functions removes duplication throughout the roles.  It also allows a function to be configured or executed without the concern for undesired upgrades occurring.
 
-- Added an example script for the zkg role
+## Default Settings Changes
 
-v1.0.0
+**NOTE:** As a general rule, changes were made in an attempt to use application default settings where possible.  Other applications depending on those settings will be adjusted.  For example:
 
-## Common
+- Suricata-update will use Suricata-update default settings
+- A Software Sensor with Suricata-update installed will look for Suricata rules in the Suricata-update default location ```/var/lib/suricata/rules```.
+- A Software Sensor without Suricata-update installed will look for Suricata rules in the Software Sensor default location ```/etc/corelight/rules```.
 
-- Combined all roles into a single repository
-- Added 'common' fold to store all user provided variables, including the following:
-  - Input Framework files (if any)
-  - Suricata custom rule files (if any)
-  - inventory.yml file
-  - main-vars.yml file
-  - secrets.yml file
+### Changed defaults
 
-## Scripts
+```yaml
+# The directory where corelight-suricata looks for rulesets
+suricata_rule_path:
+# renamed to
+suricata_rule_dir:
 
-- Added an optional scripts folder with example commands to run the playbooks
-- The Scripts can be ran 'AS IS' directly from the scripts folder
-- Any modified scripts should be renamed to start with ansible so they are not replaced on the next 'git pull'
+# Path to custom Suricata rules for Suricata-update (see New defaults below)
+suricata_custom_rules_path: /etc/corelight/suricata-update/custom-rules
+# Path to Suricata-update config and rule files (see New defaults below)
+suricata_update_path: /etc/corelight/suricata-update
+```
 
-## Software Sensor Role
+### Removed defaults - (no longer needed)
 
-- Manage all Software Sensor settings
-- Manage all Corelight and Open Source packages
-- Manage custom Input Framework files
-- Added all default Input Framework files that are included on the physical sensors
+```yaml
+# settings for coping the files to a remote cron job host
+secrets_path: "../../../common/secrets.yml"
+inventory_path: "../../../common/inventory.yml"
+main_vars_path: "../../../common/main-vars.yml"
 
-## Suricata
+# true or false, if set to false, address_groups or port_groups tasks will be skipped
+process_suricata_port_groups: false
+process_suricata_address_groups: false
+```
 
-- Manage custom Suricata rules files (if Suricata-update is not enabled)
-- Added support for modifying Suricata address groups on both physical and software sensors (via Suricata-update role)
+### New defaults
 
-## Suricata-update Role
+```yaml
+virtual_env_dir: /etc/corelight-env                 # The default Python environment created for all installations
+validate_certs: yes                                 # Enable/Disable cert validation for yum and dnf installs
 
-- Suricata-update runs as the local defined user, NOT as root
-- Manage all Suricata rule sources, including custom rules files
-- Collect Corelight-Suricata version information from all sensors in the inventory
-- Run Suricata-update once for each version
-- Create a Cron Job to run Suricata-update daily (can run locally or on a designated host)
+suricata_dir: /usr/local/etc/suricata               # The default directory for corelight-suricata config files
+suricata_update_dir: /etc/suricata                  # The default directory where suricata-update looks for config files
+suricata_update_output_dir: /var/lib/suricata/rules # The default directory where suricata-update puts suricata.rules
+suricata_rules_dir: /var/lib/suricata/rules         # The directory where corelight-suricata looks for rulesets
+suricata_custom_rules_dir: /etc/suricata/rules      # The directory where suricata-update looks for local rules
+```
 
-## Suricata-update-cron-job Role
+## Variable Changes
 
-- Simplified Suricata-update role that only runs Suricata-update, it will not modify any sources or install any software updates
-- Primary use is for the daily cron job
+
+
+## File Structure Changes
+
+- Files folders renamed
+  - input_files > ```common/files/input-files```
+    - default input files > ```common/files/input_files/default-input-files```
+  - suricata_custom_rules > ```common/files/suricata-custom-rules```
+  - zkg_bundles are still > ```common/files/zkg_bundles```
+
+- Inventory moved to ```common/inventory/```  **Note:** All inventory files in this directory get loaded.
+
+- Variable files are still in ```common/```   **Note:** All files ending with ```*-vars.yml``` get loaded.
+
+- All playbooks should be executed from the base directory.  The playbooks in ```plybooks-additional/``` need to be copied up one directory to be used.
+
+- The example scripts in the ```scripts/``` folder contain the full command line to execute a given playbook without moving it.
+- The ```scripts/``` folder also contains a script to initially configure ansible on any linux OS ```initial_ansible_installation_venv.sh``` and a script with the command to activate the python virtual environment if needed ```activate_venv.sh```.  The activate script is only needed to manually interact with a configured host.  The roles already account for it.

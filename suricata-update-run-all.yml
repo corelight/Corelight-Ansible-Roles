@@ -1,0 +1,45 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: "[plbk-1] Include common role"
+      include_role:
+        name: common
+      vars:
+        role_name_fact:
+          - suricata_update_run
+
+    - name: "[plbk-2] add suricata_update_host to dynamically_created_hosts group"
+      add_host:
+        name: "{{ suricata_update_host }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+      when:
+        - suricata_update_host is defined
+
+    - name: "[plbk-3] Include suricata_remote members in dynamically_created_hosts"
+      add_host:
+        name: "{{ item }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+      with_items: "{{ groups['suricata_remote'] }}"
+
+    - name: "[plbk-4] Include suricata_local members in dynamically_created_hosts"
+      add_host:
+        name: "{{ item }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+      when:
+        - groups.suricata_local is defined
+      with_items: "{{ groups['suricata_local'] }}"
+
+- hosts: dynamically_created_hosts
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: "[plbk-5] "
+      include_role:
+        name: suricata_update_run

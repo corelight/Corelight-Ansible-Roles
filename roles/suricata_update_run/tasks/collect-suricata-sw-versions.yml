@@ -1,0 +1,14 @@
+---
+- name: "[sur-31] Collect software sensor Suricata version"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-suricata -V
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: no
+  register: suricata_status
+
+- name: "[sur-32] results"
+  debug:
+    msg: "{{ suricata_status.stdout_lines }}"

@@ -1,0 +1,35 @@
+---
+- name: "[cm-65] Create suricata_local_missing_config group"
+  group_by:
+    key: suricata_local_missing_config
+  changed_when: false
+  when:
+    - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') != 'success'"
+
+- name: "[cm-66] List Corelight-Ansible-Role Facts"
+  debug:
+    msg:
+      - "The inventory_hostname {{ inventory_hostname }} has the following Corelight facts"
+      - "{{ ansible_local.corelight_ansible_roles }}"
+  when: "ansible_local.corelight_ansible_roles is defined"
+  tags: [never, debug]
+
+- name: "[cm-67] "
+  pause:
+    seconds: 1
+    prompt: |
+      #################################################################
+      #################################################################
+      The Suricata-update has not been configured locally on the
+      following, it MUST EXIT NOW!
+      "{{ groups.suricata_local_missing_config | to_nice_json }}"
+      #################################################################
+      #################################################################
+  when:
+    - "groups.suricata_local_missing_config is defined"
+
+- name: "[cm-68] Cannot run suricata-update"
+  fail:
+    msg: "Suricata-update has not been configured on {{ inventory_hostname }}"
+  when:
+    - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') != 'success'"

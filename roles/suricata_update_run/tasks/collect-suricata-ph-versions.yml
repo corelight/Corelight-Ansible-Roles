@@ -1,0 +1,16 @@
+---
+- name: "[sur-29] Collect physical or virtual sensor Suricata version"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    corelight-client -b "{{ ansible_host }}" -u "{{ sensor_username }}" -p "{{ sensor_password }}" --no-password-save --ssl-no-verify-certificate suricata status show --json
+  args:
+    executable: /bin/bash
+  changed_when: false
+  become: no
+  register: suricata_status
+  delegate_to: localhost
+
+- name: "[sur-30] results"
+  debug:
+    var: suricata_status.stdout_lines
+  ignore_errors: true

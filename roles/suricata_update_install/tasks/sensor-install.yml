@@ -1,0 +1,27 @@
+---
+- name: "[sui-10] Touch files for symbolic links to corelight-suricata"
+  file:
+    path: "/var/corelight/suricata/{{ item.fl }}"
+    state: touch
+    mode: '0644'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - { fl: classification.config }
+    - { fl: reference.config }
+    - { fl: threshold.config }
+    - { fl: suricata.socket }
+
+- name: "[sui-11] Create symbolic links to corelight-suricata"
+  file:
+    src: "/var/corelight/suricata/{{ item.fl }}"
+    dest: "{{ suricata_dir }}/{{ item.fl }}"
+    mode: '0644'
+    state: hard
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  loop:
+    - { fl: classification.config }
+    - { fl: reference.config }
+    - { fl: threshold.config }
+    - { fl: suricata.socket }

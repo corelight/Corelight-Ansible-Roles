@@ -1,50 +1,64 @@
 ---
-- name:                 "remove-packages: Write installed_scripts to file"
+- name: "remove-packages: Write installed_scripts to file"
   template:
-    src:                "zkg_remove.j2"
-    dest:               "{{ role_path }}/vars/remove_packages.json"
-    mode:               0644
-  changed_when:         false
+    src: "zkg_remove.j2"
+    dest: "{{ role_path }}/vars/remove_packages.json"
+    mode: '0644'
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
+  changed_when: false
+  delegate_to: localhost
+  run_once: true
 
-- name:                 "remove-packages: Remove zeek_packages from list"
+- name: "remove-packages: Remove zeek_packages from list"
   lineinfile:
-    path:               "{{ role_path }}/vars/remove_packages.json"
-    regexp:             '{{ item.name }}'
-    state:              absent
-  with_items:           "{{ zeek_packages }}"
-  changed_when:         false
+    path: "{{ role_path }}/vars/remove_packages.json"
+    regexp: "{{ item.name }}"
+    state: absent
+  with_items: "{{ zeek_packages }}"
+  changed_when: false
   when:
-    - 'zeek_packages != None'
+    - "zeek_packages != None"
+  delegate_to: localhost
+  run_once: true
 
-- name:                 "remove-packages: Remove dependencies from list"
+- name: "remove-packages: Remove dependencies from list"
   lineinfile:
-    path:               "{{ role_path }}/vars/remove_packages.json"
-    regexp:             "{{ item.dependency }}"
-    state:              absent
-  with_items:           "{{ zeek_packages }}"
-  changed_when:         false
+    path: "{{ role_path }}/vars/remove_packages.json"
+    regexp: "{{ item.dependency }}"
+    state: absent
+  with_items: "{{ zeek_packages }}"
+  changed_when: false
   when:
-    - 'zeek_packages != None'
+    - "zeek_packages != None"
     - item.dependency is defined
+  delegate_to: localhost
+  run_once: true
 
-- name:                 "remove-packages: Include remove_packages vars"
+- name: "remove-packages: Include remove_packages vars"
   include_vars:
-    file:               "{{ role_path }}/vars/remove_packages.json"
+    file: "{{ role_path }}/vars/remove_packages.json"
 
-- name:                 "remove-packages: list packages to be removed"
+- name: "remove-packages: list packages to be removed"
   debug:
-    msg:                "{{ remove_packages }}"
+    msg: "{{ remove_packages }}"
+  run_once: true
 
-- name:                 "remove-packages: Remove Scripts"
-  command:              zkg remove {{ item }} --force
-  with_items:           "{{ remove_packages }}"
+- name: "remove-packages: Remove Scripts"
+  shell: zkg remove {{ item }} --force
+  with_items: "{{ remove_packages }}"
   when:
-    - 'remove_packages != None'
-  notify:               create bundle
+    - "remove_packages != None"
+  register: remove_pkgs
+  delegate_to: localhost
+  run_once: true
 
-- name:                 "remove-packages: Delete empty bundle"
+- name: "remove-packages: Delete empty bundle"
   file:
-    path:               "{{ role_path }}/files/ansible_role.bundle"
-    state:              absent
+    path: "{{ role_path }}/files/ansible_role.bundle"
+    state: absent
   when:
-    - 'zeek_packages == None'
+    - "zeek_packages == None"
+  register: empty_bundle
+  delegate_to: localhost
+  run_once: true

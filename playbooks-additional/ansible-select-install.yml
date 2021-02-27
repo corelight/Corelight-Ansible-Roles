@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+  vars_prompt:
+    - name: target
+      prompt: Enter the hosts name to install ansible on
+      private: no
+
+  tasks:
+    - name: Add target host to dynamically_created_hosts
+      add_host:
+        name: "{{ target }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+
+- hosts: dynamically_created_hosts
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: Gather Facts
+      setup:
+      when:
+        - "'physical_sensors' not in group_names"
+
+    - name: Include Python3 virtual environment setup role
+      include_role:
+        name: venv_setup
+      when:
+        - "ansible_local.corelight_ansible_roles.venv.setup|d('failed') == 'failed'"
+
+    - name: Include Ansible install role
+      include_role:
+        name: ansible_install

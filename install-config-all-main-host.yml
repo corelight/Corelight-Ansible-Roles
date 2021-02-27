@@ -1,0 +1,82 @@
+---
+- hosts: localhost
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: "[plbk-1]"
+      include_role:
+        name: common
+      vars:
+        role_name_fact:
+          - venv_setup
+          - zkg_install
+          - corelight_client_install
+          - ansible_install
+          - suricata_update_install
+          - suricata_update_config
+          - suricata_config_cron_job
+
+- hosts: main_hosts
+  debugger: never
+  # strategy: host_pinned
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: "[plbk-2] Gather Facts"
+      setup:
+      when:
+        - "'physical_sensors' not in group_names"
+
+    - name: "[plbk-3] Include common role to create groups"
+      import_role:
+        name: common
+      vars:
+        sending_role: none
+
+    - name: "[plbk-4] Include Python3 virtual environment setup role"
+      include_role:
+        name: venv_setup
+      when:
+        - "ansible_local.corelight_ansible_roles.venv.setup|d('failed') == 'failed'"
+
+    - name: "[plbk-5] Include ZKG install role"
+      include_role:
+        name: zkg_install
+      when:
+        - "ansible_local.corelight_ansible_roles.zkg.install|d('failed') == 'failed'"
+
+    - name: "[plbk-6] Include Corelight-client install role"
+      include_role:
+        name: corelight_client_install
+      when:
+        - "ansible_local.corelight_ansible_roles.corelight_client.install|d('failed') == 'failed'"
+
+    - name: "[plbk-7] Include Ansible install role"
+      include_role:
+        name: ansible_install
+      when:
+        - "ansible_local.corelight_ansible_roles.ansible.install|d('failed') == 'failed'"
+
+    - name: "[plbk-8] Include Suricata-update install role"
+      include_role:
+        name: suricata_update_install
+      when:
+        - "ansible_local.corelight_ansible_roles.suricata_update.install|d('failed') == 'failed'"
+        - "inventory_hostname == suricata_update_host"
+
+    - name: "[plbk-9] Include suricata-update config role"
+      include_role:
+        name: suricata_update_config
+      when:
+        - "ansible_local.corelight_ansible_roles.suricata_update.config|d('failed') == 'failed'"
+        - inventory_hostname == suricata_update_host
+
+    - name: "[plbk-10] Include suricata cron job role"
+      include_role:
+        name: suricata_config_cron_job
+      when:
+        - "ansible_local.corelight_ansible_roles.suricata_update_cron_job.config|d('failed') == 'failed'"
+        - inventory_hostname == cron_job_host
+        - perform_cron_job_tasks|d(true) is true

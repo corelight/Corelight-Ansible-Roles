@@ -1,7 +1,7 @@
 galaxy_info:
   author: "Corelight, Inc."
-  description: your role description
-  company: your company (optional)
+  description: Role for Zeek Package Manager
+  company: "Corelight, Inc."
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
@@ -14,7 +14,7 @@ galaxy_info:
   # - GPL-3.0-only
   # - Apache-2.0
   # - CC-BY-4.0
-  license: license (GPL-2.0-or-later, MIT, etc)
+  license: MIT
 
   min_ansible_version: 2.9
 
@@ -47,7 +47,8 @@ galaxy_info:
     # NOTE: A tag is limited to a single word comprised of alphanumeric characters.
     #       Maximum 20 tags per role.
 
-dependencies: []
-  # List your role dependencies here, one per line. Be sure to remove the '[]' above,
-  # if you add dependencies to this list.
-  
+    # The corelight-fact-check dependencies is to ensure roles cannot be ran out of order.
+    # For example, you cannot run suricata-update before it is installed and configured.
+    # All of the roles in this repository leave facts in /etc/ansible/facts.d/ with the
+    # date, time and status if the run was successful.
+  dependencies: []

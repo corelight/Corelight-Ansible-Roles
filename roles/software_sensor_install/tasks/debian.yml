@@ -1,0 +1,45 @@
+# updated 22 Nov 2020
+---
+- name: Add Corelight Package Signing Key
+  apt_key:
+    url: https://{{ corelight_repo_url }}/signing.pub
+    state: present
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: Create Corelight Repository List
+  template:
+    src: corelight.list.j2
+    dest: /etc/apt/sources.list.d/corelight.list
+    owner: root
+    group: root
+    mode: '0644'
+  register: repo
+
+- name: Remove Corelight Software Sensor if repo changed
+  apt:
+    name: corelight-softsensor
+    state: absent
+    purge: yes
+  when: repo.changed
+
+- name: Install Corelight Software Sensor arm64
+  apt:
+    name: corelight-softsensor:arm64
+    update_cache: yes
+    state: latest
+  when: ansible_facts['architecture'] == 'aarch64'
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: Install Corelight Software Sensor x86_64
+  apt:
+    name: corelight-softsensor
+    update_cache: yes
+    state: latest
+  when: ansible_facts['architecture'] == 'x86_64'
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"

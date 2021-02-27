@@ -1,0 +1,81 @@
+# updated 23 Nov 2020
+---
+# # RHEL8 with cert subs
+# subscription-manager repos --enable "codeready-builder-for-rhel-8-$(arch)-rpms"
+
+# # RHEL7 with cert subs
+# subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+
+# # If epel-release is not available for RHEL7, the following commands:
+# cd /tmp
+# wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+# ls *.rpm
+# sudo yum install epel-release-latest-7.noarch.rpm
+
+
+- name: "[venv-15] Upgrade/Enable dnf - RHEL7 / CentOS7 only"
+  yum:
+    name:
+      - dnf
+      - epel-release
+    state: latest
+    validate_certs: "{{ validate_certs |d(yes) }}"
+  when:
+    # - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-16] DNF install/upgrade RHEL7 / CentOS7"
+  dnf:
+    name:
+      - python-pip
+      - libselinux-python
+    state: latest
+    update_cache: yes
+    validate_certs: "{{ validate_certs |d(yes) }}"
+  when:
+    # - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-19] Python2 upgrade pip2 - RHEL7 / CentOS7 only"
+  pip:
+    name:
+      - pip
+    executable: pip2
+    extra_args: --upgrade
+  when:
+    - "ansible_distribution_major_version == '7'"
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-17] DNF install/upgrade pip3 & git- RHEL / CentOS"
+  dnf:
+    name:
+      - python3-pip
+      - git
+    state: latest
+    update_cache: yes
+    validate_certs: "{{ validate_certs |d(yes) }}"
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[venv-18] DNF install/upgrade RHEL7 / CentOS7"
+  dnf:
+    name:
+      - libselinux-python3
+    state: latest
+    update_cache: yes
+    validate_certs: "{{ validate_certs |d(yes) }}"
+  when:
+    # - "ansible_distribution == 'CentOS'"
+    - "ansible_distribution_major_version == '7'"
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"

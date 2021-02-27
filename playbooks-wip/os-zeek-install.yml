@@ -1,0 +1,47 @@
+---
+# this playbook is still a work in progress
+- meta: end_play
+
+- hosts: localhost
+  gather_facts: no
+  vars_prompt:
+  - name: target
+    prompt: Please enter the target host name or group name
+    private: no
+
+
+  tasks:
+    - add_host:
+        name: "{{ target }}"
+        groups: dynamically_created_hosts
+      changed_when: false
+
+
+- hosts: dynamically_created_hosts
+  become: yes
+
+  tasks:
+    - include_role:
+        name: venv_setup
+
+    - include_role:
+        name: zkg_install
+
+    - meta: end_play
+
+    - name: add zeek repo key
+      apt_key:
+        url: https://download.opensuse.org/repositories/security:zeek/xUbuntu_20.04/Release.key
+        state: present
+
+    - name: add zeek repo
+      apt_repository:
+        repo: deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_20.04/ /
+        state: present
+
+    - name: install zeek
+      apt:
+        name: zeek
+        state: latest
+        update_cache: yes
+        install_recommends: yes

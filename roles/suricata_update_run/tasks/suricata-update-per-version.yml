@@ -1,0 +1,36 @@
+---
+- name: "[sur-40] Run Suricata-update for each version"
+  shell: |
+    source /etc/corelight-env/bin/activate
+    suricata-update  --no-reload --no-test  -o "{{ suricata_update_output_dir }}/{{ item }}" --suricata-version "{{ item }}" --no-check-certificate
+  args:
+    executable: /bin/bash
+  become: no
+  register: results
+  environment:
+    http_proxy: "{{ http_proxy_env |d() }}"
+    https_proxy: "{{ https_proxy_env |d() }}"
+
+- name: "[sur-41] Suricata-update results"
+  debug:
+    var: results.stdout_lines
+  run_once: true
+
+- name: "[sur-42] Collect number of enabled rules"
+  set_fact:
+    suricata_rules: "{{ results.stdout_lines | select('match', '^(.)*?Writing') | list | regex_replace('^(.)*?enabled[^0-9]*([^;]*)(.+)$', '\\2') }}"
+    cacheable: yes
+
+- name: "[sur-43] Number of Rules for v{{ item }}"
+  debug:
+    var: "suricata_rules"
+
+- name: "[sur-44] Greater than 100,000 rules error message"
+  debug:
+    msg: "Suricata rulesets with more than 100,000 rules will timeout during the health check and fail.  Reduce the ruleset and run the playbook again."
+  when: suricata_rules | int > 100000
+
+- name: "[sur-45] Stop processing if more than 100,000 rules are enabled"
+  meta: end_play
+  when: suricata_rules | int > 100000
+  failed_when: true
