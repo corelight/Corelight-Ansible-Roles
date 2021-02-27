@@ -1,6 +1,6 @@
 #!/bin/bash
 # to download and run this script in one command, execute the following:
-# source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/v2.0.0/download-run-me-first.sh)
+# source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/main/download-run-me-first.sh)
 
 export LANG=en_US.UTF-8
 
