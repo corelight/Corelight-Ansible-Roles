@@ -18,15 +18,15 @@
       - 'yml'
       - 'json'
 
-# - name: "[ssc-7] Write current zeek_packages list to file"
-#   template:
-#     src: previous-os-packages.yaml.j2
-#     dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
-#     mode: "0644"
-#     owner: "{{ hostvars['localhost'].ansible_user }}"
-#     group: "{{ hostvars['localhost'].ansible_user }}"
-#   register: previous_os_packages
-#   delegate_to: localhost
+- name: "[ssc-7] Write current zeek_packages list to file"
+  template:
+    src: previous-os-packages.yaml.j2
+    dest: "{{ role_path }}/vars/previous-os-packages-list.yaml"
+    mode: "0644"
+    owner: "{{ hostvars['localhost'].ansible_user }}"
+    group: "{{ hostvars['localhost'].ansible_user }}"
+  register: previous_os_packages
+  delegate_to: localhost
 
 - block:
     - name: Refresh Script Index
