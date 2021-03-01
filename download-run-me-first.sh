@@ -139,7 +139,7 @@ echo "Cloning Corelight-Ansible-Roles 2.0beta Branch"
 cd /etc/corelight-env
 git clone https://github.com/corelight/Corelight-Ansible-Roles.git
 cd Corelight-Ansible-Roles/
-git checkout 2.0beta
+git checkout devel
 
 echo "Coping Ansible default config to /etc/ansible/ansible/cfg"
 cp /etc/corelight-env/Corelight-Ansible-Roles/roles/ansible_install/files/default-ansible.cfg /etc/ansible/ansible.cfg
