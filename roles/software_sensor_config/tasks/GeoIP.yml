@@ -18,7 +18,14 @@
   become: yes
   register: geoip_name
 
-- name: "[ssc-32] Move GeoLite2-City.mmdb"
+- name: "[ssc-32] Create /usr/share/Geoip"
+  file:
+    dest: /usr/share/GeoIP
+    mode: "0644"
+    state: directory
+  become: yes
+
+- name: "[ssc-33] Move GeoLite2-City.mmdb"
   copy:
     src: "/tmp/{{ geoip_name.files[0] }}GeoLite2-City.mmdb"
     dest: /usr/share/GeoIP/GeoLite2-City.mmdb
@@ -27,7 +34,7 @@
     mode: "0644"
   notify: restart software sensor
 
-- name: "[ssc-33] Cleanup GeoLite2-City tar file"
+- name: "[ssc-34] Cleanup GeoLite2-City tar file"
   file:
     path: "/tmp/{{ geoip_name.files[0] }}"
     state: absent
