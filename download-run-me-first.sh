@@ -12,70 +12,45 @@ OS="$(lowercase "$(uname)")"
 KERNEL="$(uname -r)"
 MACH="$(uname -m)"
 
-if [ "${OS}" == "windowsnt" ]; then
-  OS=windows
-elif [ "${OS}" == "darwin" ]; then
-  OS=mac
-else
-  OS=$(uname)
-  if [ "${OS}" = "SunOS" ] ; then
-    OS=Solaris
-    ARCH=$(uname -p)
-    OSSTR="${OS} ${REV}(${ARCH} $(uname -v))"
-  elif [ "${OS}" = "AIX" ] ; then
-    OSSTR="${OS} $(oslevel) ($(oslevel -r))"
-  elif [ "${OS}" = "Linux" ] ; then
-    if [ -f /etc/redhat-release ] ; then
-      DistroBasedOn='RedHat'
-      DIST=$(sed s/\ release.*//  /etc/redhat-release)
-      PSUEDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
-      REV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*//)
-      MREV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*// | sed s/\\..*//)
-    elif [ -f /etc/SuSE-release ] ; then
-      DistroBasedOn='SuSe'
-      PSUEDONAME=$(tr "\n" ' ' /etc/SuSE-release | sed s/VERSION.*//)
-      REV=$(tr "\n" ' ' /etc/SuSE-release | sed s/.*=\ //)
-      MREV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*// | sed s/\\..*//)
-    elif [ -f /etc/mandrake-release ] ; then
-      DistroBasedOn='Mandrake'
-      PSUEDONAME=$(sed s/.*\(// /etc/mandrake-release | sed s/\)//)
-      REV=$( sed s/.*release\ // /etc/mandrake-release |sed s/\ .*//)
-      MREV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*// | sed s/\\..*//)
-    elif [ -f /etc/debian_version ] ; then
-      DistroBasedOn='Debian'
-      if [ -f /etc/lsb-release ] ; then
-              DIST=$(grep '^DISTRIB_ID' /etc/lsb-release | awk -F=  '{ print $2 }')
-                    PSUEDONAME=$(grep '^DISTRIB_CODENAME' /etc/lsb-release | awk -F=  '{ print $2 }')
-                    REV=$(grep '^DISTRIB_RELEASE' /etc/lsb-release | awk -F=  '{ print $2 }')
-                    MREV=$(grep '^DISTRIB_RELEASE' /etc/lsb-release | awk -F. '{ print $1 }' | awk -F= '{ print $2 }')
-                fi
+OS=$(uname)
+if [ "${OS}" = "Linux" ] ; then
+  if [ -f /etc/redhat-release ] ; then
+    DistroBasedOn='RedHat'
+    DIST=$(sed s/\ release.*//  /etc/redhat-release)
+    PSUEDONAME=$(sed s/.*\(// /etc/redhat-release | sed s/\)//)
+    REV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*//)
+    MREV=$(sed s/.*release\ // /etc/redhat-release | sed s/\ .*// | sed s/\\..*//)
+  elif [ -f /etc/debian_version ] ; then
+    DistroBasedOn='Debian'
+    if [ -f /etc/lsb-release ] ; then
+            DIST=$(grep '^DISTRIB_ID' /etc/lsb-release | awk -F=  '{ print $2 }')
+                  PSUEDONAME=$(grep '^DISTRIB_CODENAME' /etc/lsb-release | awk -F=  '{ print $2 }')
+                  REV=$(grep '^DISTRIB_RELEASE' /etc/lsb-release | awk -F=  '{ print $2 }')
+                  MREV=$(grep '^DISTRIB_RELEASE' /etc/lsb-release | awk -F. '{ print $1 }' | awk -F= '{ print $2 }')
     fi
-    if [ -f /etc/UnitedLinux-release ] ; then
-      DIST="${DIST}[$(tr "\n" ' ' /etc/UnitedLinux-release | sed s/VERSION.*//)]"
-    fi
-    OS=$(lowercase $OS)
-    DistroBasedOn=$(lowercase $DistroBasedOn)
-    readonly OS
-    readonly DIST
-    readonly DistroBasedOn
-    readonly PSUEDONAME
-    readonly REV
-    readonly MREV
-    readonly KERNEL
-    readonly MACH
   fi
-
+  OS=$(lowercase $OS)
+  DistroBasedOn=$(lowercase $DistroBasedOn)
+  readonly OS
+  readonly DIST
+  readonly DistroBasedOn
+  readonly PSUEDONAME
+  readonly REV
+  readonly MREV
+  readonly KERNEL
+  readonly MACH
 fi
+
 
 echo -e "\033[0;33m";
 echo "$DIST" "$REV"
-echo "  "
+echo ""
 echo "The script you are about to run will do the following:"
 echo ""
 echo "  Install or upgrade the following packages depending on the OS"
 echo "  [ ] Python3-pip"
 echo "  [ ] Python3-venv"
-echo "  [ ] epel-release, libselinux-python dnf (RHEL7/CentOS7)"
+echo "  [ ] epel-release, libselinux-python (RHEL7/CentOS7)"
 echo "  [ ] Python3-pip, git"
 echo "  [ ] libselinux-python3 (RHEL7/CentOS7)"
 echo "  [ ] Upgrade pip3 to version 20.x or later"
@@ -89,53 +64,43 @@ echo ""
 
 if [ "$DistroBasedOn" = "redhat" ]; then
         if [ "$MREV" = "7" ]; then
-                echo "Installing epel-release libselinux-python and dnf"
-                sudo yum install -y epel-release libselinux-python dnf
-                echo "Installing Python3-pip and git"
-                sudo dnf install -y -q python3-pip git
-                echo "Installing libselinux-python3"
-                sudo dnf install -y -q libselinux-python3
+                sudo yum install -y epel-release libselinux-python
+                sudo yum install -y python3-pip git
+                sudo yum install -y libselinux-python3
         else
-                echo "Installing dnf"
-                sudo yum install -y dnf
-                echo "Installing Python3-pip and git"
-                sudo dnf install -y -q python3-pip git
+                sudo yum install -y python3-pip git
         fi
 elif [ "$DistroBasedOn" = "debian" ]; then
         sudo apt-get update -y -q
-        echo "Installing Python3-pip and git"
-        sudo apt-get install -y -q --install-suggests python3-pip git
-        echo "Installing Python3-venv"
-        sudo apt-get install -y -q --install-suggests python3-venv
+        sudo apt-get install -y -q python3-pip git
+        sudo apt-get install -y -q python3-venv
 else
         echo "Not RedHat or Debian based"
         exit 1
 fi
 
+echo "Creating python3 virtual environment"
 if ! [ -d /etc/corelight-env/ ] > /dev/null; then
         echo "Creating /etc/corelight-env directory"
         sudo mkdir /etc/corelight-env
         sudo chown "$USER"."$USER" /etc/corelight-env
 fi
+python3 -m venv /etc/corelight-env
+source /etc/corelight-env/bin/activate
 
+python3 -m pip install --upgrade pip wheel setuptools
+
+echo "Installing Ansible"
 if ! [ -d /etc/ansible/ ] > /dev/null; then
         echo "Creating /etc/ansible directory"
         sudo mkdir /etc/ansible
         sudo chown "$USER"."$USER" /etc/ansible
         sudo chmod 755 /etc/ansible
 fi
-
-
-echo "Creating python3 virtual environment"
-python3 -m venv /etc/corelight-env
-source /etc/corelight-env/bin/activate
-python3 -m pip install --upgrade pip wheel setuptools
-
-echo "Installing Ansible"
 python3 -m pip install --upgrade --upgrade-strategy eager ansible
 ansible-galaxy collection install community.general -c
 
-echo "Cloning Corelight-Ansible-Roles 2.0beta Branch"
+echo "Cloning Corelight-Ansible-Roles"
 cd /etc/corelight-env
 git clone https://github.com/corelight/Corelight-Ansible-Roles.git
 cd Corelight-Ansible-Roles/

@@ -13,10 +13,9 @@
 # sudo yum install epel-release-latest-7.noarch.rpm
 
 
-- name: "[venv-15] Upgrade/Enable dnf - RHEL7 / CentOS7 only"
+- name: "[venv-15] Enable epel-release - RHEL7 / CentOS7 only"
   yum:
     name:
-      - dnf
       - epel-release
     state: latest
     validate_certs: "{{ validate_certs |d(yes) }}"
@@ -27,13 +26,12 @@
     http_proxy: "{{ http_proxy_env |d() }}"
     https_proxy: "{{ https_proxy_env |d() }}"
 
-- name: "[venv-16] DNF install/upgrade RHEL7 / CentOS7"
-  dnf:
+- name: "[venv-16] yum install/upgrade RHEL7 / CentOS7"
+  yum:
     name:
       - python-pip
       - libselinux-python
     state: latest
-    update_cache: yes
     validate_certs: "{{ validate_certs |d(yes) }}"
   when:
     # - "ansible_distribution == 'CentOS'"
@@ -55,23 +53,21 @@
     https_proxy: "{{ https_proxy_env |d() }}"
 
 - name: "[venv-17] DNF install/upgrade pip3 & git- RHEL / CentOS"
-  dnf:
+  yum:
     name:
       - python3-pip
       - git
     state: latest
-    update_cache: yes
     validate_certs: "{{ validate_certs |d(yes) }}"
   environment:
     http_proxy: "{{ http_proxy_env |d() }}"
     https_proxy: "{{ https_proxy_env |d() }}"
 
 - name: "[venv-18] DNF install/upgrade RHEL7 / CentOS7"
-  dnf:
+  yum:
     name:
       - libselinux-python3
     state: latest
-    update_cache: yes
     validate_certs: "{{ validate_certs |d(yes) }}"
   when:
     # - "ansible_distribution == 'CentOS'"
