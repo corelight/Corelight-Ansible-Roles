@@ -1,6 +1,6 @@
 #!/bin/bash
 # to download and run this script in one command, execute the following:
-# source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/devel/download-run-me-first.sh)
+# source <( curl https://raw.githubusercontent.com/corelight/Corelight-Ansible-Roles/main/download-run-me-first.sh)
 
 export LANG=en_US.UTF-8
 
@@ -104,7 +104,7 @@ echo "Cloning Corelight-Ansible-Roles"
 cd /etc/corelight-env
 git clone https://github.com/corelight/Corelight-Ansible-Roles.git
 cd Corelight-Ansible-Roles/
-git checkout devel
+git checkout main
 
 echo "Coping Ansible default config to /etc/ansible/ansible/cfg"
 cp /etc/corelight-env/Corelight-Ansible-Roles/roles/ansible_install/files/default-ansible.cfg /etc/ansible/ansible.cfg
